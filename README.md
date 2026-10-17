@@ -61,6 +61,8 @@ The same code is in `example_test.go`, so `make test` checks that it compiles.
 
 Method names come from the spec's operation IDs. For example, `GetVersionV1VersionGetWithResponse` reads the API version and `RunTaskV1RunTasksPostWithResponse` starts a task.
 
+The full API, with the spec's descriptions as doc comments, is in the [Go reference](https://pkg.go.dev/github.com/psyb0t/go-skyvern) and in `go doc github.com/psyb0t/go-skyvern` from inside your module.
+
 ## Auth
 
 The spec's `ApiKeyAuth` scheme sends your Skyvern API key in the `x-api-key` header. Get the key from [Skyvern settings](https://app.skyvern.com/settings), export it as `SKYVERN_API_KEY`, and attach it with `WithRequestEditorFn` as shown above.

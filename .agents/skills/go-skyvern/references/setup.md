@@ -49,7 +49,7 @@ The spec declares `ApiKeyAuth`, an API key in the `x-api-key` header. Use `WithR
 | Artifacts | `GET /v1/runs/{run_id}/artifacts` |
 | Audit exports | `GET /v1/audit-events/export` |
 
-The full specification has 94 operations across 71 paths. Operation IDs determine generated method names. Some retain `Workflow` in the name even though their route uses `/v1/agents`.
+Operation IDs determine generated method names. Some retain `Workflow` in the name even though their route uses `/v1/agents`.
 
 ## Responses and pitfalls
 
