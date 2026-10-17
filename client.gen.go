@@ -909,11 +909,12 @@ func (e CredentialTypeOutput) Valid() bool {
 
 // Defines values for CredentialVaultType.
 const (
-	CredentialVaultTypeAzureVault CredentialVaultType = "azure_vault"
-	CredentialVaultTypeBitwarden  CredentialVaultType = "bitwarden"
-	CredentialVaultTypeCustom     CredentialVaultType = "custom"
-	CredentialVaultTypeGcp        CredentialVaultType = "gcp"
-	CredentialVaultTypeSkyvern    CredentialVaultType = "skyvern"
+	CredentialVaultTypeAzureVault  CredentialVaultType = "azure_vault"
+	CredentialVaultTypeBitwarden   CredentialVaultType = "bitwarden"
+	CredentialVaultTypeCustom      CredentialVaultType = "custom"
+	CredentialVaultTypeGcp         CredentialVaultType = "gcp"
+	CredentialVaultTypeOnepassword CredentialVaultType = "onepassword"
+	CredentialVaultTypeSkyvern     CredentialVaultType = "skyvern"
 )
 
 // Valid indicates whether the value is a known member of the CredentialVaultType enum.
@@ -926,6 +927,8 @@ func (e CredentialVaultType) Valid() bool {
 	case CredentialVaultTypeCustom:
 		return true
 	case CredentialVaultTypeGcp:
+		return true
+	case CredentialVaultTypeOnepassword:
 		return true
 	case CredentialVaultTypeSkyvern:
 		return true
@@ -2815,6 +2818,36 @@ func (e WhileLoopBlockYAMLBlockType) Valid() bool {
 	}
 }
 
+// Defines values for WorkflowBuildSource.
+const (
+	WorkflowBuildSourceApi      WorkflowBuildSource = "api"
+	WorkflowBuildSourceCli      WorkflowBuildSource = "cli"
+	WorkflowBuildSourceCopilot  WorkflowBuildSource = "copilot"
+	WorkflowBuildSourceInternal WorkflowBuildSource = "internal"
+	WorkflowBuildSourceMcp      WorkflowBuildSource = "mcp"
+	WorkflowBuildSourceUi       WorkflowBuildSource = "ui"
+)
+
+// Valid indicates whether the value is a known member of the WorkflowBuildSource enum.
+func (e WorkflowBuildSource) Valid() bool {
+	switch e {
+	case WorkflowBuildSourceApi:
+		return true
+	case WorkflowBuildSourceCli:
+		return true
+	case WorkflowBuildSourceCopilot:
+		return true
+	case WorkflowBuildSourceInternal:
+		return true
+	case WorkflowBuildSourceMcp:
+		return true
+	case WorkflowBuildSourceUi:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for WorkflowParameterParameterType.
 const (
 	WorkflowParameterParameterTypeWorkflow WorkflowParameterParameterType = "workflow"
@@ -3145,6 +3178,21 @@ func (e ExportAuditEventsV1AuditEventsExportGetParamsFormat) Valid() bool {
 	case ExportAuditEventsV1AuditEventsExportGetParamsFormatCsv:
 		return true
 	case ExportAuditEventsV1AuditEventsExportGetParamsFormatJson:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode.
+const (
+	CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCodeTooManyStartingBrowserSessions CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode = "too_many_starting_browser_sessions"
+)
+
+// Valid indicates whether the value is a known member of the CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode enum.
+func (e CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode) Valid() bool {
+	switch e {
+	case CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCodeTooManyStartingBrowserSessions:
 		return true
 	default:
 		return false
@@ -7337,7 +7385,7 @@ type TaskRunListItem struct {
 	// TriggerType How a workflow run was initiated.
 	//
 	// - manual: User clicked "Run" in the UI
-	// - mcp: First-party MCP client request
+	// - mcp: First-party MCP client or Skyvern CLI request
 	// - api: Direct API call to the run endpoint
 	// - scheduled: Triggered by a cron schedule
 	// - webhook: Triggered by an external system via the webhook endpoint
@@ -8606,11 +8654,21 @@ type Workflow struct {
 	AdaptiveCaching *bool `json:"adaptive_caching,omitempty"`
 
 	// AgentId Alias of `workflow_permanent_id` , the stable agent identifier (starts with `wpid_`).
-	AgentId                  *string                 `json:"agent_id,omitempty"`
-	AiFallback               *bool                   `json:"ai_fallback,omitempty"`
-	BrowserProfileId         *string                 `json:"browser_profile_id,omitempty"`
-	BrowserProfileKey        *string                 `json:"browser_profile_key,omitempty"`
-	BrowserType              *string                 `json:"browser_type,omitempty"`
+	AgentId           *string `json:"agent_id,omitempty"`
+	AiFallback        *bool   `json:"ai_fallback,omitempty"`
+	BrowserProfileId  *string `json:"browser_profile_id,omitempty"`
+	BrowserProfileKey *string `json:"browser_profile_key,omitempty"`
+	BrowserType       *string `json:"browser_type,omitempty"`
+
+	// BuildSource Which surface wrote a workflow version.
+	//
+	// - ui: the Skyvern app
+	// - copilot: the workflow copilot
+	// - mcp: a first-party MCP client
+	// - cli: the Skyvern CLI
+	// - api: any other API or SDK caller
+	// - internal: a workflow Skyvern creates for its own runs (task v2, login, credential tests)
+	BuildSource              *WorkflowBuildSource    `json:"build_source,omitempty"`
 	CacheKey                 *string                 `json:"cache_key,omitempty"`
 	CdpConnectHeaders        *map[string]string      `json:"cdp_connect_headers,omitempty"`
 	CodeVersion              *int                    `json:"code_version,omitempty"`
@@ -8665,6 +8723,16 @@ type WorkflowProxyLocation2 map[string]interface{}
 type Workflow_ProxyLocation struct {
 	union json.RawMessage
 }
+
+// WorkflowBuildSource Which surface wrote a workflow version.
+//
+// - ui: the Skyvern app
+// - copilot: the workflow copilot
+// - mcp: a first-party MCP client
+// - cli: the Skyvern CLI
+// - api: any other API or SDK caller
+// - internal: a workflow Skyvern creates for its own runs (task v2, login, credential tests)
+type WorkflowBuildSource string
 
 // WorkflowCreateYAMLRequest defines model for WorkflowCreateYAMLRequest.
 type WorkflowCreateYAMLRequest struct {
@@ -8967,7 +9035,7 @@ type WorkflowRun struct {
 	// TriggerType How a workflow run was initiated.
 	//
 	// - manual: User clicked "Run" in the UI
-	// - mcp: First-party MCP client request
+	// - mcp: First-party MCP client or Skyvern CLI request
 	// - api: Direct API call to the run endpoint
 	// - scheduled: Triggered by a cron schedule
 	// - webhook: Triggered by an external system via the webhook endpoint
@@ -9590,7 +9658,7 @@ type WorkflowRunTimelineType string
 // WorkflowRunTriggerType How a workflow run was initiated.
 //
 // - manual: User clicked "Run" in the UI
-// - mcp: First-party MCP client request
+// - mcp: First-party MCP client or Skyvern CLI request
 // - api: Direct API call to the run endpoint
 // - scheduled: Triggered by a cron schedule
 // - webhook: Triggered by an external system via the webhook endpoint
@@ -9601,7 +9669,10 @@ type WorkflowRunTriggerType string
 
 // WorkflowSchedule defines model for WorkflowSchedule.
 type WorkflowSchedule struct {
-	CreatedAt           time.Time               `json:"created_at"`
+	CreatedAt time.Time `json:"created_at"`
+
+	// CreatedBy Who the schedule runs as; null for schedules created before owners were recorded.
+	CreatedBy           *string                 `json:"created_by,omitempty"`
 	CronExpression      *string                 `json:"cron_expression,omitempty"`
 	DeletedAt           *time.Time              `json:"deleted_at,omitempty"`
 	Description         *string                 `json:"description,omitempty"`
@@ -9724,6 +9795,77 @@ type WorkflowTriggerBlockYAML struct {
 
 // WorkflowTriggerBlockYAMLBlockType defines model for WorkflowTriggerBlockYAML.BlockType.
 type WorkflowTriggerBlockYAMLBlockType string
+
+// WorkflowUpdateRequest defines model for WorkflowUpdateRequest.
+type WorkflowUpdateRequest struct {
+	// JsonDefinition Update-only definition that preserves titles stored before the create limit.
+	JsonDefinition *WorkflowUpdateYAMLRequest `json:"json_definition,omitempty"`
+
+	// YamlDefinition Workflow definition in YAML format
+	YamlDefinition *string `json:"yaml_definition,omitempty"`
+}
+
+// WorkflowUpdateYAMLRequest Update-only definition that preserves titles stored before the create limit.
+type WorkflowUpdateYAMLRequest struct {
+	AdaptiveCaching   *bool   `json:"adaptive_caching,omitempty"`
+	AiFallback        *bool   `json:"ai_fallback,omitempty"`
+	BrowserProfileId  *string `json:"browser_profile_id,omitempty"`
+	BrowserProfileKey *string `json:"browser_profile_key,omitempty"`
+
+	// BrowserType Browser engine for runs of this workflow, one of the supported browser types (e.g. msedge, chrome, stealth-chromium). A workflow-run setting overrides this. Null means the system default.
+	BrowserType *string `json:"browser_type,omitempty"`
+	CacheKey    *string `json:"cache_key,omitempty"`
+
+	// CdpConnectHeaders On PUT updates, omission keeps the stored value, null clears it, and a supplied value replaces it. An empty object ({}) clears the header map; each masked *** entry keeps the stored value for that key.
+	CdpConnectHeaders *map[string]string `json:"cdp_connect_headers,omitempty"`
+	CodeVersion       *int               `json:"code_version,omitempty"`
+	Description       *string            `json:"description,omitempty"`
+	EnableSelfHealing *bool              `json:"enable_self_healing,omitempty"`
+
+	// ExtraHttpHeaders On PUT updates, omission keeps the stored value, null clears it, and a supplied value replaces it. An empty object ({}) clears the header map. Values, including ***, are literal.
+	ExtraHttpHeaders         *map[string]string `json:"extra_http_headers,omitempty"`
+	FolderId                 *string            `json:"folder_id,omitempty"`
+	GenerateScriptOnTerminal *bool              `json:"generate_script_on_terminal,omitempty"`
+	IsSavedTask              *bool              `json:"is_saved_task,omitempty"`
+
+	// MaskSecrets Mask secret values across this workflow's runs: hide them while they are typed (screenshots, recordings, live view) and redact them from stored artifacts, network logs, and LLM-bound text.
+	MaskSecrets           *bool                   `json:"mask_secrets,omitempty"`
+	MaxElapsedTimeMinutes *int                    `json:"max_elapsed_time_minutes,omitempty"`
+	MaxScreenshotScrolls  *int                    `json:"max_screenshot_scrolls,omitempty"`
+	Model                 *map[string]interface{} `json:"model,omitempty"`
+	PersistBrowserSession *bool                   `json:"persist_browser_session,omitempty"`
+	PinSavedSessionIp     *bool                   `json:"pin_saved_session_ip,omitempty"`
+
+	// ProxyLocation On PUT updates, omission keeps the stored value, null clears it, and a supplied value replaces it.
+	ProxyLocation *WorkflowUpdateYAMLRequest_ProxyLocation `json:"proxy_location,omitempty"`
+
+	// RecordingId Durable browser recording to attach to the workflow version created by this save.
+	RecordingId         *string         `json:"recording_id,omitempty"`
+	ReuseBrowserSession *bool           `json:"reuse_browser_session,omitempty"`
+	RunSequentially     *bool           `json:"run_sequentially,omitempty"`
+	RunWith             *string         `json:"run_with,omitempty"`
+	SequentialKey       *string         `json:"sequential_key,omitempty"`
+	Status              *WorkflowStatus `json:"status,omitempty"`
+	Title               string          `json:"title"`
+
+	// TotpIdentifier On PUT updates, omission keeps the stored value, null clears it, and a supplied value replaces it.
+	TotpIdentifier *string `json:"totp_identifier,omitempty"`
+
+	// TotpVerificationUrl On PUT updates, omission keeps the stored value, null clears it, and a supplied value replaces it. URL validation errors identify the field and failure class without returning the URL or host.
+	TotpVerificationUrl *string `json:"totp_verification_url,omitempty"`
+
+	// WebhookCallbackUrl On PUT updates, omission keeps the stored value, null clears it, and a supplied value replaces it. URL validation errors identify the field and failure class without returning the URL or host.
+	WebhookCallbackUrl *string                `json:"webhook_callback_url,omitempty"`
+	WorkflowDefinition WorkflowDefinitionYAML `json:"workflow_definition"`
+}
+
+// WorkflowUpdateYAMLRequestProxyLocation2 defines model for WorkflowUpdateYAMLRequest.ProxyLocation.2.
+type WorkflowUpdateYAMLRequestProxyLocation2 map[string]interface{}
+
+// WorkflowUpdateYAMLRequest_ProxyLocation On PUT updates, omission keeps the stored value, null clears it, and a supplied value replaces it.
+type WorkflowUpdateYAMLRequest_ProxyLocation struct {
+	union json.RawMessage
+}
 
 // SkyvernForgeSdkSchemasCredentialsCredentialType Type of credential stored in the system.
 type SkyvernForgeSdkSchemasCredentialsCredentialType string
@@ -10025,6 +10167,9 @@ type CreateBrowserSessionV1BrowserSessionsPostParams struct {
 	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
 	XApiKey *string `json:"x-api-key,omitempty"`
 }
+
+// CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode defines parameters for CreateBrowserSessionV1BrowserSessionsPost.
+type CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode string
 
 // GetBrowserSessionV1BrowserSessionsBrowserSessionIdGetParams defines parameters for GetBrowserSessionV1BrowserSessionsBrowserSessionIdGet.
 type GetBrowserSessionV1BrowserSessionsBrowserSessionIdGetParams struct {
@@ -10616,7 +10761,7 @@ type BatchGetWorkflowTagsPostV1WorkflowTagsPostParams struct {
 type CreateWorkflowV1AgentsPostJSONRequestBody = WorkflowRequest
 
 // UpdateWorkflowV1AgentsWorkflowIdPostJSONRequestBody defines body for UpdateWorkflowV1AgentsWorkflowIdPost for application/json ContentType.
-type UpdateWorkflowV1AgentsWorkflowIdPostJSONRequestBody = WorkflowRequest
+type UpdateWorkflowV1AgentsWorkflowIdPostJSONRequestBody = WorkflowUpdateRequest
 
 // UpdateWorkflowFolderV1WorkflowsWorkflowPermanentIdFolderPutJSONRequestBody defines body for UpdateWorkflowFolderV1WorkflowsWorkflowPermanentIdFolderPut for application/json ContentType.
 type UpdateWorkflowFolderV1WorkflowsWorkflowPermanentIdFolderPutJSONRequestBody = UpdateWorkflowFolderRequest
@@ -33261,6 +33406,94 @@ func (t *WorkflowTriggerBlock_Parameters_Item) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+// AsProxyLocation returns the union data inside the WorkflowUpdateYAMLRequest_ProxyLocation as a ProxyLocation
+func (t WorkflowUpdateYAMLRequest_ProxyLocation) AsProxyLocation() (ProxyLocation, error) {
+	var body ProxyLocation
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromProxyLocation overwrites any union data inside the WorkflowUpdateYAMLRequest_ProxyLocation as the provided ProxyLocation
+func (t *WorkflowUpdateYAMLRequest_ProxyLocation) FromProxyLocation(v ProxyLocation) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeProxyLocation performs a merge with any union data inside the WorkflowUpdateYAMLRequest_ProxyLocation, using the provided ProxyLocation
+func (t *WorkflowUpdateYAMLRequest_ProxyLocation) MergeProxyLocation(v ProxyLocation) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsGeoTarget returns the union data inside the WorkflowUpdateYAMLRequest_ProxyLocation as a GeoTarget
+func (t WorkflowUpdateYAMLRequest_ProxyLocation) AsGeoTarget() (GeoTarget, error) {
+	var body GeoTarget
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromGeoTarget overwrites any union data inside the WorkflowUpdateYAMLRequest_ProxyLocation as the provided GeoTarget
+func (t *WorkflowUpdateYAMLRequest_ProxyLocation) FromGeoTarget(v GeoTarget) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeGeoTarget performs a merge with any union data inside the WorkflowUpdateYAMLRequest_ProxyLocation, using the provided GeoTarget
+func (t *WorkflowUpdateYAMLRequest_ProxyLocation) MergeGeoTarget(v GeoTarget) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsWorkflowUpdateYAMLRequestProxyLocation2 returns the union data inside the WorkflowUpdateYAMLRequest_ProxyLocation as a WorkflowUpdateYAMLRequestProxyLocation2
+func (t WorkflowUpdateYAMLRequest_ProxyLocation) AsWorkflowUpdateYAMLRequestProxyLocation2() (WorkflowUpdateYAMLRequestProxyLocation2, error) {
+	var body WorkflowUpdateYAMLRequestProxyLocation2
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromWorkflowUpdateYAMLRequestProxyLocation2 overwrites any union data inside the WorkflowUpdateYAMLRequest_ProxyLocation as the provided WorkflowUpdateYAMLRequestProxyLocation2
+func (t *WorkflowUpdateYAMLRequest_ProxyLocation) FromWorkflowUpdateYAMLRequestProxyLocation2(v WorkflowUpdateYAMLRequestProxyLocation2) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeWorkflowUpdateYAMLRequestProxyLocation2 performs a merge with any union data inside the WorkflowUpdateYAMLRequest_ProxyLocation, using the provided WorkflowUpdateYAMLRequestProxyLocation2
+func (t *WorkflowUpdateYAMLRequest_ProxyLocation) MergeWorkflowUpdateYAMLRequestProxyLocation2(v WorkflowUpdateYAMLRequestProxyLocation2) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t WorkflowUpdateYAMLRequest_ProxyLocation) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *WorkflowUpdateYAMLRequest_ProxyLocation) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
 // AsProxyLocation returns the union data inside the ApplyToJobV1RecipesJobsApplyPostJSONBody_ProxyLocation as a ProxyLocation
 func (t ApplyToJobV1RecipesJobsApplyPostJSONBody_ProxyLocation) AsProxyLocation() (ProxyLocation, error) {
 	var body ProxyLocation
@@ -46049,6 +46282,11 @@ type CreateBrowserSessionV1BrowserSessionsPostResponse struct {
 	JSON200 *BrowserSessionResponse
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *HTTPValidationError
+	// JSON429 the response for an HTTP 429 `application/json` response
+	JSON429 *struct {
+		Detail    string                                                                `json:"detail"`
+		ErrorCode CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode `json:"error_code"`
+	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
@@ -46059,6 +46297,14 @@ func (r CreateBrowserSessionV1BrowserSessionsPostResponse) GetJSON200() *Browser
 // GetJSON422 returns the response for an HTTP 422 `application/json` response
 func (r CreateBrowserSessionV1BrowserSessionsPostResponse) GetJSON422() *HTTPValidationError {
 	return r.JSON422
+}
+
+// GetJSON429 returns the response for an HTTP 429 `application/json` response
+func (r CreateBrowserSessionV1BrowserSessionsPostResponse) GetJSON429() *struct {
+	Detail    string                                                                `json:"detail"`
+	ErrorCode CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode `json:"error_code"`
+} {
+	return r.JSON429
 }
 
 // GetBody returns the raw response body bytes
@@ -51178,6 +51424,9 @@ func ParseDeleteWorkflowV1AgentsWorkflowIdDeletePostResponse(rsp *http.Response)
 		}
 		response.JSON200 = &dest
 
+	case rsp.StatusCode == 404:
+		break // No content-type
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
 		var dest HTTPValidationError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -52142,6 +52391,16 @@ func ParseCreateBrowserSessionV1BrowserSessionsPostResponse(rsp *http.Response) 
 			return nil, err
 		}
 		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest struct {
+			Detail    string                                                                `json:"detail"`
+			ErrorCode CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode `json:"error_code"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	}
 
