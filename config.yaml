@@ -1,0 +1,15 @@
+package: skyvern
+generate:
+  client: true
+  models: true
+output: client.gen.go
+output-options:
+  resolve-type-name-collisions: true
+  skip-prune: true
+  # Keep unformatted numbers at double precision.
+  type-mapping:
+    number:
+      default:
+        type: float64
+compatibility:
+  always-prefix-enum-values: true

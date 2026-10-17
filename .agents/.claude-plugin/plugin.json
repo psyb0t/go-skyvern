@@ -1,0 +1,8 @@
+{
+  "name": "go-skyvern",
+  "description": "Unofficial Go client for the Skyvern API: tasks, agents, runs, browser sessions, credentials and schedules, generated from the spec Skyvern publishes.",
+  "author": { "name": "psyb0t", "url": "https://github.com/psyb0t" },
+  "homepage": "https://github.com/psyb0t/go-skyvern",
+  "license": "MIT",
+  "keywords": ["skyvern", "browser-automation", "ai", "api-client", "go-library", "openapi"]
+}
