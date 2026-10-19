@@ -2,6 +2,13 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.3.0, 2026-10-19
+
+- `(*Client).UpdateWorkflowV1AgentsWorkflowIdPost` and `(*ClientWithResponses).UpdateWorkflowV1AgentsWorkflowIdPostWithResponse` take a `WorkflowRequest` body again instead of `WorkflowUpdateRequest`. The alias `UpdateWorkflowV1AgentsWorkflowIdPostJSONRequestBody` points back to `WorkflowRequest`. The types `WorkflowUpdateRequest`, `WorkflowUpdateYAMLRequest`, `WorkflowUpdateYAMLRequestProxyLocation2` and `WorkflowUpdateYAMLRequest_ProxyLocation`, added in v0.2.0, are removed. Code that builds a `WorkflowUpdateRequest` for this call needs to switch back to `WorkflowRequest`.
+- `BrowserProfile` gained a `LinkedCredentialId` field, the ID of the linked credential.
+- `CredentialResponse` gained an `ItemId` field and a `VaultId` field, the 1Password item and vault IDs for a linked credential, and an `UpstreamMissingAt` field, the time the linked 1Password item was last found missing upstream.
+- Deleting a workflow no longer parses a 404 response as no content. A 404 is unhandled again, as it was before v0.2.0.
+
 ## v0.2.0, 2026-10-17
 
 - `(*Client).UpdateWorkflowV1AgentsWorkflowIdPost` and `(*ClientWithResponses).UpdateWorkflowV1AgentsWorkflowIdPostWithResponse` now take a `WorkflowUpdateRequest` body instead of `WorkflowRequest`. The alias `UpdateWorkflowV1AgentsWorkflowIdPostJSONRequestBody` now points to `WorkflowUpdateRequest`, which accepts a `YamlDefinition` string or a `JsonDefinition` of the new `WorkflowUpdateYAMLRequest` type. Code that builds a `WorkflowRequest` for this call needs to switch to the new type.
