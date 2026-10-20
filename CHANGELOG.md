@@ -2,6 +2,12 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.3.1, 2026-10-20
+
+- `GetWorkflowRunsV1WorkflowsRunsGetParams` gained `CreatedAtStart` and `CreatedAtEnd` fields, both `*time.Time`. `CreatedAtStart` includes runs created at or after the timestamp. `CreatedAtEnd` includes only runs created before it. `NewGetWorkflowRunsV1WorkflowsRunsGetRequest` sends them as the `created_at_start` and `created_at_end` query parameters.
+- A free-text `SearchKey` on the workflow runs listing now covers only the 30 days before `CreatedAtEnd` (or before now) unless `CreatedAtStart` is set. A complete browser profile ID or browser session ID is not limited. Set `CreatedAtStart` to search older runs.
+- The doc comments for `GetWorkflowRunsV1WorkflowsRunsGet` and its `WithResponse` variant describe the search window and the new fields.
+
 ## v0.3.0, 2026-10-19
 
 - `(*Client).UpdateWorkflowV1AgentsWorkflowIdPost` and `(*ClientWithResponses).UpdateWorkflowV1AgentsWorkflowIdPostWithResponse` take a `WorkflowRequest` body again instead of `WorkflowUpdateRequest`. The alias `UpdateWorkflowV1AgentsWorkflowIdPostJSONRequestBody` points back to `WorkflowRequest`. The types `WorkflowUpdateRequest`, `WorkflowUpdateYAMLRequest`, `WorkflowUpdateYAMLRequestProxyLocation2` and `WorkflowUpdateYAMLRequest_ProxyLocation`, added in v0.2.0, are removed. Code that builds a `WorkflowUpdateRequest` for this call needs to switch back to `WorkflowRequest`.

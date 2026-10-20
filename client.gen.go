@@ -9862,11 +9862,17 @@ type GetWorkflowRunsV1WorkflowsRunsGetParams struct {
 	// Status Filter by one or more run statuses.
 	Status *[]WorkflowRunStatus `form:"status,omitempty" json:"status,omitempty"`
 
-	// SearchKey Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete browser profile or browser session ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
+	// SearchKey Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete browser profile or browser session ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well. Without created_at_start, a search other than a complete browser profile or session ID covers only runs created in the 30 days before created_at_end (or before now).
 	SearchKey *string `form:"search_key,omitempty" json:"search_key,omitempty"`
 
 	// ErrorCode Exact-match filter on the error_code field inside each task's errors JSON array. A run matches if any of its tasks contains an error with a matching error_code. Error codes are user-defined strings set during workflow execution.
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty"`
+
+	// CreatedAtStart Only include runs created at or after this timestamp (ISO 8601; a value without an offset is read as UTC). Supplying it replaces the 30-day default window of a free-text search_key.
+	CreatedAtStart *time.Time `form:"created_at_start,omitempty" json:"created_at_start,omitempty"`
+
+	// CreatedAtEnd Only include runs created strictly before this timestamp (ISO 8601; a value without an offset is read as UTC). Without created_at_start, a free-text search_key covers the 30 days before this timestamp.
+	CreatedAtEnd *time.Time `form:"created_at_end,omitempty" json:"created_at_end,omitempty"`
 
 	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
 	XApiKey *string `json:"x-api-key,omitempty"`
@@ -33753,6 +33759,14 @@ type ClientInterface interface {
 	//
 	// A complete browser profile or browser session id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
 	//
+	// ### Default search window
+	//
+	// A `search_key` other than a complete browser profile or session id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete run and credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
+	//
+	// ### created_at_start / created_at_end
+	//
+	// Optional ISO 8601 bounds on the run's creation time: `created_at_start` is inclusive and `created_at_end` is exclusive. A timestamp without an offset is read as UTC.
+	//
 	// ### error_code
 	//
 	// An **exact-match** filter against the `error_code` field inside each task's `errors` JSON array. A run matches if **any** of its tasks contains an error object with a matching `error_code` value. Error codes are user-defined strings set during workflow execution (e.g. `INVALID_CREDENTIALS`, `LOGIN_FAILED`, `CAPTCHA_DETECTED`).
@@ -33762,7 +33776,8 @@ type ClientInterface interface {
 	// All query parameters use AND logic:
 	// - `?status=failed` , only failed runs
 	// - `?status=failed&error_code=LOGIN_FAILED` , failed runs **and** have a LOGIN_FAILED error
-	// - `?status=failed&error_code=LOGIN_FAILED&search_key=prod_credential` , all three conditions must match
+	// - `?status=failed&error_code=LOGIN_FAILED&search_key=prod_credential` , all three conditions must match (searched over the last 30 days)
+	// - `?search_key=prod_credential&created_at_start=2026-01-01T00:00:00Z&created_at_end=2026-02-01T00:00:00Z` , search one explicit month
 	//
 	// Corresponds with GET /v1/agents/runs (the `GetWorkflowRunsV1WorkflowsRunsGet` operationId).
 	GetWorkflowRunsV1WorkflowsRunsGet(ctx context.Context, params *GetWorkflowRunsV1WorkflowsRunsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -34896,6 +34911,14 @@ func (c *Client) CreateWorkflowV1AgentsPost(ctx context.Context, params *CreateW
 //
 // A complete browser profile or browser session id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
 //
+// ### Default search window
+//
+// A `search_key` other than a complete browser profile or session id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete run and credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
+//
+// ### created_at_start / created_at_end
+//
+// Optional ISO 8601 bounds on the run's creation time: `created_at_start` is inclusive and `created_at_end` is exclusive. A timestamp without an offset is read as UTC.
+//
 // ### error_code
 //
 // An **exact-match** filter against the `error_code` field inside each task's `errors` JSON array. A run matches if **any** of its tasks contains an error object with a matching `error_code` value. Error codes are user-defined strings set during workflow execution (e.g. `INVALID_CREDENTIALS`, `LOGIN_FAILED`, `CAPTCHA_DETECTED`).
@@ -34905,7 +34928,8 @@ func (c *Client) CreateWorkflowV1AgentsPost(ctx context.Context, params *CreateW
 // All query parameters use AND logic:
 // - `?status=failed` , only failed runs
 // - `?status=failed&error_code=LOGIN_FAILED` , failed runs **and** have a LOGIN_FAILED error
-// - `?status=failed&error_code=LOGIN_FAILED&search_key=prod_credential` , all three conditions must match
+// - `?status=failed&error_code=LOGIN_FAILED&search_key=prod_credential` , all three conditions must match (searched over the last 30 days)
+// - `?search_key=prod_credential&created_at_start=2026-01-01T00:00:00Z&created_at_end=2026-02-01T00:00:00Z` , search one explicit month
 //
 // Corresponds with GET /v1/agents/runs (the `GetWorkflowRunsV1WorkflowsRunsGet` operationId).
 func (c *Client) GetWorkflowRunsV1WorkflowsRunsGet(ctx context.Context, params *GetWorkflowRunsV1WorkflowsRunsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -37588,6 +37612,30 @@ func NewGetWorkflowRunsV1WorkflowsRunsGetRequest(server string, params *GetWorkf
 		if params.ErrorCode != nil {
 
 			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "error_code", *params.ErrorCode, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.CreatedAtStart != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "created_at_start", *params.CreatedAtStart, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date-time"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.CreatedAtEnd != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "created_at_end", *params.CreatedAtEnd, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date-time"}); err != nil {
 				return nil, err
 			} else {
 				for _, qp := range strings.Split(queryFrag, "&") {
@@ -43449,6 +43497,14 @@ type ClientWithResponsesInterface interface {
 	//
 	// A complete browser profile or browser session id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
 	//
+	// ### Default search window
+	//
+	// A `search_key` other than a complete browser profile or session id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete run and credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
+	//
+	// ### created_at_start / created_at_end
+	//
+	// Optional ISO 8601 bounds on the run's creation time: `created_at_start` is inclusive and `created_at_end` is exclusive. A timestamp without an offset is read as UTC.
+	//
 	// ### error_code
 	//
 	// An **exact-match** filter against the `error_code` field inside each task's `errors` JSON array. A run matches if **any** of its tasks contains an error object with a matching `error_code` value. Error codes are user-defined strings set during workflow execution (e.g. `INVALID_CREDENTIALS`, `LOGIN_FAILED`, `CAPTCHA_DETECTED`).
@@ -43458,7 +43514,8 @@ type ClientWithResponsesInterface interface {
 	// All query parameters use AND logic:
 	// - `?status=failed` , only failed runs
 	// - `?status=failed&error_code=LOGIN_FAILED` , failed runs **and** have a LOGIN_FAILED error
-	// - `?status=failed&error_code=LOGIN_FAILED&search_key=prod_credential` , all three conditions must match
+	// - `?status=failed&error_code=LOGIN_FAILED&search_key=prod_credential` , all three conditions must match (searched over the last 30 days)
+	// - `?search_key=prod_credential&created_at_start=2026-01-01T00:00:00Z&created_at_end=2026-02-01T00:00:00Z` , search one explicit month
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
@@ -49143,6 +49200,14 @@ func (c *ClientWithResponses) CreateWorkflowV1AgentsPostWithResponse(ctx context
 //
 // A complete browser profile or browser session id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
 //
+// ### Default search window
+//
+// A `search_key` other than a complete browser profile or session id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete run and credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
+//
+// ### created_at_start / created_at_end
+//
+// Optional ISO 8601 bounds on the run's creation time: `created_at_start` is inclusive and `created_at_end` is exclusive. A timestamp without an offset is read as UTC.
+//
 // ### error_code
 //
 // An **exact-match** filter against the `error_code` field inside each task's `errors` JSON array. A run matches if **any** of its tasks contains an error object with a matching `error_code` value. Error codes are user-defined strings set during workflow execution (e.g. `INVALID_CREDENTIALS`, `LOGIN_FAILED`, `CAPTCHA_DETECTED`).
@@ -49152,7 +49217,8 @@ func (c *ClientWithResponses) CreateWorkflowV1AgentsPostWithResponse(ctx context
 // All query parameters use AND logic:
 // - `?status=failed` , only failed runs
 // - `?status=failed&error_code=LOGIN_FAILED` , failed runs **and** have a LOGIN_FAILED error
-// - `?status=failed&error_code=LOGIN_FAILED&search_key=prod_credential` , all three conditions must match
+// - `?status=failed&error_code=LOGIN_FAILED&search_key=prod_credential` , all three conditions must match (searched over the last 30 days)
+// - `?search_key=prod_credential&created_at_start=2026-01-01T00:00:00Z&created_at_end=2026-02-01T00:00:00Z` , search one explicit month
 //
 // Returns a wrapper object for the known response body format(s).
 //
