@@ -3533,12 +3533,14 @@ type AuditEventExportRow struct {
 
 // AuditExportDenialDetail defines model for AuditExportDenialDetail.
 type AuditExportDenialDetail struct {
+	Action     *string                           `json:"action,omitempty"`
 	CallerHas  map[string]*string                `json:"caller_has"`
 	ErrorCode  AuditExportDenialDetailErrorCode  `json:"error_code"`
 	Message    string                            `json:"message"`
 	NextAction string                            `json:"next_action"`
 	ReasonKind AuditExportDenialDetailReasonKind `json:"reason_kind"`
 	Required   map[string]string                 `json:"required"`
+	Role       *string                           `json:"role,omitempty"`
 }
 
 // AuditExportDenialDetailErrorCode defines model for AuditExportDenialDetail.ErrorCode.
@@ -8776,16 +8778,13 @@ type WorkflowCreateYAMLRequest struct {
 	PinSavedSessionIp     *bool                   `json:"pin_saved_session_ip,omitempty"`
 
 	// ProxyLocation On PUT updates, omission keeps the stored value, null clears it, and a supplied value replaces it.
-	ProxyLocation *WorkflowCreateYAMLRequest_ProxyLocation `json:"proxy_location,omitempty"`
-
-	// RecordingId Durable browser recording to attach to the workflow version created by this save.
-	RecordingId         *string         `json:"recording_id,omitempty"`
-	ReuseBrowserSession *bool           `json:"reuse_browser_session,omitempty"`
-	RunSequentially     *bool           `json:"run_sequentially,omitempty"`
-	RunWith             *string         `json:"run_with,omitempty"`
-	SequentialKey       *string         `json:"sequential_key,omitempty"`
-	Status              *WorkflowStatus `json:"status,omitempty"`
-	Title               string          `json:"title"`
+	ProxyLocation       *WorkflowCreateYAMLRequest_ProxyLocation `json:"proxy_location,omitempty"`
+	ReuseBrowserSession *bool                                    `json:"reuse_browser_session,omitempty"`
+	RunSequentially     *bool                                    `json:"run_sequentially,omitempty"`
+	RunWith             *string                                  `json:"run_with,omitempty"`
+	SequentialKey       *string                                  `json:"sequential_key,omitempty"`
+	Status              *WorkflowStatus                          `json:"status,omitempty"`
+	Title               string                                   `json:"title"`
 
 	// TotpIdentifier On PUT updates, omission keeps the stored value, null clears it, and a supplied value replaces it.
 	TotpIdentifier *string `json:"totp_identifier,omitempty"`

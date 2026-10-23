@@ -4,7 +4,7 @@ This module is unofficial and not affiliated with Skyvern.
 
 ## Requirements
 
-- Go 1.26.9 or newer, per `go.mod`.
+- Go 1.26.10 or newer, per `go.mod`.
 - A Skyvern API key from `https://app.skyvern.com/settings`, exported as `SKYVERN_API_KEY`.
 
 ## Install

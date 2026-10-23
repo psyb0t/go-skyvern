@@ -2,6 +2,12 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.4.0, 2026-10-23
+
+- `WorkflowCreateYAMLRequest` lost its `RecordingId` field, which the Skyvern API no longer has. Code that sets `RecordingId` must drop it.
+- `AuditExportDenialDetail` gained `Action` and `Role` fields, both `*string`.
+- The Go pin moves from 1.26.9 to 1.26.10 in `go.mod`, `Dockerfile.dev` and the agent skill setup notes, because govulncheck flagged GO-2026-6809 in `crypto/x509`. The development image also moves to `ca-certificates` 20261020-r0.
+
 ## v0.3.1, 2026-10-20
 
 - `GetWorkflowRunsV1WorkflowsRunsGetParams` gained `CreatedAtStart` and `CreatedAtEnd` fields, both `*time.Time`. `CreatedAtStart` includes runs created at or after the timestamp. `CreatedAtEnd` includes only runs created before it. `NewGetWorkflowRunsV1WorkflowsRunsGetRequest` sends them as the `created_at_start` and `created_at_end` query parameters.
