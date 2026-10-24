@@ -3184,6 +3184,24 @@ func (e ExportAuditEventsV1AuditEventsExportGetParamsFormat) Valid() bool {
 	}
 }
 
+// Defines values for ExportRunActivityV1AuditEventsRunsExportGetParamsFormat.
+const (
+	ExportRunActivityV1AuditEventsRunsExportGetParamsFormatCsv  ExportRunActivityV1AuditEventsRunsExportGetParamsFormat = "csv"
+	ExportRunActivityV1AuditEventsRunsExportGetParamsFormatJson ExportRunActivityV1AuditEventsRunsExportGetParamsFormat = "json"
+)
+
+// Valid indicates whether the value is a known member of the ExportRunActivityV1AuditEventsRunsExportGetParamsFormat enum.
+func (e ExportRunActivityV1AuditEventsRunsExportGetParamsFormat) Valid() bool {
+	switch e {
+	case ExportRunActivityV1AuditEventsRunsExportGetParamsFormatCsv:
+		return true
+	case ExportRunActivityV1AuditEventsRunsExportGetParamsFormatJson:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode.
 const (
 	CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCodeTooManyStartingBrowserSessions CreateBrowserSessionV1BrowserSessionsPost429JSONResponseBodyErrorCode = "too_many_starting_browser_sessions"
@@ -3294,17 +3312,20 @@ type ActActionType string
 
 // Action defines model for Action.
 type Action struct {
-	ActionId             *string                 `json:"action_id,omitempty"`
-	ActionOrder          *int                    `json:"action_order,omitempty"`
-	ActionType           ActionType              `json:"action_type"`
-	ClickContext         *ClickContext           `json:"click_context,omitempty"`
-	ConfidenceFloat      *float64                `json:"confidence_float,omitempty"`
-	CreatedAt            *time.Time              `json:"created_at,omitempty"`
-	CreatedBy            *string                 `json:"created_by,omitempty"`
-	DataExtractionGoal   *string                 `json:"data_extraction_goal,omitempty"`
-	Description          *string                 `json:"description,omitempty"`
-	Download             *bool                   `json:"download,omitempty"`
-	DownloadTriggered    *bool                   `json:"download_triggered,omitempty"`
+	ActionId           *string       `json:"action_id,omitempty"`
+	ActionOrder        *int          `json:"action_order,omitempty"`
+	ActionType         ActionType    `json:"action_type"`
+	ClickContext       *ClickContext `json:"click_context,omitempty"`
+	ConfidenceFloat    *float64      `json:"confidence_float,omitempty"`
+	CreatedAt          *time.Time    `json:"created_at,omitempty"`
+	CreatedBy          *string       `json:"created_by,omitempty"`
+	DataExtractionGoal *string       `json:"data_extraction_goal,omitempty"`
+	Description        *string       `json:"description,omitempty"`
+	Download           *bool         `json:"download,omitempty"`
+	DownloadTriggered  *bool         `json:"download_triggered,omitempty"`
+
+	// DownloadUrl Origin URL recorded by a download action.
+	DownloadUrl          *string                 `json:"download_url,omitempty"`
 	DownloadedFiles      *[]string               `json:"downloaded_files,omitempty"`
 	ElementId            *string                 `json:"element_id,omitempty"`
 	Errors               *[]UserDefinedError     `json:"errors,omitempty"`
@@ -6643,6 +6664,24 @@ type ProxyLocation string
 type RetryRunWebhookRequest struct {
 	// WebhookUrl Optional webhook URL to send the payload to instead of the stored configuration
 	WebhookUrl *string `json:"webhook_url,omitempty"`
+}
+
+// RunActivityExportResponse defines model for RunActivityExportResponse.
+type RunActivityExportResponse struct {
+	Next *string                `json:"next"`
+	Rows []RunActivityExportRow `json:"rows"`
+}
+
+// RunActivityExportRow defines model for RunActivityExportRow.
+type RunActivityExportRow struct {
+	CreatedAt                time.Time `json:"created_at"`
+	CreatedBy                *string   `json:"created_by"`
+	RequestedBy              *string   `json:"requested_by"`
+	RetriedFromWorkflowRunId *string   `json:"retried_from_workflow_run_id"`
+	TriggerType              *string   `json:"trigger_type"`
+	WorkflowPermanentId      string    `json:"workflow_permanent_id"`
+	WorkflowRunId            string    `json:"workflow_run_id"`
+	WorkflowScheduleId       *string   `json:"workflow_schedule_id"`
 }
 
 // RunEngine defines model for RunEngine.
@@ -10041,16 +10080,32 @@ type GetWorkflowVersionsV1WorkflowsWorkflowPermanentIdVersionsGetParams struct {
 
 // ExportAuditEventsV1AuditEventsExportGetParams defines parameters for ExportAuditEventsV1AuditEventsExportGet.
 type ExportAuditEventsV1AuditEventsExportGetParams struct {
-	Since   *time.Time                                           `form:"since,omitempty" json:"since,omitempty"`
-	Until   *time.Time                                           `form:"until,omitempty" json:"until,omitempty"`
-	Limit   *int                                                 `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor  *string                                              `form:"cursor,omitempty" json:"cursor,omitempty"`
-	Format  *ExportAuditEventsV1AuditEventsExportGetParamsFormat `form:"format,omitempty" json:"format,omitempty"`
-	XApiKey *string                                              `json:"x-api-key,omitempty"`
+	Since        *time.Time                                           `form:"since,omitempty" json:"since,omitempty"`
+	Until        *time.Time                                           `form:"until,omitempty" json:"until,omitempty"`
+	Action       *string                                              `form:"action,omitempty" json:"action,omitempty"`
+	ActorUserId  *string                                              `form:"actor_user_id,omitempty" json:"actor_user_id,omitempty"`
+	ResourceType *string                                              `form:"resource_type,omitempty" json:"resource_type,omitempty"`
+	Limit        *int                                                 `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor       *string                                              `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Format       *ExportAuditEventsV1AuditEventsExportGetParamsFormat `form:"format,omitempty" json:"format,omitempty"`
+	XApiKey      *string                                              `json:"x-api-key,omitempty"`
 }
 
 // ExportAuditEventsV1AuditEventsExportGetParamsFormat defines parameters for ExportAuditEventsV1AuditEventsExportGet.
 type ExportAuditEventsV1AuditEventsExportGetParamsFormat string
+
+// ExportRunActivityV1AuditEventsRunsExportGetParams defines parameters for ExportRunActivityV1AuditEventsRunsExportGet.
+type ExportRunActivityV1AuditEventsRunsExportGetParams struct {
+	Since   *time.Time                                               `form:"since,omitempty" json:"since,omitempty"`
+	Until   *time.Time                                               `form:"until,omitempty" json:"until,omitempty"`
+	Limit   *int                                                     `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor  *string                                                  `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Format  *ExportRunActivityV1AuditEventsRunsExportGetParamsFormat `form:"format,omitempty" json:"format,omitempty"`
+	XApiKey *string                                                  `json:"x-api-key,omitempty"`
+}
+
+// ExportRunActivityV1AuditEventsRunsExportGetParamsFormat defines parameters for ExportRunActivityV1AuditEventsRunsExportGet.
+type ExportRunActivityV1AuditEventsRunsExportGetParamsFormat string
 
 // ListBrowserProfilesV1BrowserProfilesGetParams defines parameters for ListBrowserProfilesV1BrowserProfilesGet.
 type ListBrowserProfilesV1BrowserProfilesGetParams struct {
@@ -33998,6 +34053,13 @@ type ClientInterface interface {
 	// Corresponds with GET /v1/audit-events/export (the `ExportAuditEventsV1AuditEventsExportGet` operationId).
 	ExportAuditEventsV1AuditEventsExportGet(ctx context.Context, params *ExportAuditEventsV1AuditEventsExportGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ExportRunActivityV1AuditEventsRunsExportGet Export workflow run activity
+	//
+	// Export top-level workflow runs for the authenticated organization as JSON or CSV. Only organization admins and full API keys may export. The default window is the last 90 days, with timezone-aware since/until bounds, newest-first keyset pagination, and a maximum page size of 500. CSV output uses fixed columns and is protected from spreadsheet formula execution.
+	//
+	// Corresponds with GET /v1/audit-events/runs/export (the `ExportRunActivityV1AuditEventsRunsExportGet` operationId).
+	ExportRunActivityV1AuditEventsRunsExportGet(ctx context.Context, params *ExportRunActivityV1AuditEventsRunsExportGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListBrowserProfilesV1BrowserProfilesGet List browser profiles
 	//
 	// Get all browser profiles for the organization.
@@ -35420,6 +35482,23 @@ func (c *Client) GetArtifactContentV1ArtifactsArtifactIdContentGet(ctx context.C
 // Corresponds with GET /v1/audit-events/export (the `ExportAuditEventsV1AuditEventsExportGet` operationId).
 func (c *Client) ExportAuditEventsV1AuditEventsExportGet(ctx context.Context, params *ExportAuditEventsV1AuditEventsExportGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewExportAuditEventsV1AuditEventsExportGetRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ExportRunActivityV1AuditEventsRunsExportGet Export workflow run activity
+//
+// Export top-level workflow runs for the authenticated organization as JSON or CSV. Only organization admins and full API keys may export. The default window is the last 90 days, with timezone-aware since/until bounds, newest-first keyset pagination, and a maximum page size of 500. CSV output uses fixed columns and is protected from spreadsheet formula execution.
+//
+// Corresponds with GET /v1/audit-events/runs/export (the `ExportRunActivityV1AuditEventsRunsExportGet` operationId).
+func (c *Client) ExportRunActivityV1AuditEventsRunsExportGet(ctx context.Context, params *ExportRunActivityV1AuditEventsRunsExportGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewExportRunActivityV1AuditEventsRunsExportGetRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -39073,6 +39152,159 @@ func NewExportAuditEventsV1AuditEventsExportGetRequest(server string, params *Ex
 	}
 
 	operationPath := fmt.Sprintf("/v1/audit-events/export")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Since != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "since", *params.Since, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date-time"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Until != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "until", *params.Until, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: "date-time"}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Action != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "action", *params.Action, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.ActorUserId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "actor_user_id", *params.ActorUserId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.ResourceType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "resource_type", *params.ResourceType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "cursor", *params.Cursor, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Format != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "format", *params.Format, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewExportRunActivityV1AuditEventsRunsExportGetRequest constructs an http.Request for the ExportRunActivityV1AuditEventsRunsExportGet method
+func NewExportRunActivityV1AuditEventsRunsExportGetRequest(server string, params *ExportRunActivityV1AuditEventsRunsExportGetParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/audit-events/runs/export")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -43772,6 +44004,15 @@ type ClientWithResponsesInterface interface {
 	// Corresponds with GET /v1/audit-events/export (the `ExportAuditEventsV1AuditEventsExportGet` operationId).
 	ExportAuditEventsV1AuditEventsExportGetWithResponse(ctx context.Context, params *ExportAuditEventsV1AuditEventsExportGetParams, reqEditors ...RequestEditorFn) (*ExportAuditEventsV1AuditEventsExportGetResponse, error)
 
+	// ExportRunActivityV1AuditEventsRunsExportGetWithResponse Export workflow run activity
+	//
+	// Export top-level workflow runs for the authenticated organization as JSON or CSV. Only organization admins and full API keys may export. The default window is the last 90 days, with timezone-aware since/until bounds, newest-first keyset pagination, and a maximum page size of 500. CSV output uses fixed columns and is protected from spreadsheet formula execution.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /v1/audit-events/runs/export (the `ExportRunActivityV1AuditEventsRunsExportGet` operationId).
+	ExportRunActivityV1AuditEventsRunsExportGetWithResponse(ctx context.Context, params *ExportRunActivityV1AuditEventsRunsExportGetParams, reqEditors ...RequestEditorFn) (*ExportRunActivityV1AuditEventsRunsExportGetResponse, error)
+
 	// ListBrowserProfilesV1BrowserProfilesGetWithResponse List browser profiles
 	//
 	// Get all browser profiles for the organization.
@@ -45847,6 +46088,61 @@ func (r ExportAuditEventsV1AuditEventsExportGetResponse) StatusCode() int {
 
 // ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
 func (r ExportAuditEventsV1AuditEventsExportGetResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ExportRunActivityV1AuditEventsRunsExportGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *RunActivityExportResponse
+	// JSON403 the response for an HTTP 403 `application/json` response
+	JSON403 *AuditExportDenialResponse
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *HTTPValidationError
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ExportRunActivityV1AuditEventsRunsExportGetResponse) GetJSON200() *RunActivityExportResponse {
+	return r.JSON200
+}
+
+// GetJSON403 returns the response for an HTTP 403 `application/json` response
+func (r ExportRunActivityV1AuditEventsRunsExportGetResponse) GetJSON403() *AuditExportDenialResponse {
+	return r.JSON403
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r ExportRunActivityV1AuditEventsRunsExportGetResponse) GetJSON422() *HTTPValidationError {
+	return r.JSON422
+}
+
+// GetBody returns the raw response body bytes
+func (r ExportRunActivityV1AuditEventsRunsExportGetResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ExportRunActivityV1AuditEventsRunsExportGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ExportRunActivityV1AuditEventsRunsExportGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ExportRunActivityV1AuditEventsRunsExportGetResponse) ContentType() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Header.Get("Content-Type")
 	}
@@ -49643,6 +49939,21 @@ func (c *ClientWithResponses) ExportAuditEventsV1AuditEventsExportGetWithRespons
 	return ParseExportAuditEventsV1AuditEventsExportGetResponse(rsp)
 }
 
+// ExportRunActivityV1AuditEventsRunsExportGetWithResponse Export workflow run activity
+//
+// Export top-level workflow runs for the authenticated organization as JSON or CSV. Only organization admins and full API keys may export. The default window is the last 90 days, with timezone-aware since/until bounds, newest-first keyset pagination, and a maximum page size of 500. CSV output uses fixed columns and is protected from spreadsheet formula execution.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /v1/audit-events/runs/export (the `ExportRunActivityV1AuditEventsRunsExportGet` operationId).
+func (c *ClientWithResponses) ExportRunActivityV1AuditEventsRunsExportGetWithResponse(ctx context.Context, params *ExportRunActivityV1AuditEventsRunsExportGetParams, reqEditors ...RequestEditorFn) (*ExportRunActivityV1AuditEventsRunsExportGetResponse, error) {
+	rsp, err := c.ExportRunActivityV1AuditEventsRunsExportGet(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseExportRunActivityV1AuditEventsRunsExportGetResponse(rsp)
+}
+
 // ListBrowserProfilesV1BrowserProfilesGetWithResponse List browser profiles
 //
 // Get all browser profiles for the organization.
@@ -51990,6 +52301,49 @@ func ParseExportAuditEventsV1AuditEventsExportGetResponse(rsp *http.Response) (*
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest AuditEventExportResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest AuditExportDenialResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case rsp.StatusCode == 200:
+		// Content-type (text/csv) unsupported
+
+	}
+
+	return response, nil
+}
+
+// ParseExportRunActivityV1AuditEventsRunsExportGetResponse parses an HTTP response from a ExportRunActivityV1AuditEventsRunsExportGetWithResponse call
+func ParseExportRunActivityV1AuditEventsRunsExportGetResponse(rsp *http.Response) (*ExportRunActivityV1AuditEventsRunsExportGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ExportRunActivityV1AuditEventsRunsExportGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RunActivityExportResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

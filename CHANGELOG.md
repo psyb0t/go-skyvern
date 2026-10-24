@@ -2,6 +2,15 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.5.0, 2026-10-24
+
+- Added the run activity export endpoint. `(*Client).ExportRunActivityV1AuditEventsRunsExportGet` and `(*ClientWithResponses).ExportRunActivityV1AuditEventsRunsExportGetWithResponse` send the request, built by `NewExportRunActivityV1AuditEventsRunsExportGetRequest` and parsed by `ParseExportRunActivityV1AuditEventsRunsExportGetResponse`. The result type is `ExportRunActivityV1AuditEventsRunsExportGetResponse`.
+- Added `ExportRunActivityV1AuditEventsRunsExportGetParams` with a `Format` of type `ExportRunActivityV1AuditEventsRunsExportGetParamsFormat`, which has the values `ExportRunActivityV1AuditEventsRunsExportGetParamsFormatCsv` and `ExportRunActivityV1AuditEventsRunsExportGetParamsFormatJson`.
+- Added `RunActivityExportResponse`, with `Rows` and `Next`, and `RunActivityExportRow`, one row per workflow run.
+- `ClientInterface` gained `ExportRunActivityV1AuditEventsRunsExportGet` and `ClientWithResponsesInterface` gained `ExportRunActivityV1AuditEventsRunsExportGetWithResponse`. Custom types that implement either interface, such as test mocks, must add the new method.
+- `ExportAuditEventsV1AuditEventsExportGetParams` gained `Action`, `ActorUserId` and `ResourceType` filter fields, all `*string`.
+- `Action` gained a `DownloadUrl` field, a `*string` with the origin URL recorded by a download action.
+
 ## v0.4.0, 2026-10-23
 
 - `WorkflowCreateYAMLRequest` lost its `RecordingId` field, which the Skyvern API no longer has. Code that sets `RecordingId` must drop it.
