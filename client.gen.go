@@ -3545,6 +3545,7 @@ type AuditEventExportRow struct {
 	AuthKind       string                 `json:"auth_kind"`
 	CreatedAt      time.Time              `json:"created_at"`
 	Details        map[string]interface{} `json:"details"`
+	ImpersonatedBy *string                `json:"impersonated_by"`
 	OrgRole        *string                `json:"org_role"`
 	OrganizationId string                 `json:"organization_id"`
 	RequestId      *string                `json:"request_id"`
@@ -5149,6 +5150,7 @@ type FileDownloadBlock struct {
 	SftpPrivateKey           *string `json:"sftp_private_key,omitempty"`
 	SftpPrivateKeyPassphrase *string `json:"sftp_private_key_passphrase,omitempty"`
 	SftpRemotePath           *string `json:"sftp_remote_path,omitempty"`
+	SftpSourcePath           *string `json:"sftp_source_path,omitempty"`
 	SftpUsername             *string `json:"sftp_username,omitempty"`
 	TaskType                 *string `json:"task_type,omitempty"`
 	TerminateCriterion       *string `json:"terminate_criterion,omitempty"`
@@ -5226,6 +5228,7 @@ type FileDownloadBlockYAML struct {
 	SftpPrivateKey           *string   `json:"sftp_private_key,omitempty"`
 	SftpPrivateKeyPassphrase *string   `json:"sftp_private_key_passphrase,omitempty"`
 	SftpRemotePath           *string   `json:"sftp_remote_path,omitempty"`
+	SftpSourcePath           *string   `json:"sftp_source_path,omitempty"`
 	SftpUsername             *string   `json:"sftp_username,omitempty"`
 	Title                    *string   `json:"title,omitempty"`
 	TotpIdentifier           *string   `json:"totp_identifier,omitempty"`

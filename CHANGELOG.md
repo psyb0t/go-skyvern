@@ -2,6 +2,11 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.5.1, 2026-10-25
+
+- `AuditEventExportRow` gained an `ImpersonatedBy` field, a `*string`.
+- `FileDownloadBlock` and `FileDownloadBlockYAML` gained a `SftpSourcePath` field, a `*string` sent as `sftp_source_path`.
+
 ## v0.5.0, 2026-10-24
 
 - Added the run activity export endpoint. `(*Client).ExportRunActivityV1AuditEventsRunsExportGet` and `(*ClientWithResponses).ExportRunActivityV1AuditEventsRunsExportGetWithResponse` send the request, built by `NewExportRunActivityV1AuditEventsRunsExportGetRequest` and parsed by `ParseExportRunActivityV1AuditEventsRunsExportGetResponse`. The result type is `ExportRunActivityV1AuditEventsRunsExportGetResponse`.
