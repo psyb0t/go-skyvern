@@ -1801,6 +1801,45 @@ func (e OneTimeDispatchStatus) Valid() bool {
 	}
 }
 
+// Defines values for OrganizationPhoneNumberResponseStatus.
+const (
+	OrganizationPhoneNumberResponseStatusActive          OrganizationPhoneNumberResponseStatus = "active"
+	OrganizationPhoneNumberResponseStatusDisabled        OrganizationPhoneNumberResponseStatus = "disabled"
+	OrganizationPhoneNumberResponseStatusProvisioning    OrganizationPhoneNumberResponseStatus = "provisioning"
+	OrganizationPhoneNumberResponseStatusQuarantined     OrganizationPhoneNumberResponseStatus = "quarantined"
+	OrganizationPhoneNumberResponseStatusQuarantining    OrganizationPhoneNumberResponseStatus = "quarantining"
+	OrganizationPhoneNumberResponseStatusReleased        OrganizationPhoneNumberResponseStatus = "released"
+	OrganizationPhoneNumberResponseStatusReleasing       OrganizationPhoneNumberResponseStatus = "releasing"
+	OrganizationPhoneNumberResponseStatusReversalPending OrganizationPhoneNumberResponseStatus = "reversal_pending"
+	OrganizationPhoneNumberResponseStatusSurrendering    OrganizationPhoneNumberResponseStatus = "surrendering"
+)
+
+// Valid indicates whether the value is a known member of the OrganizationPhoneNumberResponseStatus enum.
+func (e OrganizationPhoneNumberResponseStatus) Valid() bool {
+	switch e {
+	case OrganizationPhoneNumberResponseStatusActive:
+		return true
+	case OrganizationPhoneNumberResponseStatusDisabled:
+		return true
+	case OrganizationPhoneNumberResponseStatusProvisioning:
+		return true
+	case OrganizationPhoneNumberResponseStatusQuarantined:
+		return true
+	case OrganizationPhoneNumberResponseStatusQuarantining:
+		return true
+	case OrganizationPhoneNumberResponseStatusReleased:
+		return true
+	case OrganizationPhoneNumberResponseStatusReleasing:
+		return true
+	case OrganizationPhoneNumberResponseStatusReversalPending:
+		return true
+	case OrganizationPhoneNumberResponseStatusSurrendering:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for OutputParameterParameterType.
 const (
 	OutputParameterParameterTypeOutput OutputParameterParameterType = "output"
@@ -3576,6 +3615,16 @@ type AuditExportDenialResponse struct {
 	Detail AuditExportDenialDetail `json:"detail"`
 }
 
+// AvailableManagedPhoneNumber defines model for AvailableManagedPhoneNumber.
+type AvailableManagedPhoneNumber struct {
+	FriendlyName      *string `json:"friendly_name,omitempty"`
+	IsoCountry        *string `json:"iso_country,omitempty"`
+	Locality          *string `json:"locality,omitempty"`
+	MonthlyPriceCents int     `json:"monthly_price_cents"`
+	PhoneNumber       string  `json:"phone_number"`
+	Region            *string `json:"region,omitempty"`
+}
+
 // AzureSecretParameter defines model for AzureSecretParameter.
 type AzureSecretParameter struct {
 	AzureKey               string                             `json:"azure_key"`
@@ -4463,6 +4512,11 @@ type CreateScriptResponse struct {
 	Version int `json:"version"`
 }
 
+// CreateTwilioCredentialRequest defines model for CreateTwilioCredentialRequest.
+type CreateTwilioCredentialRequest struct {
+	Credential TwilioCredential `json:"credential"`
+}
+
 // CredentialParameter defines model for CredentialParameter.
 type CredentialParameter struct {
 	CreatedAt             time.Time                         `json:"created_at"`
@@ -4751,6 +4805,11 @@ type DeployScriptRequest struct {
 	Files []ScriptFileCreate `json:"files"`
 }
 
+// DisablePhoneNumberRequest defines model for DisablePhoneNumberRequest.
+type DisablePhoneNumberRequest struct {
+	PhoneNumberId string `json:"phone_number_id"`
+}
+
 // DownloadFilesRequest defines model for DownloadFilesRequest.
 type DownloadFilesRequest struct {
 	// BrowserAddress The CDP address for the task.
@@ -4922,6 +4981,13 @@ type EmailInboxBlockYAMLEmailClient string
 
 // EmailTransport defines model for EmailTransport.
 type EmailTransport string
+
+// EnablePhoneNumberRequest defines model for EnablePhoneNumberRequest.
+type EnablePhoneNumberRequest struct {
+	ConfirmTakeover *bool   `json:"confirm_takeover,omitempty"`
+	CredentialId    *string `json:"credential_id,omitempty"`
+	PhoneNumberSid  string  `json:"phone_number_sid"`
+}
 
 // ExtendBrowserSessionRequest defines model for ExtendBrowserSessionRequest.
 type ExtendBrowserSessionRequest struct {
@@ -6368,6 +6434,27 @@ type OnePasswordCredentialParameterYAMLParameterType string
 // OneTimeDispatchStatus defines model for OneTimeDispatchStatus.
 type OneTimeDispatchStatus string
 
+// OrganizationPhoneNumberResponse Safe phone-number metadata without provider routing or cost secrets.
+type OrganizationPhoneNumberResponse struct {
+	BillingExempt    *bool                                 `json:"billing_exempt,omitempty"`
+	CancelAt         *time.Time                            `json:"cancel_at,omitempty"`
+	CreatedAt        time.Time                             `json:"created_at"`
+	CredentialId     *string                               `json:"credential_id,omitempty"`
+	DeletedAt        *time.Time                            `json:"deleted_at,omitempty"`
+	ModifiedAt       time.Time                             `json:"modified_at"`
+	OrganizationId   string                                `json:"organization_id"`
+	PhoneNumber      string                                `json:"phone_number"`
+	PhoneNumberId    string                                `json:"phone_number_id"`
+	PriceCents       *int                                  `json:"price_cents,omitempty"`
+	Provider         string                                `json:"provider"`
+	QuarantinedUntil *time.Time                            `json:"quarantined_until,omitempty"`
+	SmsConfigId      string                                `json:"sms_config_id"`
+	Status           OrganizationPhoneNumberResponseStatus `json:"status"`
+}
+
+// OrganizationPhoneNumberResponseStatus defines model for OrganizationPhoneNumberResponse.Status.
+type OrganizationPhoneNumberResponseStatus string
+
 // OrganizationScheduleItem Compact schedule projection for the org-wide list endpoint.
 //
 // Intentionally omits `backend_schedule_id` , the list view is for browsing
@@ -6659,6 +6746,11 @@ type PromptBranchCriteria struct {
 
 // PromptBranchCriteriaCriteriaType defines model for PromptBranchCriteria.CriteriaType.
 type PromptBranchCriteriaCriteriaType string
+
+// ProvisionManagedNumberRequest defines model for ProvisionManagedNumberRequest.
+type ProvisionManagedNumberRequest struct {
+	PhoneNumber string `json:"phone_number"`
+}
 
 // ProxyLocation defines model for ProxyLocation.
 type ProxyLocation string
@@ -8170,6 +8262,38 @@ type ThoughtType string
 
 // TotpType Type of 2FA/TOTP method used.
 type TotpType string
+
+// TwilioCredential defines model for TwilioCredential.
+type TwilioCredential struct {
+	AccountSid   string  `json:"account_sid"`
+	ApiKeySecret *string `json:"api_key_secret,omitempty"`
+	ApiKeySid    *string `json:"api_key_sid,omitempty"`
+	AuthToken    *string `json:"auth_token,omitempty"`
+}
+
+// TwilioCredentialResponse defines model for TwilioCredentialResponse.
+type TwilioCredentialResponse struct {
+	Credential *TwilioCredentialSafe `json:"credential,omitempty"`
+}
+
+// TwilioCredentialSafe defines model for TwilioCredentialSafe.
+type TwilioCredentialSafe struct {
+	AccountSid      string  `json:"account_sid"`
+	ApiKeySid       *string `json:"api_key_sid,omitempty"`
+	HasApiKeySecret bool    `json:"has_api_key_secret"`
+	HasAuthToken    bool    `json:"has_auth_token"`
+}
+
+// TwilioPhoneNumberInfo defines model for TwilioPhoneNumberInfo.
+type TwilioPhoneNumberInfo struct {
+	CurrentSmsUrl *string `json:"current_sms_url,omitempty"`
+	Enabled       bool    `json:"enabled"`
+	FriendlyName  string  `json:"friendly_name"`
+	PhoneNumber   string  `json:"phone_number"`
+	PhoneNumberId *string `json:"phone_number_id,omitempty"`
+	Sid           string  `json:"sid"`
+	SmsCapable    bool    `json:"sms_capable"`
+}
 
 // UpdateBrowserProfileRequest defines model for UpdateBrowserProfileRequest.
 type UpdateBrowserProfileRequest struct {
@@ -9903,7 +10027,7 @@ type GetWorkflowRunsV1WorkflowsRunsGetParams struct {
 	// Status Filter by one or more run statuses.
 	Status *[]WorkflowRunStatus `form:"status,omitempty" json:"status,omitempty"`
 
-	// SearchKey Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete browser profile or browser session ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well. Without created_at_start, a search other than a complete browser profile or session ID covers only runs created in the 30 days before created_at_end (or before now).
+	// SearchKey Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete workflow run ID matches that run. A complete task ID matches the workflow run the task ran in, when this list includes that run, or the standalone task itself where standalone tasks are listed. A complete browser profile, browser session, workflow run or task ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well. Without created_at_start, a search other than a complete browser profile, browser session, workflow run or task ID covers only runs created in the 30 days before created_at_end (or before now).
 	SearchKey *string `form:"search_key,omitempty" json:"search_key,omitempty"`
 
 	// ErrorCode Exact-match filter on the error_code field inside each task's errors JSON array. A run matches if any of its tasks contains an error with a matching error_code. Error codes are user-defined strings set during workflow execution.
@@ -9949,7 +10073,7 @@ type GetWorkflowRunsByIdV1WorkflowsWorkflowIdRunsGetParams struct {
 	// Status Filter by one or more run statuses.
 	Status *[]WorkflowRunStatus `form:"status,omitempty" json:"status,omitempty"`
 
-	// SearchKey Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete browser profile or browser session ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
+	// SearchKey Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete workflow run ID matches that run. A complete task ID matches the workflow run the task ran in, when this list includes that run, or the standalone task itself where standalone tasks are listed. A complete browser profile, browser session, workflow run or task ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
 	SearchKey *string `form:"search_key,omitempty" json:"search_key,omitempty"`
 
 	// ErrorCode Exact-match filter on the error_code field inside each task's errors JSON array. A run matches if any of its tasks contains an error with a matching error_code. Error codes are user-defined strings set during workflow execution.
@@ -10329,6 +10453,48 @@ type UpdateFolderV1FoldersFolderIdPutParams struct {
 	XApiKey *string `json:"x-api-key,omitempty"`
 }
 
+// DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteParams defines parameters for DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete.
+type DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
+// GetTwilioCredentialV1IntegrationsTwilioCredentialsGetParams defines parameters for GetTwilioCredentialV1IntegrationsTwilioCredentialsGet.
+type GetTwilioCredentialV1IntegrationsTwilioCredentialsGetParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
+// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams defines parameters for CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost.
+type CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
+// ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetParams defines parameters for ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet.
+type ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
+// ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetParams defines parameters for ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet.
+type ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
+// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams defines parameters for DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost.
+type DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
+// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams defines parameters for EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost.
+type EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
 // ApplyToJobV1RecipesJobsApplyPostJSONBody defines parameters for ApplyToJobV1RecipesJobsApplyPost.
 type ApplyToJobV1RecipesJobsApplyPostJSONBody struct {
 	N2faIdentifier *string `json:"2fa_identifier,omitempty"`
@@ -10534,7 +10700,7 @@ type GetRunsV2V1RunsGetParams struct {
 	PageSize *int         `form:"page_size,omitempty" json:"page_size,omitempty"`
 	Status   *[]RunStatus `form:"status,omitempty" json:"status,omitempty"`
 
-	// SearchKey Case-insensitive substring search (min 3 chars for trigram index) across the run's title, URL, run ID, agent (workflow) ID and inputs, plus a workflow run's webhook callback URL. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete browser profile or browser session ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. Browser profile and credential IDs apply to workflow runs; a browser session ID also matches a standalone task that used it.
+	// SearchKey Case-insensitive substring search (min 3 chars for trigram index) across the run's title, URL, run ID, agent (workflow) ID and inputs, plus a workflow run's webhook callback URL. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete workflow run ID matches that run. A complete task ID matches the workflow run the task ran in, when this list includes that run, or the standalone task itself where standalone tasks are listed. A complete browser profile, browser session, workflow run or task ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. Browser profile and credential IDs apply to workflow runs; a browser session ID also matches a standalone task that used it.
 	SearchKey *string    `form:"search_key,omitempty" json:"search_key,omitempty"`
 	RunType   *[]RunType `form:"run_type,omitempty" json:"run_type,omitempty"`
 
@@ -10687,6 +10853,32 @@ type RunSdkActionV1SdkRunActionPostParams struct {
 	XApiKey *string `json:"x-api-key,omitempty"`
 }
 
+// ListManagedNumbersV1SmsNumbersGetParams defines parameters for ListManagedNumbersV1SmsNumbersGet.
+type ListManagedNumbersV1SmsNumbersGetParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
+// ProvisionManagedNumberV1SmsNumbersPostParams defines parameters for ProvisionManagedNumberV1SmsNumbersPost.
+type ProvisionManagedNumberV1SmsNumbersPostParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
+// SearchAvailableNumbersV1SmsNumbersAvailableGetParams defines parameters for SearchAvailableNumbersV1SmsNumbersAvailableGet.
+type SearchAvailableNumbersV1SmsNumbersAvailableGetParams struct {
+	AreaCode *string `form:"area_code,omitempty" json:"area_code,omitempty"`
+
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
+// ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostParams defines parameters for ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost.
+type ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostParams struct {
+	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
+	XApiKey *string `json:"x-api-key,omitempty"`
+}
+
 // ListTagKeysV1TagKeysGetParams defines parameters for ListTagKeysV1TagKeysGet.
 type ListTagKeysV1TagKeysGetParams struct {
 	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
@@ -10813,6 +11005,15 @@ type CreateFolderV1FoldersPostJSONRequestBody = FolderCreate
 // UpdateFolderV1FoldersFolderIdPutJSONRequestBody defines body for UpdateFolderV1FoldersFolderIdPut for application/json ContentType.
 type UpdateFolderV1FoldersFolderIdPutJSONRequestBody = FolderUpdate
 
+// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostJSONRequestBody defines body for CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost for application/json ContentType.
+type CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostJSONRequestBody = CreateTwilioCredentialRequest
+
+// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostJSONRequestBody defines body for DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost for application/json ContentType.
+type DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostJSONRequestBody = DisablePhoneNumberRequest
+
+// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostJSONRequestBody defines body for EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost for application/json ContentType.
+type EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostJSONRequestBody = EnablePhoneNumberRequest
+
 // ApplyToJobV1RecipesJobsApplyPostJSONRequestBody defines body for ApplyToJobV1RecipesJobsApplyPost for application/json ContentType.
 type ApplyToJobV1RecipesJobsApplyPostJSONRequestBody ApplyToJobV1RecipesJobsApplyPostJSONBody
 
@@ -10854,6 +11055,9 @@ type DeployScriptV1ScriptsScriptIdDeployPostJSONRequestBody = DeployScriptReques
 
 // RunSdkActionV1SdkRunActionPostJSONRequestBody defines body for RunSdkActionV1SdkRunActionPost for application/json ContentType.
 type RunSdkActionV1SdkRunActionPostJSONRequestBody = RunSdkActionRequest
+
+// ProvisionManagedNumberV1SmsNumbersPostJSONRequestBody defines body for ProvisionManagedNumberV1SmsNumbersPost for application/json ContentType.
+type ProvisionManagedNumberV1SmsNumbersPostJSONRequestBody = ProvisionManagedNumberRequest
 
 // UpdateTagKeyV1TagKeysKeyPatchJSONRequestBody defines body for UpdateTagKeyV1TagKeysKeyPatch for application/json ContentType.
 type UpdateTagKeyV1TagKeysKeyPatchJSONRequestBody = TagKeyUpdate
@@ -33813,12 +34017,14 @@ type ClientInterface interface {
 	// | `browser_profile_id` | The browser profile the run used (e.g. `bp_123…`) |
 	// | `browser_session_id` | The browser session the run used (e.g. `pbs_123…`) |
 	// | **Credential id** | A credential the run used (e.g. `cred_123…`) |
+	// | `workflow_run_id` | The run itself (e.g. `wr_123…`) |
+	// | **Task id** | The workflow run the task ran in, when that run is top-level (e.g. `tsk_123…`) |
 	//
-	// A complete browser profile or browser session id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
+	// A complete browser profile, browser session, workflow run or task id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
 	//
 	// ### Default search window
 	//
-	// A `search_key` other than a complete browser profile or session id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete run and credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
+	// A `search_key` other than a complete browser profile, browser session, workflow run or task id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Explicit bounds apply to every search, complete ids included. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
 	//
 	// ### created_at_start / created_at_end
 	//
@@ -33873,7 +34079,7 @@ type ClientInterface interface {
 	//
 	// ### search_key
 	//
-	// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete browser profile or browser session ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
+	// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete workflow run ID matches that run. A complete task ID matches the workflow run the task ran in, when this list includes that run, or the standalone task itself where standalone tasks are listed. A complete browser profile, browser session, workflow run or task ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
 	//
 	// ### error_code
 	//
@@ -34402,6 +34608,88 @@ type ClientInterface interface {
 	// Corresponds with PUT /v1/folders/{folder_id} (the `UpdateFolderV1FoldersFolderIdPut` operationId).
 	UpdateFolderV1FoldersFolderIdPut(ctx context.Context, folderId string, params *UpdateFolderV1FoldersFolderIdPutParams, body UpdateFolderV1FoldersFolderIdPutJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete Disconnect Twilio credentials
+	//
+	// Remove the stored Twilio credentials after connected phone numbers are disabled.
+	//
+	// Corresponds with DELETE /v1/integrations/twilio/credentials (the `DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete` operationId).
+	DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete(ctx context.Context, params *DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetTwilioCredentialV1IntegrationsTwilioCredentialsGet Get Twilio credentials
+	//
+	// Get the safe Twilio credential metadata for the current organization.
+	//
+	// Corresponds with GET /v1/integrations/twilio/credentials (the `GetTwilioCredentialV1IntegrationsTwilioCredentialsGet` operationId).
+	GetTwilioCredentialV1IntegrationsTwilioCredentialsGet(ctx context.Context, params *GetTwilioCredentialV1IntegrationsTwilioCredentialsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithBody Connect Twilio credentials
+	//
+	// Validate and store Twilio credentials for the current organization.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /v1/integrations/twilio/credentials (the `CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost` operationId).
+	CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithBody(ctx context.Context, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost Connect Twilio credentials
+	//
+	// Validate and store Twilio credentials for the current organization.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /v1/integrations/twilio/credentials (the `CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost` operationId).
+	CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost(ctx context.Context, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, body CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet List registered phone numbers
+	//
+	// List the current organization's phone numbers registered for SMS forwarding.
+	//
+	// Corresponds with GET /v1/integrations/twilio/phone-number-registry (the `ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet` operationId).
+	ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet(ctx context.Context, params *ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet List Twilio phone numbers
+	//
+	// List SMS-capable phone numbers available in the connected Twilio account.
+	//
+	// Corresponds with GET /v1/integrations/twilio/phone-numbers (the `ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet` operationId).
+	ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet(ctx context.Context, params *ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithBody Disable Twilio phone number
+	//
+	// Disable SMS forwarding for a phone number registered in the current organization.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /v1/integrations/twilio/phone-numbers/disable (the `DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost` operationId).
+	DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithBody(ctx context.Context, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost Disable Twilio phone number
+	//
+	// Disable SMS forwarding for a phone number registered in the current organization.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /v1/integrations/twilio/phone-numbers/disable (the `DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost` operationId).
+	DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost(ctx context.Context, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, body DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithBody Enable Twilio phone number
+	//
+	// Enable SMS forwarding for a Twilio phone number in the current organization.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /v1/integrations/twilio/phone-numbers/enable (the `EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost` operationId).
+	EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithBody(ctx context.Context, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost Enable Twilio phone number
+	//
+	// Enable SMS forwarding for a Twilio phone number in the current organization.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /v1/integrations/twilio/phone-numbers/enable (the `EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost` operationId).
+	EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost(ctx context.Context, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, body EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ApplyToJobV1RecipesJobsApplyPostWithBody Apply to a job
 	//
 	// Start a workflow run that applies to a job with a résumé and optional credentials.
@@ -34731,6 +35019,45 @@ type ClientInterface interface {
 	// Corresponds with POST /v1/sdk/run_action (the `RunSdkActionV1SdkRunActionPost` operationId).
 	RunSdkActionV1SdkRunActionPost(ctx context.Context, params *RunSdkActionV1SdkRunActionPostParams, body RunSdkActionV1SdkRunActionPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListManagedNumbersV1SmsNumbersGet List managed SMS numbers
+	//
+	// List the Skyvern-managed SMS numbers for the authenticated organization.
+	//
+	// Corresponds with GET /v1/sms-numbers (the `ListManagedNumbersV1SmsNumbersGet` operationId).
+	ListManagedNumbersV1SmsNumbersGet(ctx context.Context, params *ListManagedNumbersV1SmsNumbersGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ProvisionManagedNumberV1SmsNumbersPostWithBody Provision managed SMS number
+	//
+	// Purchase and configure a Skyvern-managed SMS number for the authenticated organization.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /v1/sms-numbers (the `ProvisionManagedNumberV1SmsNumbersPost` operationId).
+	ProvisionManagedNumberV1SmsNumbersPostWithBody(ctx context.Context, params *ProvisionManagedNumberV1SmsNumbersPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ProvisionManagedNumberV1SmsNumbersPost Provision managed SMS number
+	//
+	// Purchase and configure a Skyvern-managed SMS number for the authenticated organization.
+	//
+	// Takes a body of the `application/json` content type.
+	//
+	// Corresponds with POST /v1/sms-numbers (the `ProvisionManagedNumberV1SmsNumbersPost` operationId).
+	ProvisionManagedNumberV1SmsNumbersPost(ctx context.Context, params *ProvisionManagedNumberV1SmsNumbersPostParams, body ProvisionManagedNumberV1SmsNumbersPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SearchAvailableNumbersV1SmsNumbersAvailableGet Search available managed SMS numbers
+	//
+	// Search for available US Skyvern-managed SMS numbers, optionally by area code.
+	//
+	// Corresponds with GET /v1/sms-numbers/available (the `SearchAvailableNumbersV1SmsNumbersAvailableGet` operationId).
+	SearchAvailableNumbersV1SmsNumbersAvailableGet(ctx context.Context, params *SearchAvailableNumbersV1SmsNumbersAvailableGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost Release managed SMS number
+	//
+	// For billing-exempt numbers, forwarding stops immediately. For numbers with a subscription, billing and forwarding continue until the current billing period ends. Skyvern then holds the number for 30 days before it can be reassigned.
+	//
+	// Corresponds with POST /v1/sms-numbers/{phone_number_id}/release (the `ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost` operationId).
+	ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost(ctx context.Context, phoneNumberId string, params *ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListTagKeysV1TagKeysGet List tag keys
 	//
 	// List all tag keys registered for the organization with their descriptions.
@@ -34972,12 +35299,14 @@ func (c *Client) CreateWorkflowV1AgentsPost(ctx context.Context, params *CreateW
 // | `browser_profile_id` | The browser profile the run used (e.g. `bp_123…`) |
 // | `browser_session_id` | The browser session the run used (e.g. `pbs_123…`) |
 // | **Credential id** | A credential the run used (e.g. `cred_123…`) |
+// | `workflow_run_id` | The run itself (e.g. `wr_123…`) |
+// | **Task id** | The workflow run the task ran in, when that run is top-level (e.g. `tsk_123…`) |
 //
-// A complete browser profile or browser session id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
+// A complete browser profile, browser session, workflow run or task id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
 //
 // ### Default search window
 //
-// A `search_key` other than a complete browser profile or session id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete run and credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
+// A `search_key` other than a complete browser profile, browser session, workflow run or task id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Explicit bounds apply to every search, complete ids included. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
 //
 // ### created_at_start / created_at_end
 //
@@ -35082,7 +35411,7 @@ func (c *Client) DeleteWorkflowV1AgentsWorkflowIdDeletePost(ctx context.Context,
 //
 // ### search_key
 //
-// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete browser profile or browser session ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
+// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete workflow run ID matches that run. A complete task ID matches the workflow run the task ran in, when this list includes that run, or the standalone task itself where standalone tasks are listed. A complete browser profile, browser session, workflow run or task ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
 //
 // ### error_code
 //
@@ -36261,6 +36590,188 @@ func (c *Client) UpdateFolderV1FoldersFolderIdPut(ctx context.Context, folderId 
 	return c.Client.Do(req)
 }
 
+// DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete Disconnect Twilio credentials
+//
+// Remove the stored Twilio credentials after connected phone numbers are disabled.
+//
+// Corresponds with DELETE /v1/integrations/twilio/credentials (the `DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete` operationId).
+func (c *Client) DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete(ctx context.Context, params *DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// GetTwilioCredentialV1IntegrationsTwilioCredentialsGet Get Twilio credentials
+//
+// Get the safe Twilio credential metadata for the current organization.
+//
+// Corresponds with GET /v1/integrations/twilio/credentials (the `GetTwilioCredentialV1IntegrationsTwilioCredentialsGet` operationId).
+func (c *Client) GetTwilioCredentialV1IntegrationsTwilioCredentialsGet(ctx context.Context, params *GetTwilioCredentialV1IntegrationsTwilioCredentialsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetTwilioCredentialV1IntegrationsTwilioCredentialsGetRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithBody Connect Twilio credentials
+//
+// Validate and store Twilio credentials for the current organization.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /v1/integrations/twilio/credentials (the `CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost` operationId).
+func (c *Client) CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithBody(ctx context.Context, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost Connect Twilio credentials
+//
+// Validate and store Twilio credentials for the current organization.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /v1/integrations/twilio/credentials (the `CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost` operationId).
+func (c *Client) CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost(ctx context.Context, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, body CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet List registered phone numbers
+//
+// List the current organization's phone numbers registered for SMS forwarding.
+//
+// Corresponds with GET /v1/integrations/twilio/phone-number-registry (the `ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet` operationId).
+func (c *Client) ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet(ctx context.Context, params *ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet List Twilio phone numbers
+//
+// List SMS-capable phone numbers available in the connected Twilio account.
+//
+// Corresponds with GET /v1/integrations/twilio/phone-numbers (the `ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet` operationId).
+func (c *Client) ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet(ctx context.Context, params *ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithBody Disable Twilio phone number
+//
+// Disable SMS forwarding for a phone number registered in the current organization.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /v1/integrations/twilio/phone-numbers/disable (the `DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost` operationId).
+func (c *Client) DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithBody(ctx context.Context, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost Disable Twilio phone number
+//
+// Disable SMS forwarding for a phone number registered in the current organization.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /v1/integrations/twilio/phone-numbers/disable (the `DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost` operationId).
+func (c *Client) DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost(ctx context.Context, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, body DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithBody Enable Twilio phone number
+//
+// Enable SMS forwarding for a Twilio phone number in the current organization.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /v1/integrations/twilio/phone-numbers/enable (the `EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost` operationId).
+func (c *Client) EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithBody(ctx context.Context, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost Enable Twilio phone number
+//
+// Enable SMS forwarding for a Twilio phone number in the current organization.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /v1/integrations/twilio/phone-numbers/enable (the `EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost` operationId).
+func (c *Client) EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost(ctx context.Context, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, body EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // ApplyToJobV1RecipesJobsApplyPostWithBody Apply to a job
 //
 // Start a workflow run that applies to a job with a résumé and optional credentials.
@@ -36990,6 +37501,95 @@ func (c *Client) RunSdkActionV1SdkRunActionPostWithBody(ctx context.Context, par
 // Corresponds with POST /v1/sdk/run_action (the `RunSdkActionV1SdkRunActionPost` operationId).
 func (c *Client) RunSdkActionV1SdkRunActionPost(ctx context.Context, params *RunSdkActionV1SdkRunActionPostParams, body RunSdkActionV1SdkRunActionPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRunSdkActionV1SdkRunActionPostRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListManagedNumbersV1SmsNumbersGet List managed SMS numbers
+//
+// List the Skyvern-managed SMS numbers for the authenticated organization.
+//
+// Corresponds with GET /v1/sms-numbers (the `ListManagedNumbersV1SmsNumbersGet` operationId).
+func (c *Client) ListManagedNumbersV1SmsNumbersGet(ctx context.Context, params *ListManagedNumbersV1SmsNumbersGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListManagedNumbersV1SmsNumbersGetRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ProvisionManagedNumberV1SmsNumbersPostWithBody Provision managed SMS number
+//
+// Purchase and configure a Skyvern-managed SMS number for the authenticated organization.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /v1/sms-numbers (the `ProvisionManagedNumberV1SmsNumbersPost` operationId).
+func (c *Client) ProvisionManagedNumberV1SmsNumbersPostWithBody(ctx context.Context, params *ProvisionManagedNumberV1SmsNumbersPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewProvisionManagedNumberV1SmsNumbersPostRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ProvisionManagedNumberV1SmsNumbersPost Provision managed SMS number
+//
+// Purchase and configure a Skyvern-managed SMS number for the authenticated organization.
+//
+// Takes a body of the `application/json` content type.
+//
+// Corresponds with POST /v1/sms-numbers (the `ProvisionManagedNumberV1SmsNumbersPost` operationId).
+func (c *Client) ProvisionManagedNumberV1SmsNumbersPost(ctx context.Context, params *ProvisionManagedNumberV1SmsNumbersPostParams, body ProvisionManagedNumberV1SmsNumbersPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewProvisionManagedNumberV1SmsNumbersPostRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// SearchAvailableNumbersV1SmsNumbersAvailableGet Search available managed SMS numbers
+//
+// Search for available US Skyvern-managed SMS numbers, optionally by area code.
+//
+// Corresponds with GET /v1/sms-numbers/available (the `SearchAvailableNumbersV1SmsNumbersAvailableGet` operationId).
+func (c *Client) SearchAvailableNumbersV1SmsNumbersAvailableGet(ctx context.Context, params *SearchAvailableNumbersV1SmsNumbersAvailableGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSearchAvailableNumbersV1SmsNumbersAvailableGetRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost Release managed SMS number
+//
+// For billing-exempt numbers, forwarding stops immediately. For numbers with a subscription, billing and forwarding continue until the current billing period ends. Skyvern then holds the number for 30 days before it can be reassigned.
+//
+// Corresponds with POST /v1/sms-numbers/{phone_number_id}/release (the `ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost` operationId).
+func (c *Client) ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost(ctx context.Context, phoneNumberId string, params *ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostRequest(c.Server, phoneNumberId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -41136,6 +41736,339 @@ func NewUpdateFolderV1FoldersFolderIdPutRequestWithBody(server string, folderId 
 	return req, nil
 }
 
+// NewDeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteRequest constructs an http.Request for the DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete method
+func NewDeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteRequest(server string, params *DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/integrations/twilio/credentials")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewGetTwilioCredentialV1IntegrationsTwilioCredentialsGetRequest constructs an http.Request for the GetTwilioCredentialV1IntegrationsTwilioCredentialsGet method
+func NewGetTwilioCredentialV1IntegrationsTwilioCredentialsGetRequest(server string, params *GetTwilioCredentialV1IntegrationsTwilioCredentialsGetParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/integrations/twilio/credentials")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostRequest calls the generic CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost builder with application/json body
+func NewCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostRequest(server string, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, body CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostRequestWithBody constructs an http.Request for the CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost method, with any body, and a specified content type
+func NewCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostRequestWithBody(server string, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/integrations/twilio/credentials")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetRequest constructs an http.Request for the ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet method
+func NewListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetRequest(server string, params *ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/integrations/twilio/phone-number-registry")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetRequest constructs an http.Request for the ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet method
+func NewListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetRequest(server string, params *ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/integrations/twilio/phone-numbers")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostRequest calls the generic DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost builder with application/json body
+func NewDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostRequest(server string, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, body DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostRequestWithBody constructs an http.Request for the DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost method, with any body, and a specified content type
+func NewDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostRequestWithBody(server string, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/integrations/twilio/phone-numbers/disable")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostRequest calls the generic EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost builder with application/json body
+func NewEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostRequest(server string, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, body EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostRequestWithBody constructs an http.Request for the EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost method, with any body, and a specified content type
+func NewEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostRequestWithBody(server string, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/integrations/twilio/phone-numbers/enable")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
 // NewApplyToJobV1RecipesJobsApplyPostRequest calls the generic ApplyToJobV1RecipesJobsApplyPost builder with application/json body
 func NewApplyToJobV1RecipesJobsApplyPostRequest(server string, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -42966,6 +43899,221 @@ func NewRunSdkActionV1SdkRunActionPostRequestWithBody(server string, params *Run
 	return req, nil
 }
 
+// NewListManagedNumbersV1SmsNumbersGetRequest constructs an http.Request for the ListManagedNumbersV1SmsNumbersGet method
+func NewListManagedNumbersV1SmsNumbersGetRequest(server string, params *ListManagedNumbersV1SmsNumbersGetParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/sms-numbers")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewProvisionManagedNumberV1SmsNumbersPostRequest calls the generic ProvisionManagedNumberV1SmsNumbersPost builder with application/json body
+func NewProvisionManagedNumberV1SmsNumbersPostRequest(server string, params *ProvisionManagedNumberV1SmsNumbersPostParams, body ProvisionManagedNumberV1SmsNumbersPostJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewProvisionManagedNumberV1SmsNumbersPostRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewProvisionManagedNumberV1SmsNumbersPostRequestWithBody constructs an http.Request for the ProvisionManagedNumberV1SmsNumbersPost method, with any body, and a specified content type
+func NewProvisionManagedNumberV1SmsNumbersPostRequestWithBody(server string, params *ProvisionManagedNumberV1SmsNumbersPostParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/sms-numbers")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewSearchAvailableNumbersV1SmsNumbersAvailableGetRequest constructs an http.Request for the SearchAvailableNumbersV1SmsNumbersAvailableGet method
+func NewSearchAvailableNumbersV1SmsNumbersAvailableGetRequest(server string, params *SearchAvailableNumbersV1SmsNumbersAvailableGetParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/sms-numbers/available")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.AreaCode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "area_code", *params.AreaCode, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostRequest constructs an http.Request for the ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost method
+func NewReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostRequest(server string, phoneNumberId string, params *ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "phone_number_id", phoneNumberId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/sms-numbers/%s/release", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XApiKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", *params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-api-key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
 // NewListTagKeysV1TagKeysGetRequest constructs an http.Request for the ListTagKeysV1TagKeysGet method
 func NewListTagKeysV1TagKeysGetRequest(server string, params *ListTagKeysV1TagKeysGetParams) (*http.Request, error) {
 	var err error
@@ -43728,12 +44876,14 @@ type ClientWithResponsesInterface interface {
 	// | `browser_profile_id` | The browser profile the run used (e.g. `bp_123…`) |
 	// | `browser_session_id` | The browser session the run used (e.g. `pbs_123…`) |
 	// | **Credential id** | A credential the run used (e.g. `cred_123…`) |
+	// | `workflow_run_id` | The run itself (e.g. `wr_123…`) |
+	// | **Task id** | The workflow run the task ran in, when that run is top-level (e.g. `tsk_123…`) |
 	//
-	// A complete browser profile or browser session id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
+	// A complete browser profile, browser session, workflow run or task id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
 	//
 	// ### Default search window
 	//
-	// A `search_key` other than a complete browser profile or session id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete run and credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
+	// A `search_key` other than a complete browser profile, browser session, workflow run or task id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Explicit bounds apply to every search, complete ids included. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
 	//
 	// ### created_at_start / created_at_end
 	//
@@ -43794,7 +44944,7 @@ type ClientWithResponsesInterface interface {
 	//
 	// ### search_key
 	//
-	// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete browser profile or browser session ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
+	// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete workflow run ID matches that run. A complete task ID matches the workflow run the task ran in, when this list includes that run, or the standalone task itself where standalone tasks are listed. A complete browser profile, browser session, workflow run or task ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
 	//
 	// ### error_code
 	//
@@ -44389,6 +45539,96 @@ type ClientWithResponsesInterface interface {
 	// Corresponds with PUT /v1/folders/{folder_id} (the `UpdateFolderV1FoldersFolderIdPut` operationId).
 	UpdateFolderV1FoldersFolderIdPutWithResponse(ctx context.Context, folderId string, params *UpdateFolderV1FoldersFolderIdPutParams, body UpdateFolderV1FoldersFolderIdPutJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFolderV1FoldersFolderIdPutResponse, error)
 
+	// DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteWithResponse Disconnect Twilio credentials
+	//
+	// Remove the stored Twilio credentials after connected phone numbers are disabled.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with DELETE /v1/integrations/twilio/credentials (the `DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete` operationId).
+	DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteWithResponse(ctx context.Context, params *DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse, error)
+
+	// GetTwilioCredentialV1IntegrationsTwilioCredentialsGetWithResponse Get Twilio credentials
+	//
+	// Get the safe Twilio credential metadata for the current organization.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /v1/integrations/twilio/credentials (the `GetTwilioCredentialV1IntegrationsTwilioCredentialsGet` operationId).
+	GetTwilioCredentialV1IntegrationsTwilioCredentialsGetWithResponse(ctx context.Context, params *GetTwilioCredentialV1IntegrationsTwilioCredentialsGetParams, reqEditors ...RequestEditorFn) (*GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse, error)
+
+	// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithBodyWithResponse Connect Twilio credentials
+	//
+	// Validate and store Twilio credentials for the current organization.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/integrations/twilio/credentials (the `CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost` operationId).
+	CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithBodyWithResponse(ctx context.Context, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse, error)
+
+	// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithResponse Connect Twilio credentials
+	//
+	// Validate and store Twilio credentials for the current organization.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/integrations/twilio/credentials (the `CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost` operationId).
+	CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithResponse(ctx context.Context, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, body CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse, error)
+
+	// ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetWithResponse List registered phone numbers
+	//
+	// List the current organization's phone numbers registered for SMS forwarding.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /v1/integrations/twilio/phone-number-registry (the `ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet` operationId).
+	ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetWithResponse(ctx context.Context, params *ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetParams, reqEditors ...RequestEditorFn) (*ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse, error)
+
+	// ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetWithResponse List Twilio phone numbers
+	//
+	// List SMS-capable phone numbers available in the connected Twilio account.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /v1/integrations/twilio/phone-numbers (the `ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet` operationId).
+	ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetWithResponse(ctx context.Context, params *ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetParams, reqEditors ...RequestEditorFn) (*ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse, error)
+
+	// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithBodyWithResponse Disable Twilio phone number
+	//
+	// Disable SMS forwarding for a phone number registered in the current organization.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/integrations/twilio/phone-numbers/disable (the `DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost` operationId).
+	DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithBodyWithResponse(ctx context.Context, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse, error)
+
+	// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithResponse Disable Twilio phone number
+	//
+	// Disable SMS forwarding for a phone number registered in the current organization.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/integrations/twilio/phone-numbers/disable (the `DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost` operationId).
+	DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithResponse(ctx context.Context, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, body DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostJSONRequestBody, reqEditors ...RequestEditorFn) (*DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse, error)
+
+	// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithBodyWithResponse Enable Twilio phone number
+	//
+	// Enable SMS forwarding for a Twilio phone number in the current organization.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/integrations/twilio/phone-numbers/enable (the `EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost` operationId).
+	EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithBodyWithResponse(ctx context.Context, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse, error)
+
+	// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithResponse Enable Twilio phone number
+	//
+	// Enable SMS forwarding for a Twilio phone number in the current organization.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/integrations/twilio/phone-numbers/enable (the `EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost` operationId).
+	EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithResponse(ctx context.Context, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, body EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostJSONRequestBody, reqEditors ...RequestEditorFn) (*EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse, error)
+
 	// ApplyToJobV1RecipesJobsApplyPostWithBodyWithResponse Apply to a job
 	//
 	// Start a workflow run that applies to a job with a résumé and optional credentials.
@@ -44747,6 +45987,51 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with POST /v1/sdk/run_action (the `RunSdkActionV1SdkRunActionPost` operationId).
 	RunSdkActionV1SdkRunActionPostWithResponse(ctx context.Context, params *RunSdkActionV1SdkRunActionPostParams, body RunSdkActionV1SdkRunActionPostJSONRequestBody, reqEditors ...RequestEditorFn) (*RunSdkActionV1SdkRunActionPostResponse, error)
+
+	// ListManagedNumbersV1SmsNumbersGetWithResponse List managed SMS numbers
+	//
+	// List the Skyvern-managed SMS numbers for the authenticated organization.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /v1/sms-numbers (the `ListManagedNumbersV1SmsNumbersGet` operationId).
+	ListManagedNumbersV1SmsNumbersGetWithResponse(ctx context.Context, params *ListManagedNumbersV1SmsNumbersGetParams, reqEditors ...RequestEditorFn) (*ListManagedNumbersV1SmsNumbersGetResponse, error)
+
+	// ProvisionManagedNumberV1SmsNumbersPostWithBodyWithResponse Provision managed SMS number
+	//
+	// Purchase and configure a Skyvern-managed SMS number for the authenticated organization.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/sms-numbers (the `ProvisionManagedNumberV1SmsNumbersPost` operationId).
+	ProvisionManagedNumberV1SmsNumbersPostWithBodyWithResponse(ctx context.Context, params *ProvisionManagedNumberV1SmsNumbersPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ProvisionManagedNumberV1SmsNumbersPostResponse, error)
+
+	// ProvisionManagedNumberV1SmsNumbersPostWithResponse Provision managed SMS number
+	//
+	// Purchase and configure a Skyvern-managed SMS number for the authenticated organization.
+	//
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/sms-numbers (the `ProvisionManagedNumberV1SmsNumbersPost` operationId).
+	ProvisionManagedNumberV1SmsNumbersPostWithResponse(ctx context.Context, params *ProvisionManagedNumberV1SmsNumbersPostParams, body ProvisionManagedNumberV1SmsNumbersPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ProvisionManagedNumberV1SmsNumbersPostResponse, error)
+
+	// SearchAvailableNumbersV1SmsNumbersAvailableGetWithResponse Search available managed SMS numbers
+	//
+	// Search for available US Skyvern-managed SMS numbers, optionally by area code.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /v1/sms-numbers/available (the `SearchAvailableNumbersV1SmsNumbersAvailableGet` operationId).
+	SearchAvailableNumbersV1SmsNumbersAvailableGetWithResponse(ctx context.Context, params *SearchAvailableNumbersV1SmsNumbersAvailableGetParams, reqEditors ...RequestEditorFn) (*SearchAvailableNumbersV1SmsNumbersAvailableGetResponse, error)
+
+	// ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostWithResponse Release managed SMS number
+	//
+	// For billing-exempt numbers, forwarding stops immediately. For numbers with a subscription, billing and forwarding continue until the current billing period ends. Skyvern then holds the number for 30 days before it can be reassigned.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/sms-numbers/{phone_number_id}/release (the `ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost` operationId).
+	ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostWithResponse(ctx context.Context, phoneNumberId string, params *ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostParams, reqEditors ...RequestEditorFn) (*ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse, error)
 
 	// ListTagKeysV1TagKeysGetWithResponse List tag keys
 	//
@@ -47553,6 +48838,293 @@ func (r UpdateFolderV1FoldersFolderIdPutResponse) ContentType() string {
 	return ""
 }
 
+type DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *map[string]bool
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse) GetJSON200() *map[string]bool {
+	return r.JSON200
+}
+
+// GetBody returns the raw response body bytes
+func (r DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *TwilioCredentialResponse
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse) GetJSON200() *TwilioCredentialResponse {
+	return r.JSON200
+}
+
+// GetBody returns the raw response body bytes
+func (r GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *TwilioCredentialResponse
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse) GetJSON200() *TwilioCredentialResponse {
+	return r.JSON200
+}
+
+// GetBody returns the raw response body bytes
+func (r CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]OrganizationPhoneNumberResponse
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse) GetJSON200() *[]OrganizationPhoneNumberResponse {
+	return r.JSON200
+}
+
+// GetBody returns the raw response body bytes
+func (r ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]TwilioPhoneNumberInfo
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse) GetJSON200() *[]TwilioPhoneNumberInfo {
+	return r.JSON200
+}
+
+// GetBody returns the raw response body bytes
+func (r ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *OrganizationPhoneNumberResponse
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse) GetJSON200() *OrganizationPhoneNumberResponse {
+	return r.JSON200
+}
+
+// GetBody returns the raw response body bytes
+func (r DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *OrganizationPhoneNumberResponse
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse) GetJSON200() *OrganizationPhoneNumberResponse {
+	return r.JSON200
+}
+
+// GetBody returns the raw response body bytes
+func (r EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type ApplyToJobV1RecipesJobsApplyPostResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -48876,6 +50448,198 @@ func (r RunSdkActionV1SdkRunActionPostResponse) ContentType() string {
 	return ""
 }
 
+type ListManagedNumbersV1SmsNumbersGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]OrganizationPhoneNumberResponse
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *HTTPValidationError
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListManagedNumbersV1SmsNumbersGetResponse) GetJSON200() *[]OrganizationPhoneNumberResponse {
+	return r.JSON200
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r ListManagedNumbersV1SmsNumbersGetResponse) GetJSON422() *HTTPValidationError {
+	return r.JSON422
+}
+
+// GetBody returns the raw response body bytes
+func (r ListManagedNumbersV1SmsNumbersGetResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListManagedNumbersV1SmsNumbersGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListManagedNumbersV1SmsNumbersGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListManagedNumbersV1SmsNumbersGetResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ProvisionManagedNumberV1SmsNumbersPostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *OrganizationPhoneNumberResponse
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *HTTPValidationError
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ProvisionManagedNumberV1SmsNumbersPostResponse) GetJSON200() *OrganizationPhoneNumberResponse {
+	return r.JSON200
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r ProvisionManagedNumberV1SmsNumbersPostResponse) GetJSON422() *HTTPValidationError {
+	return r.JSON422
+}
+
+// GetBody returns the raw response body bytes
+func (r ProvisionManagedNumberV1SmsNumbersPostResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ProvisionManagedNumberV1SmsNumbersPostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ProvisionManagedNumberV1SmsNumbersPostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ProvisionManagedNumberV1SmsNumbersPostResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type SearchAvailableNumbersV1SmsNumbersAvailableGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *[]AvailableManagedPhoneNumber
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *HTTPValidationError
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r SearchAvailableNumbersV1SmsNumbersAvailableGetResponse) GetJSON200() *[]AvailableManagedPhoneNumber {
+	return r.JSON200
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r SearchAvailableNumbersV1SmsNumbersAvailableGetResponse) GetJSON422() *HTTPValidationError {
+	return r.JSON422
+}
+
+// GetBody returns the raw response body bytes
+func (r SearchAvailableNumbersV1SmsNumbersAvailableGetResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r SearchAvailableNumbersV1SmsNumbersAvailableGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SearchAvailableNumbersV1SmsNumbersAvailableGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r SearchAvailableNumbersV1SmsNumbersAvailableGetResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
+type ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *OrganizationPhoneNumberResponse
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *HTTPValidationError
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse) GetJSON200() *OrganizationPhoneNumberResponse {
+	return r.JSON200
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse) GetJSON422() *HTTPValidationError {
+	return r.JSON422
+}
+
+// GetBody returns the raw response body bytes
+func (r ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type ListTagKeysV1TagKeysGetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -49495,12 +51259,14 @@ func (c *ClientWithResponses) CreateWorkflowV1AgentsPostWithResponse(ctx context
 // | `browser_profile_id` | The browser profile the run used (e.g. `bp_123…`) |
 // | `browser_session_id` | The browser session the run used (e.g. `pbs_123…`) |
 // | **Credential id** | A credential the run used (e.g. `cred_123…`) |
+// | `workflow_run_id` | The run itself (e.g. `wr_123…`) |
+// | **Task id** | The workflow run the task ran in, when that run is top-level (e.g. `tsk_123…`) |
 //
-// A complete browser profile or browser session id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
+// A complete browser profile, browser session, workflow run or task id is matched against those identifiers only, not the text fields above. A credential id matches a run when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for that parameter. Other pool and fallback members the run did not use do not match.
 //
 // ### Default search window
 //
-// A `search_key` other than a complete browser profile or session id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete run and credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
+// A `search_key` other than a complete browser profile, browser session, workflow run or task id is matched only against runs created in the **30 days before `created_at_end`** (or before now) unless the request supplies `created_at_start`. This includes complete credential ids. Supply `created_at_start` (and optionally `created_at_end`) to search a different range. Explicit bounds apply to every search, complete ids included. Listings without `search_key` are not windowed. To fetch one run by its id, use `GET /v1/runs/{run_id}`.
 //
 // ### created_at_start / created_at_end
 //
@@ -49591,7 +51357,7 @@ func (c *ClientWithResponses) DeleteWorkflowV1AgentsWorkflowIdDeletePostWithResp
 //
 // ### search_key
 //
-// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete browser profile or browser session ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
+// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete workflow run ID matches that run. A complete task ID matches the workflow run the task ran in, when this list includes that run, or the standalone task itself where standalone tasks are listed. A complete browser profile, browser session, workflow run or task ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
 //
 // ### error_code
 //
@@ -50576,6 +52342,156 @@ func (c *ClientWithResponses) UpdateFolderV1FoldersFolderIdPutWithResponse(ctx c
 	return ParseUpdateFolderV1FoldersFolderIdPutResponse(rsp)
 }
 
+// DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteWithResponse Disconnect Twilio credentials
+//
+// Remove the stored Twilio credentials after connected phone numbers are disabled.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with DELETE /v1/integrations/twilio/credentials (the `DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete` operationId).
+func (c *ClientWithResponses) DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteWithResponse(ctx context.Context, params *DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse, error) {
+	rsp, err := c.DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse(rsp)
+}
+
+// GetTwilioCredentialV1IntegrationsTwilioCredentialsGetWithResponse Get Twilio credentials
+//
+// Get the safe Twilio credential metadata for the current organization.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /v1/integrations/twilio/credentials (the `GetTwilioCredentialV1IntegrationsTwilioCredentialsGet` operationId).
+func (c *ClientWithResponses) GetTwilioCredentialV1IntegrationsTwilioCredentialsGetWithResponse(ctx context.Context, params *GetTwilioCredentialV1IntegrationsTwilioCredentialsGetParams, reqEditors ...RequestEditorFn) (*GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse, error) {
+	rsp, err := c.GetTwilioCredentialV1IntegrationsTwilioCredentialsGet(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse(rsp)
+}
+
+// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithBodyWithResponse Connect Twilio credentials
+//
+// Validate and store Twilio credentials for the current organization.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/integrations/twilio/credentials (the `CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost` operationId).
+func (c *ClientWithResponses) CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithBodyWithResponse(ctx context.Context, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse, error) {
+	rsp, err := c.CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse(rsp)
+}
+
+// CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithResponse Connect Twilio credentials
+//
+// Validate and store Twilio credentials for the current organization.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/integrations/twilio/credentials (the `CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost` operationId).
+func (c *ClientWithResponses) CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithResponse(ctx context.Context, params *CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostParams, body CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse, error) {
+	rsp, err := c.CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse(rsp)
+}
+
+// ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetWithResponse List registered phone numbers
+//
+// List the current organization's phone numbers registered for SMS forwarding.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /v1/integrations/twilio/phone-number-registry (the `ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet` operationId).
+func (c *ClientWithResponses) ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetWithResponse(ctx context.Context, params *ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetParams, reqEditors ...RequestEditorFn) (*ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse, error) {
+	rsp, err := c.ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse(rsp)
+}
+
+// ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetWithResponse List Twilio phone numbers
+//
+// List SMS-capable phone numbers available in the connected Twilio account.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /v1/integrations/twilio/phone-numbers (the `ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet` operationId).
+func (c *ClientWithResponses) ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetWithResponse(ctx context.Context, params *ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetParams, reqEditors ...RequestEditorFn) (*ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse, error) {
+	rsp, err := c.ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse(rsp)
+}
+
+// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithBodyWithResponse Disable Twilio phone number
+//
+// Disable SMS forwarding for a phone number registered in the current organization.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/integrations/twilio/phone-numbers/disable (the `DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost` operationId).
+func (c *ClientWithResponses) DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithBodyWithResponse(ctx context.Context, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse, error) {
+	rsp, err := c.DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse(rsp)
+}
+
+// DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithResponse Disable Twilio phone number
+//
+// Disable SMS forwarding for a phone number registered in the current organization.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/integrations/twilio/phone-numbers/disable (the `DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost` operationId).
+func (c *ClientWithResponses) DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithResponse(ctx context.Context, params *DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostParams, body DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostJSONRequestBody, reqEditors ...RequestEditorFn) (*DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse, error) {
+	rsp, err := c.DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse(rsp)
+}
+
+// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithBodyWithResponse Enable Twilio phone number
+//
+// Enable SMS forwarding for a Twilio phone number in the current organization.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/integrations/twilio/phone-numbers/enable (the `EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost` operationId).
+func (c *ClientWithResponses) EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithBodyWithResponse(ctx context.Context, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse, error) {
+	rsp, err := c.EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse(rsp)
+}
+
+// EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithResponse Enable Twilio phone number
+//
+// Enable SMS forwarding for a Twilio phone number in the current organization.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/integrations/twilio/phone-numbers/enable (the `EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost` operationId).
+func (c *ClientWithResponses) EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithResponse(ctx context.Context, params *EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams, body EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostJSONRequestBody, reqEditors ...RequestEditorFn) (*EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse, error) {
+	rsp, err := c.EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse(rsp)
+}
+
 // ApplyToJobV1RecipesJobsApplyPostWithBodyWithResponse Apply to a job
 //
 // Start a workflow run that applies to a job with a résumé and optional credentials.
@@ -51179,6 +53095,81 @@ func (c *ClientWithResponses) RunSdkActionV1SdkRunActionPostWithResponse(ctx con
 		return nil, err
 	}
 	return ParseRunSdkActionV1SdkRunActionPostResponse(rsp)
+}
+
+// ListManagedNumbersV1SmsNumbersGetWithResponse List managed SMS numbers
+//
+// List the Skyvern-managed SMS numbers for the authenticated organization.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /v1/sms-numbers (the `ListManagedNumbersV1SmsNumbersGet` operationId).
+func (c *ClientWithResponses) ListManagedNumbersV1SmsNumbersGetWithResponse(ctx context.Context, params *ListManagedNumbersV1SmsNumbersGetParams, reqEditors ...RequestEditorFn) (*ListManagedNumbersV1SmsNumbersGetResponse, error) {
+	rsp, err := c.ListManagedNumbersV1SmsNumbersGet(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListManagedNumbersV1SmsNumbersGetResponse(rsp)
+}
+
+// ProvisionManagedNumberV1SmsNumbersPostWithBodyWithResponse Provision managed SMS number
+//
+// Purchase and configure a Skyvern-managed SMS number for the authenticated organization.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/sms-numbers (the `ProvisionManagedNumberV1SmsNumbersPost` operationId).
+func (c *ClientWithResponses) ProvisionManagedNumberV1SmsNumbersPostWithBodyWithResponse(ctx context.Context, params *ProvisionManagedNumberV1SmsNumbersPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ProvisionManagedNumberV1SmsNumbersPostResponse, error) {
+	rsp, err := c.ProvisionManagedNumberV1SmsNumbersPostWithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseProvisionManagedNumberV1SmsNumbersPostResponse(rsp)
+}
+
+// ProvisionManagedNumberV1SmsNumbersPostWithResponse Provision managed SMS number
+//
+// Purchase and configure a Skyvern-managed SMS number for the authenticated organization.
+//
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/sms-numbers (the `ProvisionManagedNumberV1SmsNumbersPost` operationId).
+func (c *ClientWithResponses) ProvisionManagedNumberV1SmsNumbersPostWithResponse(ctx context.Context, params *ProvisionManagedNumberV1SmsNumbersPostParams, body ProvisionManagedNumberV1SmsNumbersPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ProvisionManagedNumberV1SmsNumbersPostResponse, error) {
+	rsp, err := c.ProvisionManagedNumberV1SmsNumbersPost(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseProvisionManagedNumberV1SmsNumbersPostResponse(rsp)
+}
+
+// SearchAvailableNumbersV1SmsNumbersAvailableGetWithResponse Search available managed SMS numbers
+//
+// Search for available US Skyvern-managed SMS numbers, optionally by area code.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /v1/sms-numbers/available (the `SearchAvailableNumbersV1SmsNumbersAvailableGet` operationId).
+func (c *ClientWithResponses) SearchAvailableNumbersV1SmsNumbersAvailableGetWithResponse(ctx context.Context, params *SearchAvailableNumbersV1SmsNumbersAvailableGetParams, reqEditors ...RequestEditorFn) (*SearchAvailableNumbersV1SmsNumbersAvailableGetResponse, error) {
+	rsp, err := c.SearchAvailableNumbersV1SmsNumbersAvailableGet(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSearchAvailableNumbersV1SmsNumbersAvailableGetResponse(rsp)
+}
+
+// ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostWithResponse Release managed SMS number
+//
+// For billing-exempt numbers, forwarding stops immediately. For numbers with a subscription, billing and forwarding continue until the current billing period ends. Skyvern then holds the number for 30 days before it can be reassigned.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/sms-numbers/{phone_number_id}/release (the `ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost` operationId).
+func (c *ClientWithResponses) ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostWithResponse(ctx context.Context, phoneNumberId string, params *ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostParams, reqEditors ...RequestEditorFn) (*ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse, error) {
+	rsp, err := c.ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost(ctx, phoneNumberId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse(rsp)
 }
 
 // ListTagKeysV1TagKeysGetWithResponse List tag keys
@@ -53422,6 +55413,275 @@ func ParseUpdateFolderV1FoldersFolderIdPutResponse(rsp *http.Response) (*UpdateF
 	return response, nil
 }
 
+// ParseDeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse parses an HTTP response from a DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteWithResponse call
+func ParseDeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse(rsp *http.Response) (*DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]bool
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 404:
+		break // No content-type
+
+	case rsp.StatusCode == 409:
+		break // No content-type
+
+	case rsp.StatusCode == 422:
+		break // No content-type
+
+	}
+
+	return response, nil
+}
+
+// ParseGetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse parses an HTTP response from a GetTwilioCredentialV1IntegrationsTwilioCredentialsGetWithResponse call
+func ParseGetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse(rsp *http.Response) (*GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetTwilioCredentialV1IntegrationsTwilioCredentialsGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest TwilioCredentialResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 404:
+		break // No content-type
+
+	case rsp.StatusCode == 422:
+		break // No content-type
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse parses an HTTP response from a CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostWithResponse call
+func ParseCreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse(rsp *http.Response) (*CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateTwilioCredentialV1IntegrationsTwilioCredentialsPostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest TwilioCredentialResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 400:
+		break // No content-type
+
+	case rsp.StatusCode == 404:
+		break // No content-type
+
+	case rsp.StatusCode == 409:
+		break // No content-type
+
+	case rsp.StatusCode == 422:
+		break // No content-type
+
+	case rsp.StatusCode == 502:
+		break // No content-type
+
+	case rsp.StatusCode == 503:
+		break // No content-type
+
+	}
+
+	return response, nil
+}
+
+// ParseListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse parses an HTTP response from a ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetWithResponse call
+func ParseListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse(rsp *http.Response) (*ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []OrganizationPhoneNumberResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 404:
+		break // No content-type
+
+	case rsp.StatusCode == 422:
+		break // No content-type
+
+	}
+
+	return response, nil
+}
+
+// ParseListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse parses an HTTP response from a ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetWithResponse call
+func ParseListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse(rsp *http.Response) (*ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []TwilioPhoneNumberInfo
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 400:
+		break // No content-type
+
+	case rsp.StatusCode == 404:
+		break // No content-type
+
+	case rsp.StatusCode == 422:
+		break // No content-type
+
+	case rsp.StatusCode == 502:
+		break // No content-type
+
+	case rsp.StatusCode == 503:
+		break // No content-type
+
+	}
+
+	return response, nil
+}
+
+// ParseDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse parses an HTTP response from a DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostWithResponse call
+func ParseDisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse(rsp *http.Response) (*DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OrganizationPhoneNumberResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 404:
+		break // No content-type
+
+	case rsp.StatusCode == 409:
+		break // No content-type
+
+	case rsp.StatusCode == 422:
+		break // No content-type
+
+	case rsp.StatusCode == 502:
+		break // No content-type
+
+	case rsp.StatusCode == 503:
+		break // No content-type
+
+	}
+
+	return response, nil
+}
+
+// ParseEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse parses an HTTP response from a EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostWithResponse call
+func ParseEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse(rsp *http.Response) (*EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OrganizationPhoneNumberResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 400:
+		break // No content-type
+
+	case rsp.StatusCode == 404:
+		break // No content-type
+
+	case rsp.StatusCode == 409:
+		break // No content-type
+
+	case rsp.StatusCode == 422:
+		break // No content-type
+
+	case rsp.StatusCode == 502:
+		break // No content-type
+
+	case rsp.StatusCode == 503:
+		break // No content-type
+
+	}
+
+	return response, nil
+}
+
 // ParseApplyToJobV1RecipesJobsApplyPostResponse parses an HTTP response from a ApplyToJobV1RecipesJobsApplyPostWithResponse call
 func ParseApplyToJobV1RecipesJobsApplyPostResponse(rsp *http.Response) (*ApplyToJobV1RecipesJobsApplyPostResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -54409,6 +56669,177 @@ func ParseRunSdkActionV1SdkRunActionPostResponse(rsp *http.Response) (*RunSdkAct
 			return nil, err
 		}
 		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListManagedNumbersV1SmsNumbersGetResponse parses an HTTP response from a ListManagedNumbersV1SmsNumbersGetWithResponse call
+func ParseListManagedNumbersV1SmsNumbersGetResponse(rsp *http.Response) (*ListManagedNumbersV1SmsNumbersGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListManagedNumbersV1SmsNumbersGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []OrganizationPhoneNumberResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 403:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseProvisionManagedNumberV1SmsNumbersPostResponse parses an HTTP response from a ProvisionManagedNumberV1SmsNumbersPostWithResponse call
+func ParseProvisionManagedNumberV1SmsNumbersPostResponse(rsp *http.Response) (*ProvisionManagedNumberV1SmsNumbersPostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ProvisionManagedNumberV1SmsNumbersPostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OrganizationPhoneNumberResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 402:
+		break // No content-type
+
+	case rsp.StatusCode == 403:
+		break // No content-type
+
+	case rsp.StatusCode == 409:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case rsp.StatusCode == 502:
+		break // No content-type
+
+	case rsp.StatusCode == 503:
+		break // No content-type
+
+	}
+
+	return response, nil
+}
+
+// ParseSearchAvailableNumbersV1SmsNumbersAvailableGetResponse parses an HTTP response from a SearchAvailableNumbersV1SmsNumbersAvailableGetWithResponse call
+func ParseSearchAvailableNumbersV1SmsNumbersAvailableGetResponse(rsp *http.Response) (*SearchAvailableNumbersV1SmsNumbersAvailableGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SearchAvailableNumbersV1SmsNumbersAvailableGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []AvailableManagedPhoneNumber
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 403:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case rsp.StatusCode == 502:
+		break // No content-type
+
+	}
+
+	return response, nil
+}
+
+// ParseReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse parses an HTTP response from a ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostWithResponse call
+func ParseReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse(rsp *http.Response) (*ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OrganizationPhoneNumberResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case rsp.StatusCode == 403:
+		break // No content-type
+
+	case rsp.StatusCode == 404:
+		break // No content-type
+
+	case rsp.StatusCode == 409:
+		break // No content-type
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case rsp.StatusCode == 502:
+		break // No content-type
+
+	case rsp.StatusCode == 503:
+		break // No content-type
 
 	}
 

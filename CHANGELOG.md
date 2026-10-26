@@ -2,6 +2,15 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.6.0, 2026-10-26
+
+- Added Twilio credential endpoints. `(*Client).CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost`, `GetTwilioCredentialV1IntegrationsTwilioCredentialsGet` and `DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete` send the requests. Each has a `WithResponse` variant on `ClientWithResponses`, a `New...Request` builder and a `Parse...Response` function. The body type is `CreateTwilioCredentialRequest`, and the stored credential is returned as `TwilioCredentialResponse`, `TwilioCredential` or `TwilioCredentialSafe`.
+- Added Twilio phone number endpoints: `ListTwilioPhoneNumbersV1IntegrationsTwilioPhoneNumbersGet`, `ListRegisteredPhoneNumbersV1IntegrationsTwilioPhoneNumberRegistryGet`, `EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePost` and `DisableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersDisablePost`. The new types are `TwilioPhoneNumberInfo`, `EnablePhoneNumberRequest` and `DisablePhoneNumberRequest`.
+- Added managed SMS number endpoints: `SearchAvailableNumbersV1SmsNumbersAvailableGet`, `ListManagedNumbersV1SmsNumbersGet`, `ProvisionManagedNumberV1SmsNumbersPost` and `ReleaseManagedNumberV1SmsNumbersPhoneNumberIdReleasePost`. The new types are `AvailableManagedPhoneNumber`, `ProvisionManagedNumberRequest` and `OrganizationPhoneNumberResponse`, whose `Status` is `OrganizationPhoneNumberResponseStatus` with values such as `OrganizationPhoneNumberResponseStatusActive` and `OrganizationPhoneNumberResponseStatusDisabled`.
+- `ClientInterface` gained the 15 new client methods and `ClientWithResponsesInterface` gained the 15 new `WithResponse` methods. Custom types that implement either interface, such as test mocks, must add them.
+- The `ApplyToJobV1RecipesJobsApplyPost`, `ExtractJobApplicationV1RecipesJobsExtractPost` and `ListJobRecipeRunsV1RecipesJobsRunsGet` request builders moved within `client.gen.go`. Their signatures are unchanged.
+- The doc comments for `SearchKey` and the 30 day search window on the run listing parameters were reworded.
+
 ## v0.5.1, 2026-10-25
 
 - `AuditEventExportRow` gained an `ImpersonatedBy` field, a `*string`.
