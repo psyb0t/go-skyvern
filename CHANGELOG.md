@@ -2,6 +2,10 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.6.1, 2026-10-27
+
+- The development image is based on Debian (`golang:1.26.10-trixie`) instead of Alpine. Alpine keeps only the latest build of each package, so the exact pins broke the image build whenever a package was updated. System packages now come from the snapshot.debian.org date the base image was built from, which keeps them fixed for a given base image digest. jq 1.8.2, shellcheck 0.11.0 and shfmt 3.13.1 keep their versions, and Semgrep runs in its own virtual environment.
+
 ## v0.6.0, 2026-10-26
 
 - Added Twilio credential endpoints. `(*Client).CreateTwilioCredentialV1IntegrationsTwilioCredentialsPost`, `GetTwilioCredentialV1IntegrationsTwilioCredentialsGet` and `DeleteTwilioCredentialV1IntegrationsTwilioCredentialsDelete` send the requests. Each has a `WithResponse` variant on `ClientWithResponses`, a `New...Request` builder and a `Parse...Response` function. The body type is `CreateTwilioCredentialRequest`, and the stored credential is returned as `TwilioCredentialResponse`, `TwilioCredential` or `TwilioCredentialSafe`.
