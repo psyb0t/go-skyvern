@@ -2,6 +2,13 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.6.2, 2026-10-27
+
+- Added the `agent_step` workflow block. `AgentStepBlock` and `AgentStepBlockYAML` have `Label`, `Prompt`, `OutputParameter`, `MaxTurns`, `DataSchema`, `Model`, `Parameters` and the usual block fields such as `ContinueOnFailure`, `DisableCache` and `NextBlockLabel`. Their `BlockType` has the single value `AgentStepBlockBlockTypeAgentStep` or `AgentStepBlockYAMLBlockTypeAgentStep`. `AgentStepBlock_Parameters_Item` holds the parameter union.
+- `BlockType` gained `BlockTypeAgentStep`.
+- The block unions `WorkflowDefinition_Blocks_Item`, `WorkflowDefinitionYAML_Blocks_Item`, `ForLoopBlock_LoopBlocks_Item`, `ForLoopBlockYAML_LoopBlocks_Item`, `WhileLoopBlock_LoopBlocks_Item` and `WhileLoopBlockYAML_LoopBlocks_Item` gained `AsAgentStepBlock`, `FromAgentStepBlock` and `MergeAgentStepBlock` methods, with `YAML` suffixed variants on the YAML unions.
+- `WorkflowRunTriggerType` gained the value `WorkflowRunTriggerTypeSeoRecipeSubmit`.
+
 ## v0.6.1, 2026-10-27
 
 - The development image is based on Debian (`golang:1.26.10-trixie`) instead of Alpine. Alpine keeps only the latest build of each package, so the exact pins broke the image build whenever a package was updated. System packages now come from the snapshot.debian.org date the base image was built from, which keeps them fixed for a given base image digest. jq 1.8.2, shellcheck 0.11.0 and shfmt 3.13.1 keep their versions, and Semgrep runs in its own virtual environment.

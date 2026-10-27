@@ -232,6 +232,36 @@ func (e ActionType) Valid() bool {
 	}
 }
 
+// Defines values for AgentStepBlockBlockType.
+const (
+	AgentStepBlockBlockTypeAgentStep AgentStepBlockBlockType = "agent_step"
+)
+
+// Valid indicates whether the value is a known member of the AgentStepBlockBlockType enum.
+func (e AgentStepBlockBlockType) Valid() bool {
+	switch e {
+	case AgentStepBlockBlockTypeAgentStep:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AgentStepBlockYAMLBlockType.
+const (
+	AgentStepBlockYAMLBlockTypeAgentStep AgentStepBlockYAMLBlockType = "agent_step"
+)
+
+// Valid indicates whether the value is a known member of the AgentStepBlockYAMLBlockType enum.
+func (e AgentStepBlockYAMLBlockType) Valid() bool {
+	switch e {
+	case AgentStepBlockYAMLBlockTypeAgentStep:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ArtifactType.
 const (
 	ArtifactTypeAudio                       ArtifactType = "audio"
@@ -532,6 +562,7 @@ func (e BitwardenSensitiveInformationParameterYAMLParameterType) Valid() bool {
 // Defines values for BlockType.
 const (
 	BlockTypeAction            BlockType = "action"
+	BlockTypeAgentStep         BlockType = "agent_step"
 	BlockTypeCode              BlockType = "code"
 	BlockTypeConditional       BlockType = "conditional"
 	BlockTypeDataExport        BlockType = "data_export"
@@ -570,6 +601,8 @@ const (
 func (e BlockType) Valid() bool {
 	switch e {
 	case BlockTypeAction:
+		return true
+	case BlockTypeAgentStep:
 		return true
 	case BlockTypeCode:
 		return true
@@ -3076,6 +3109,7 @@ const (
 	WorkflowRunTriggerTypeManual           WorkflowRunTriggerType = "manual"
 	WorkflowRunTriggerTypeMcp              WorkflowRunTriggerType = "mcp"
 	WorkflowRunTriggerTypeScheduled        WorkflowRunTriggerType = "scheduled"
+	WorkflowRunTriggerTypeSeoRecipeSubmit  WorkflowRunTriggerType = "seo_recipe_submit"
 	WorkflowRunTriggerTypeWebhook          WorkflowRunTriggerType = "webhook"
 )
 
@@ -3095,6 +3129,8 @@ func (e WorkflowRunTriggerType) Valid() bool {
 	case WorkflowRunTriggerTypeMcp:
 		return true
 	case WorkflowRunTriggerTypeScheduled:
+		return true
+	case WorkflowRunTriggerTypeSeoRecipeSubmit:
 		return true
 	case WorkflowRunTriggerTypeWebhook:
 		return true
@@ -3534,6 +3570,57 @@ type ActionStatus string
 
 // ActionType defines model for ActionType.
 type ActionType string
+
+// AgentStepBlock defines model for AgentStepBlock.
+type AgentStepBlock struct {
+	BlockType                  *AgentStepBlockBlockType `json:"block_type,omitempty"`
+	ContinueOnFailure          *bool                    `json:"continue_on_failure,omitempty"`
+	DataSchema                 map[string]interface{}   `json:"data_schema"`
+	DisableCache               *bool                    `json:"disable_cache,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool                    `json:"ignore_workflow_system_prompt,omitempty"`
+
+	// Label Author-facing identifier for a block; unique within a workflow.
+	Label    string                  `json:"label"`
+	MaxTurns *int                    `json:"max_turns,omitempty"`
+	Model    *map[string]interface{} `json:"model,omitempty"`
+
+	// NextBlockLabel Optional pointer to the next block label when constructing a DAG. Defaults to sequential order when omitted.
+	NextBlockLabel    *string                           `json:"next_block_label,omitempty"`
+	NextLoopOnFailure *bool                             `json:"next_loop_on_failure,omitempty"`
+	OutputParameter   OutputParameter                   `json:"output_parameter"`
+	Parameters        *[]AgentStepBlock_Parameters_Item `json:"parameters,omitempty"`
+	Prompt            string                            `json:"prompt"`
+}
+
+// AgentStepBlockBlockType defines model for AgentStepBlock.BlockType.
+type AgentStepBlockBlockType string
+
+// AgentStepBlock_Parameters_Item defines model for AgentStepBlock.parameters.Item.
+type AgentStepBlock_Parameters_Item struct {
+	union json.RawMessage
+}
+
+// AgentStepBlockYAML defines model for AgentStepBlockYAML.
+type AgentStepBlockYAML struct {
+	BlockType                  *AgentStepBlockYAMLBlockType `json:"block_type,omitempty"`
+	ContinueOnFailure          *bool                        `json:"continue_on_failure,omitempty"`
+	DataSchema                 *map[string]interface{}      `json:"data_schema,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool                        `json:"ignore_workflow_system_prompt,omitempty"`
+
+	// Label Author-facing identifier; must be unique per workflow.
+	Label    string                  `json:"label"`
+	MaxTurns *int                    `json:"max_turns,omitempty"`
+	Model    *map[string]interface{} `json:"model,omitempty"`
+
+	// NextBlockLabel Optional pointer to the label of the next block. When omitted, it will default to sequential order. See [[s-4bnl]].
+	NextBlockLabel    *string   `json:"next_block_label,omitempty"`
+	NextLoopOnFailure *bool     `json:"next_loop_on_failure,omitempty"`
+	ParameterKeys     *[]string `json:"parameter_keys,omitempty"`
+	Prompt            string    `json:"prompt"`
+}
+
+// AgentStepBlockYAMLBlockType defines model for AgentStepBlockYAML.BlockType.
+type AgentStepBlockYAMLBlockType string
 
 // Artifact defines model for Artifact.
 type Artifact struct {
@@ -7538,6 +7625,7 @@ type TaskRunListItem struct {
 	// - event: Triggered by an external event source
 	// - job_recipe_extract: Launched by a job recipe extract request
 	// - job_recipe_apply: Launched by a job recipe apply request
+	// - seo_recipe_submit: Launched by an SEO recipe directory submission
 	TriggerType         *WorkflowRunTriggerType `json:"trigger_type,omitempty"`
 	WorkflowDeleted     *bool                   `json:"workflow_deleted,omitempty"`
 	WorkflowPermanentId *string                 `json:"workflow_permanent_id,omitempty"`
@@ -9217,6 +9305,7 @@ type WorkflowRun struct {
 	// - event: Triggered by an external event source
 	// - job_recipe_extract: Launched by a job recipe extract request
 	// - job_recipe_apply: Launched by a job recipe apply request
+	// - seo_recipe_submit: Launched by an SEO recipe directory submission
 	TriggerType          *WorkflowRunTriggerType `json:"trigger_type,omitempty"`
 	WebhookCallbackUrl   *string                 `json:"webhook_callback_url,omitempty"`
 	WebhookFailureReason *string                 `json:"webhook_failure_reason,omitempty"`
@@ -9840,6 +9929,7 @@ type WorkflowRunTimelineType string
 // - event: Triggered by an external event source
 // - job_recipe_extract: Launched by a job recipe extract request
 // - job_recipe_apply: Launched by a job recipe apply request
+// - seo_recipe_submit: Launched by an SEO recipe directory submission
 type WorkflowRunTriggerType string
 
 // WorkflowSchedule defines model for WorkflowSchedule.
@@ -11739,6 +11829,431 @@ func (t ActionBlock_Parameters_Item) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ActionBlock_Parameters_Item) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsWorkflowParameter returns the union data inside the AgentStepBlock_Parameters_Item as a WorkflowParameter
+func (t AgentStepBlock_Parameters_Item) AsWorkflowParameter() (WorkflowParameter, error) {
+	var body WorkflowParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromWorkflowParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided WorkflowParameter
+func (t *AgentStepBlock_Parameters_Item) FromWorkflowParameter(v WorkflowParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"workflow"}`))
+	t.union = b
+	return err
+}
+
+// MergeWorkflowParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided WorkflowParameter
+func (t *AgentStepBlock_Parameters_Item) MergeWorkflowParameter(v WorkflowParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"workflow"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsContextParameter returns the union data inside the AgentStepBlock_Parameters_Item as a ContextParameter
+func (t AgentStepBlock_Parameters_Item) AsContextParameter() (ContextParameter, error) {
+	var body ContextParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromContextParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided ContextParameter
+func (t *AgentStepBlock_Parameters_Item) FromContextParameter(v ContextParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"context"}`))
+	t.union = b
+	return err
+}
+
+// MergeContextParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided ContextParameter
+func (t *AgentStepBlock_Parameters_Item) MergeContextParameter(v ContextParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"context"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAWSSecretParameter returns the union data inside the AgentStepBlock_Parameters_Item as a AWSSecretParameter
+func (t AgentStepBlock_Parameters_Item) AsAWSSecretParameter() (AWSSecretParameter, error) {
+	var body AWSSecretParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAWSSecretParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided AWSSecretParameter
+func (t *AgentStepBlock_Parameters_Item) FromAWSSecretParameter(v AWSSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"aws_secret"}`))
+	t.union = b
+	return err
+}
+
+// MergeAWSSecretParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided AWSSecretParameter
+func (t *AgentStepBlock_Parameters_Item) MergeAWSSecretParameter(v AWSSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"aws_secret"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAzureSecretParameter returns the union data inside the AgentStepBlock_Parameters_Item as a AzureSecretParameter
+func (t AgentStepBlock_Parameters_Item) AsAzureSecretParameter() (AzureSecretParameter, error) {
+	var body AzureSecretParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAzureSecretParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided AzureSecretParameter
+func (t *AgentStepBlock_Parameters_Item) FromAzureSecretParameter(v AzureSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_secret"}`))
+	t.union = b
+	return err
+}
+
+// MergeAzureSecretParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided AzureSecretParameter
+func (t *AgentStepBlock_Parameters_Item) MergeAzureSecretParameter(v AzureSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_secret"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsBitwardenLoginCredentialParameter returns the union data inside the AgentStepBlock_Parameters_Item as a BitwardenLoginCredentialParameter
+func (t AgentStepBlock_Parameters_Item) AsBitwardenLoginCredentialParameter() (BitwardenLoginCredentialParameter, error) {
+	var body BitwardenLoginCredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromBitwardenLoginCredentialParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided BitwardenLoginCredentialParameter
+func (t *AgentStepBlock_Parameters_Item) FromBitwardenLoginCredentialParameter(v BitwardenLoginCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_login_credential"}`))
+	t.union = b
+	return err
+}
+
+// MergeBitwardenLoginCredentialParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided BitwardenLoginCredentialParameter
+func (t *AgentStepBlock_Parameters_Item) MergeBitwardenLoginCredentialParameter(v BitwardenLoginCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_login_credential"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsBitwardenSensitiveInformationParameter returns the union data inside the AgentStepBlock_Parameters_Item as a BitwardenSensitiveInformationParameter
+func (t AgentStepBlock_Parameters_Item) AsBitwardenSensitiveInformationParameter() (BitwardenSensitiveInformationParameter, error) {
+	var body BitwardenSensitiveInformationParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromBitwardenSensitiveInformationParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided BitwardenSensitiveInformationParameter
+func (t *AgentStepBlock_Parameters_Item) FromBitwardenSensitiveInformationParameter(v BitwardenSensitiveInformationParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_sensitive_information"}`))
+	t.union = b
+	return err
+}
+
+// MergeBitwardenSensitiveInformationParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided BitwardenSensitiveInformationParameter
+func (t *AgentStepBlock_Parameters_Item) MergeBitwardenSensitiveInformationParameter(v BitwardenSensitiveInformationParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_sensitive_information"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsBitwardenCreditCardDataParameter returns the union data inside the AgentStepBlock_Parameters_Item as a BitwardenCreditCardDataParameter
+func (t AgentStepBlock_Parameters_Item) AsBitwardenCreditCardDataParameter() (BitwardenCreditCardDataParameter, error) {
+	var body BitwardenCreditCardDataParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromBitwardenCreditCardDataParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided BitwardenCreditCardDataParameter
+func (t *AgentStepBlock_Parameters_Item) FromBitwardenCreditCardDataParameter(v BitwardenCreditCardDataParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_credit_card_data"}`))
+	t.union = b
+	return err
+}
+
+// MergeBitwardenCreditCardDataParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided BitwardenCreditCardDataParameter
+func (t *AgentStepBlock_Parameters_Item) MergeBitwardenCreditCardDataParameter(v BitwardenCreditCardDataParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_credit_card_data"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsOnePasswordCredentialParameter returns the union data inside the AgentStepBlock_Parameters_Item as a OnePasswordCredentialParameter
+func (t AgentStepBlock_Parameters_Item) AsOnePasswordCredentialParameter() (OnePasswordCredentialParameter, error) {
+	var body OnePasswordCredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromOnePasswordCredentialParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided OnePasswordCredentialParameter
+func (t *AgentStepBlock_Parameters_Item) FromOnePasswordCredentialParameter(v OnePasswordCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"onepassword"}`))
+	t.union = b
+	return err
+}
+
+// MergeOnePasswordCredentialParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided OnePasswordCredentialParameter
+func (t *AgentStepBlock_Parameters_Item) MergeOnePasswordCredentialParameter(v OnePasswordCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"onepassword"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAzureVaultCredentialParameter returns the union data inside the AgentStepBlock_Parameters_Item as a AzureVaultCredentialParameter
+func (t AgentStepBlock_Parameters_Item) AsAzureVaultCredentialParameter() (AzureVaultCredentialParameter, error) {
+	var body AzureVaultCredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAzureVaultCredentialParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided AzureVaultCredentialParameter
+func (t *AgentStepBlock_Parameters_Item) FromAzureVaultCredentialParameter(v AzureVaultCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_vault_credential"}`))
+	t.union = b
+	return err
+}
+
+// MergeAzureVaultCredentialParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided AzureVaultCredentialParameter
+func (t *AgentStepBlock_Parameters_Item) MergeAzureVaultCredentialParameter(v AzureVaultCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_vault_credential"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsOutputParameter returns the union data inside the AgentStepBlock_Parameters_Item as a OutputParameter
+func (t AgentStepBlock_Parameters_Item) AsOutputParameter() (OutputParameter, error) {
+	var body OutputParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromOutputParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided OutputParameter
+func (t *AgentStepBlock_Parameters_Item) FromOutputParameter(v OutputParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"output"}`))
+	t.union = b
+	return err
+}
+
+// MergeOutputParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided OutputParameter
+func (t *AgentStepBlock_Parameters_Item) MergeOutputParameter(v OutputParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"output"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCredentialParameter returns the union data inside the AgentStepBlock_Parameters_Item as a CredentialParameter
+func (t AgentStepBlock_Parameters_Item) AsCredentialParameter() (CredentialParameter, error) {
+	var body CredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCredentialParameter overwrites any union data inside the AgentStepBlock_Parameters_Item as the provided CredentialParameter
+func (t *AgentStepBlock_Parameters_Item) FromCredentialParameter(v CredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"credential"}`))
+	t.union = b
+	return err
+}
+
+// MergeCredentialParameter performs a merge with any union data inside the AgentStepBlock_Parameters_Item, using the provided CredentialParameter
+func (t *AgentStepBlock_Parameters_Item) MergeCredentialParameter(v CredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"credential"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t AgentStepBlock_Parameters_Item) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"parameter_type"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t AgentStepBlock_Parameters_Item) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "aws_secret":
+		return t.AsAWSSecretParameter()
+	case "azure_secret":
+		return t.AsAzureSecretParameter()
+	case "azure_vault_credential":
+		return t.AsAzureVaultCredentialParameter()
+	case "bitwarden_credit_card_data":
+		return t.AsBitwardenCreditCardDataParameter()
+	case "bitwarden_login_credential":
+		return t.AsBitwardenLoginCredentialParameter()
+	case "bitwarden_sensitive_information":
+		return t.AsBitwardenSensitiveInformationParameter()
+	case "context":
+		return t.AsContextParameter()
+	case "credential":
+		return t.AsCredentialParameter()
+	case "onepassword":
+		return t.AsOnePasswordCredentialParameter()
+	case "output":
+		return t.AsOutputParameter()
+	case "workflow":
+		return t.AsWorkflowParameter()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t AgentStepBlock_Parameters_Item) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *AgentStepBlock_Parameters_Item) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -16883,6 +17398,40 @@ func (t *ForLoopBlock_LoopBlocks_Item) MergeTerminateBlock(v TerminateBlock) err
 	return err
 }
 
+// AsAgentStepBlock returns the union data inside the ForLoopBlock_LoopBlocks_Item as a AgentStepBlock
+func (t ForLoopBlock_LoopBlocks_Item) AsAgentStepBlock() (AgentStepBlock, error) {
+	var body AgentStepBlock
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAgentStepBlock overwrites any union data inside the ForLoopBlock_LoopBlocks_Item as the provided AgentStepBlock
+func (t *ForLoopBlock_LoopBlocks_Item) FromAgentStepBlock(v AgentStepBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
+	t.union = b
+	return err
+}
+
+// MergeAgentStepBlock performs a merge with any union data inside the ForLoopBlock_LoopBlocks_Item, using the provided AgentStepBlock
+func (t *ForLoopBlock_LoopBlocks_Item) MergeAgentStepBlock(v AgentStepBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 func (t ForLoopBlock_LoopBlocks_Item) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"block_type"`
@@ -16899,6 +17448,8 @@ func (t ForLoopBlock_LoopBlocks_Item) ValueByDiscriminator() (interface{}, error
 	switch discriminator {
 	case "action":
 		return t.AsActionBlock()
+	case "agent_step":
+		return t.AsAgentStepBlock()
 	case "code":
 		return t.AsCodeBlock()
 	case "conditional":
@@ -17975,6 +18526,32 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromTerminateBlockYAML(v TerminateBlo
 
 // MergeTerminateBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided TerminateBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeTerminateBlockYAML(v TerminateBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAgentStepBlockYAML returns the union data inside the ForLoopBlockYAML_LoopBlocks_Item as a AgentStepBlockYAML
+func (t ForLoopBlockYAML_LoopBlocks_Item) AsAgentStepBlockYAML() (AgentStepBlockYAML, error) {
+	var body AgentStepBlockYAML
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAgentStepBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided AgentStepBlockYAML
+func (t *ForLoopBlockYAML_LoopBlocks_Item) FromAgentStepBlockYAML(v AgentStepBlockYAML) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeAgentStepBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided AgentStepBlockYAML
+func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeAgentStepBlockYAML(v AgentStepBlockYAML) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -27852,6 +28429,40 @@ func (t *WhileLoopBlock_LoopBlocks_Item) MergeTerminateBlock(v TerminateBlock) e
 	return err
 }
 
+// AsAgentStepBlock returns the union data inside the WhileLoopBlock_LoopBlocks_Item as a AgentStepBlock
+func (t WhileLoopBlock_LoopBlocks_Item) AsAgentStepBlock() (AgentStepBlock, error) {
+	var body AgentStepBlock
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAgentStepBlock overwrites any union data inside the WhileLoopBlock_LoopBlocks_Item as the provided AgentStepBlock
+func (t *WhileLoopBlock_LoopBlocks_Item) FromAgentStepBlock(v AgentStepBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
+	t.union = b
+	return err
+}
+
+// MergeAgentStepBlock performs a merge with any union data inside the WhileLoopBlock_LoopBlocks_Item, using the provided AgentStepBlock
+func (t *WhileLoopBlock_LoopBlocks_Item) MergeAgentStepBlock(v AgentStepBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 func (t WhileLoopBlock_LoopBlocks_Item) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"block_type"`
@@ -27868,6 +28479,8 @@ func (t WhileLoopBlock_LoopBlocks_Item) ValueByDiscriminator() (interface{}, err
 	switch discriminator {
 	case "action":
 		return t.AsActionBlock()
+	case "agent_step":
+		return t.AsAgentStepBlock()
 	case "code":
 		return t.AsCodeBlock()
 	case "conditional":
@@ -28457,6 +29070,32 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromTerminateBlockYAML(v TerminateB
 
 // MergeTerminateBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided TerminateBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeTerminateBlockYAML(v TerminateBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAgentStepBlockYAML returns the union data inside the WhileLoopBlockYAML_LoopBlocks_Item as a AgentStepBlockYAML
+func (t WhileLoopBlockYAML_LoopBlocks_Item) AsAgentStepBlockYAML() (AgentStepBlockYAML, error) {
+	var body AgentStepBlockYAML
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAgentStepBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided AgentStepBlockYAML
+func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromAgentStepBlockYAML(v AgentStepBlockYAML) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeAgentStepBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided AgentStepBlockYAML
+func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeAgentStepBlockYAML(v AgentStepBlockYAML) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -30113,6 +30752,40 @@ func (t *WorkflowDefinition_Blocks_Item) MergeTerminateBlock(v TerminateBlock) e
 	return err
 }
 
+// AsAgentStepBlock returns the union data inside the WorkflowDefinition_Blocks_Item as a AgentStepBlock
+func (t WorkflowDefinition_Blocks_Item) AsAgentStepBlock() (AgentStepBlock, error) {
+	var body AgentStepBlock
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAgentStepBlock overwrites any union data inside the WorkflowDefinition_Blocks_Item as the provided AgentStepBlock
+func (t *WorkflowDefinition_Blocks_Item) FromAgentStepBlock(v AgentStepBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
+	t.union = b
+	return err
+}
+
+// MergeAgentStepBlock performs a merge with any union data inside the WorkflowDefinition_Blocks_Item, using the provided AgentStepBlock
+func (t *WorkflowDefinition_Blocks_Item) MergeAgentStepBlock(v AgentStepBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 func (t WorkflowDefinition_Blocks_Item) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"block_type"`
@@ -30129,6 +30802,8 @@ func (t WorkflowDefinition_Blocks_Item) ValueByDiscriminator() (interface{}, err
 	switch discriminator {
 	case "action":
 		return t.AsActionBlock()
+	case "agent_step":
+		return t.AsAgentStepBlock()
 	case "code":
 		return t.AsCodeBlock()
 	case "conditional":
@@ -31313,6 +31988,40 @@ func (t *WorkflowDefinitionYAML_Blocks_Item) MergeTerminateBlockYAML(v Terminate
 	return err
 }
 
+// AsAgentStepBlockYAML returns the union data inside the WorkflowDefinitionYAML_Blocks_Item as a AgentStepBlockYAML
+func (t WorkflowDefinitionYAML_Blocks_Item) AsAgentStepBlockYAML() (AgentStepBlockYAML, error) {
+	var body AgentStepBlockYAML
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAgentStepBlockYAML overwrites any union data inside the WorkflowDefinitionYAML_Blocks_Item as the provided AgentStepBlockYAML
+func (t *WorkflowDefinitionYAML_Blocks_Item) FromAgentStepBlockYAML(v AgentStepBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
+	t.union = b
+	return err
+}
+
+// MergeAgentStepBlockYAML performs a merge with any union data inside the WorkflowDefinitionYAML_Blocks_Item, using the provided AgentStepBlockYAML
+func (t *WorkflowDefinitionYAML_Blocks_Item) MergeAgentStepBlockYAML(v AgentStepBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 // AsUrlBlockYAML returns the union data inside the WorkflowDefinitionYAML_Blocks_Item as a UrlBlockYAML
 func (t WorkflowDefinitionYAML_Blocks_Item) AsUrlBlockYAML() (UrlBlockYAML, error) {
 	var body UrlBlockYAML
@@ -31771,6 +32480,8 @@ func (t WorkflowDefinitionYAML_Blocks_Item) ValueByDiscriminator() (interface{},
 	switch discriminator {
 	case "action":
 		return t.AsActionBlockYAML()
+	case "agent_step":
+		return t.AsAgentStepBlockYAML()
 	case "code":
 		return t.AsCodeBlockYAML()
 	case "conditional":
@@ -34077,6 +34788,8 @@ type ClientInterface interface {
 	//
 	// Supports filtering by **status**, **search_key**, and **error_code**. All filters are combined with **AND** logic.
 	//
+	// Unindexed free-text searches can paginate only through the first 1,000 matching runs. Split larger exports into narrower `created_at_start`/`created_at_end` windows or use a complete run/task ID.
+	//
 	// ### search_key
 	//
 	// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete workflow run ID matches that run. A complete task ID matches the workflow run the task ran in, when this list includes that run, or the standalone task itself where standalone tasks are listed. A complete browser profile, browser session, workflow run or task ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
@@ -35408,6 +36121,8 @@ func (c *Client) DeleteWorkflowV1AgentsWorkflowIdDeletePost(ctx context.Context,
 // List runs for a specific workflow.
 //
 // Supports filtering by **status**, **search_key**, and **error_code**. All filters are combined with **AND** logic.
+//
+// Unindexed free-text searches can paginate only through the first 1,000 matching runs. Split larger exports into narrower `created_at_start`/`created_at_end` windows or use a complete run/task ID.
 //
 // ### search_key
 //
@@ -44942,6 +45657,8 @@ type ClientWithResponsesInterface interface {
 	//
 	// Supports filtering by **status**, **search_key**, and **error_code**. All filters are combined with **AND** logic.
 	//
+	// Unindexed free-text searches can paginate only through the first 1,000 matching runs. Split larger exports into narrower `created_at_start`/`created_at_end` windows or use a complete run/task ID.
+	//
 	// ### search_key
 	//
 	// Case-insensitive substring search across: workflow run ID, parameter key, parameter description, run parameter value, extra HTTP headers and webhook callback URL. A run is returned if any of these fields match. Soft-deleted parameter definitions are excluded from key/description matching. A complete browser profile ID, browser session ID or credential ID matches the run that used it exactly (no substring match). A complete workflow run ID matches that run. A complete task ID matches the workflow run the task ran in, when this list includes that run, or the standalone task itself where standalone tasks are listed. A complete browser profile, browser session, workflow run or task ID is matched against those identifiers only, not the text fields. A credential ID matches when it is the run's sequential credential, the credential the run selected from a pool or fell back to, or the credential bound by a credential parameter on the run's workflow version when the run was created and the run recorded no selection for it. The workflow title and workflow permanent ID are matched as well.
@@ -51354,6 +52071,8 @@ func (c *ClientWithResponses) DeleteWorkflowV1AgentsWorkflowIdDeletePostWithResp
 // List runs for a specific workflow.
 //
 // Supports filtering by **status**, **search_key**, and **error_code**. All filters are combined with **AND** logic.
+//
+// Unindexed free-text searches can paginate only through the first 1,000 matching runs. Split larger exports into narrower `created_at_start`/`created_at_end` windows or use a complete run/task ID.
 //
 // ### search_key
 //
