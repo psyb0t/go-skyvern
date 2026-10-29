@@ -2,6 +2,11 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.6.3, 2026-10-29
+
+- Added doc comments to `AgentStepBlockYAML` fields `DataSchema`, `MaxTurns`, `ParameterKeys` and `Prompt`. `DataSchema` is the JSON Schema of the answer the step returns, `MaxTurns` is how many model turns the step may take, `ParameterKeys` lists the parameters and earlier block outputs the step uses, and `Prompt` is rendered as a Jinja template before the step starts.
+- No fields, types or signatures changed.
+
 ## v0.6.2, 2026-10-27
 
 - Added the `agent_step` workflow block. `AgentStepBlock` and `AgentStepBlockYAML` have `Label`, `Prompt`, `OutputParameter`, `MaxTurns`, `DataSchema`, `Model`, `Parameters` and the usual block fields such as `ContinueOnFailure`, `DisableCache` and `NextBlockLabel`. Their `BlockType` has the single value `AgentStepBlockBlockTypeAgentStep` or `AgentStepBlockYAMLBlockTypeAgentStep`. `AgentStepBlock_Parameters_Item` holds the parameter union.

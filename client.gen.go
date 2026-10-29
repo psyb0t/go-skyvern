@@ -3602,21 +3602,29 @@ type AgentStepBlock_Parameters_Item struct {
 
 // AgentStepBlockYAML defines model for AgentStepBlockYAML.
 type AgentStepBlockYAML struct {
-	BlockType                  *AgentStepBlockYAMLBlockType `json:"block_type,omitempty"`
-	ContinueOnFailure          *bool                        `json:"continue_on_failure,omitempty"`
-	DataSchema                 *map[string]interface{}      `json:"data_schema,omitempty"`
-	IgnoreWorkflowSystemPrompt *bool                        `json:"ignore_workflow_system_prompt,omitempty"`
+	BlockType         *AgentStepBlockYAMLBlockType `json:"block_type,omitempty"`
+	ContinueOnFailure *bool                        `json:"continue_on_failure,omitempty"`
+
+	// DataSchema JSON Schema (type object) of the answer the step returns through its finish tool. Later blocks read the answer as {{ <label>_output.output }}.
+	DataSchema                 *map[string]interface{} `json:"data_schema,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool                   `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
-	Label    string                  `json:"label"`
+	Label string `json:"label"`
+
+	// MaxTurns Model turns the step may take. When they run out, the step gets one more turn in which only finish runs.
 	MaxTurns *int                    `json:"max_turns,omitempty"`
 	Model    *map[string]interface{} `json:"model,omitempty"`
 
 	// NextBlockLabel Optional pointer to the label of the next block. When omitted, it will default to sequential order. See [[s-4bnl]].
-	NextBlockLabel    *string   `json:"next_block_label,omitempty"`
-	NextLoopOnFailure *bool     `json:"next_loop_on_failure,omitempty"`
-	ParameterKeys     *[]string `json:"parameter_keys,omitempty"`
-	Prompt            string    `json:"prompt"`
+	NextBlockLabel    *string `json:"next_block_label,omitempty"`
+	NextLoopOnFailure *bool   `json:"next_loop_on_failure,omitempty"`
+
+	// ParameterKeys Keys of the workflow parameters and earlier block outputs the step uses.
+	ParameterKeys *[]string `json:"parameter_keys,omitempty"`
+
+	// Prompt What the step must work out or get done. Rendered as a Jinja template against the run's parameters and earlier block outputs before the step starts.
+	Prompt string `json:"prompt"`
 }
 
 // AgentStepBlockYAMLBlockType defines model for AgentStepBlockYAML.BlockType.
