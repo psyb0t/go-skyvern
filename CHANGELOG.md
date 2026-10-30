@@ -2,6 +2,14 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.6.4, 2026-10-30
+
+- Added the `powerbi_query` workflow block. `PowerBIQueryBlock` and `PowerBIQueryBlockYAML` have `ConnectionId`, `DatasetId`, `Query`, `MaxRows`, `Label`, `OutputParameter`, `Model`, `Parameters` and the usual block fields such as `ContinueOnFailure`, `DisableCache` and `NextBlockLabel`. Their `BlockType` has the single value `PowerBIQueryBlockBlockTypePowerbiQuery` or `PowerBIQueryBlockYAMLBlockTypePowerbiQuery`. `PowerBIQueryBlock_Parameters_Item` holds the parameter union. The upstream spec says saves are unavailable until the Power BI catalog status is live.
+- `BlockType` gained `BlockTypePowerbiQuery`.
+- The block unions `WorkflowDefinition_Blocks_Item`, `WorkflowDefinitionYAML_Blocks_Item`, `ForLoopBlock_LoopBlocks_Item`, `ForLoopBlockYAML_LoopBlocks_Item`, `WhileLoopBlock_LoopBlocks_Item` and `WhileLoopBlockYAML_LoopBlocks_Item` gained `AsPowerBIQueryBlock`, `FromPowerBIQueryBlock` and `MergePowerBIQueryBlock` methods, with `YAML` suffixed variants on the YAML unions.
+- The YAML loop unions `ForLoopBlockYAML_LoopBlocks_Item` and `WhileLoopBlockYAML_LoopBlocks_Item` gained `Discriminator` and `ValueByDiscriminator` methods.
+- `AgentStepBlock` and `AgentStepBlockYAML` gained the optional `Tools` field, the list of tools the step may call. Without it the step is offered every tool.
+
 ## v0.6.3, 2026-10-29
 
 - Added doc comments to `AgentStepBlockYAML` fields `DataSchema`, `MaxTurns`, `ParameterKeys` and `Prompt`. `DataSchema` is the JSON Schema of the answer the step returns, `MaxTurns` is how many model turns the step may take, `ParameterKeys` lists the parameters and earlier block outputs the step uses, and `Prompt` is rendered as a Jinja template before the step starts.

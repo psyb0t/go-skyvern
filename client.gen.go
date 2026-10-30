@@ -582,6 +582,7 @@ const (
 	BlockTypeNavigation        BlockType = "navigation"
 	BlockTypePdfFill           BlockType = "pdf_fill"
 	BlockTypePdfParser         BlockType = "pdf_parser"
+	BlockTypePowerbiQuery      BlockType = "powerbi_query"
 	BlockTypePrintPage         BlockType = "print_page"
 	BlockTypeSendEmail         BlockType = "send_email"
 	BlockTypeSplitPdf          BlockType = "split_pdf"
@@ -641,6 +642,8 @@ func (e BlockType) Valid() bool {
 	case BlockTypePdfFill:
 		return true
 	case BlockTypePdfParser:
+		return true
+	case BlockTypePowerbiQuery:
 		return true
 	case BlockTypePrintPage:
 		return true
@@ -2002,6 +2005,36 @@ func (e PersistentBrowserType) Valid() bool {
 	case PersistentBrowserTypeMsedge:
 		return true
 	case PersistentBrowserTypeStealthChromium:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PowerBIQueryBlockBlockType.
+const (
+	PowerBIQueryBlockBlockTypePowerbiQuery PowerBIQueryBlockBlockType = "powerbi_query"
+)
+
+// Valid indicates whether the value is a known member of the PowerBIQueryBlockBlockType enum.
+func (e PowerBIQueryBlockBlockType) Valid() bool {
+	switch e {
+	case PowerBIQueryBlockBlockTypePowerbiQuery:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PowerBIQueryBlockYAMLBlockType.
+const (
+	PowerBIQueryBlockYAMLBlockTypePowerbiQuery PowerBIQueryBlockYAMLBlockType = "powerbi_query"
+)
+
+// Valid indicates whether the value is a known member of the PowerBIQueryBlockYAMLBlockType enum.
+func (e PowerBIQueryBlockYAMLBlockType) Valid() bool {
+	switch e {
+	case PowerBIQueryBlockYAMLBlockTypePowerbiQuery:
 		return true
 	default:
 		return false
@@ -3590,6 +3623,7 @@ type AgentStepBlock struct {
 	OutputParameter   OutputParameter                   `json:"output_parameter"`
 	Parameters        *[]AgentStepBlock_Parameters_Item `json:"parameters,omitempty"`
 	Prompt            string                            `json:"prompt"`
+	Tools             *[]string                         `json:"tools,omitempty"`
 }
 
 // AgentStepBlockBlockType defines model for AgentStepBlock.BlockType.
@@ -3625,6 +3659,9 @@ type AgentStepBlockYAML struct {
 
 	// Prompt What the step must work out or get done. Rendered as a Jinja template against the run's parameters and earlier block outputs before the step starts.
 	Prompt string `json:"prompt"`
+
+	// Tools The tools the step may call, at least one. A block it runs through run_block is named by its block type, such as http_request. finish is always offered, and login only when the run has a credential parameter. Without a list the step is offered every tool.
+	Tools *[]string `json:"tools,omitempty"`
 }
 
 // AgentStepBlockYAMLBlockType defines model for AgentStepBlockYAML.BlockType.
@@ -6760,6 +6797,63 @@ type PdfFillBlockYAML_Payload struct {
 
 // PersistentBrowserType defines model for PersistentBrowserType.
 type PersistentBrowserType string
+
+// PowerBIQueryBlock defines model for PowerBIQueryBlock.
+type PowerBIQueryBlock struct {
+	BlockType                  *PowerBIQueryBlockBlockType `json:"block_type,omitempty"`
+	ConnectionId               string                      `json:"connection_id"`
+	ContinueOnFailure          *bool                       `json:"continue_on_failure,omitempty"`
+	DatasetId                  string                      `json:"dataset_id"`
+	DisableCache               *bool                       `json:"disable_cache,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool                       `json:"ignore_workflow_system_prompt,omitempty"`
+
+	// Label Author-facing identifier for a block; unique within a workflow.
+	Label   string                  `json:"label"`
+	MaxRows *int                    `json:"max_rows,omitempty"`
+	Model   *map[string]interface{} `json:"model,omitempty"`
+
+	// NextBlockLabel Optional pointer to the next block label when constructing a DAG. Defaults to sequential order when omitted.
+	NextBlockLabel    *string                              `json:"next_block_label,omitempty"`
+	NextLoopOnFailure *bool                                `json:"next_loop_on_failure,omitempty"`
+	OutputParameter   OutputParameter                      `json:"output_parameter"`
+	Parameters        *[]PowerBIQueryBlock_Parameters_Item `json:"parameters,omitempty"`
+	Query             string                               `json:"query"`
+}
+
+// PowerBIQueryBlockBlockType defines model for PowerBIQueryBlock.BlockType.
+type PowerBIQueryBlockBlockType string
+
+// PowerBIQueryBlock_Parameters_Item defines model for PowerBIQueryBlock.parameters.Item.
+type PowerBIQueryBlock_Parameters_Item struct {
+	union json.RawMessage
+}
+
+// PowerBIQueryBlockYAML Documented ahead of release; saves are unavailable until the Power BI catalog status is live.
+type PowerBIQueryBlockYAML struct {
+	BlockType *PowerBIQueryBlockYAMLBlockType `json:"block_type,omitempty"`
+
+	// ConnectionId Microsoft OAuth credential ID for this user.
+	ConnectionId               string `json:"connection_id"`
+	ContinueOnFailure          *bool  `json:"continue_on_failure,omitempty"`
+	DatasetId                  string `json:"dataset_id"`
+	IgnoreWorkflowSystemPrompt *bool  `json:"ignore_workflow_system_prompt,omitempty"`
+
+	// Label Author-facing identifier; must be unique per workflow.
+	Label   string                  `json:"label"`
+	MaxRows *int                    `json:"max_rows,omitempty"`
+	Model   *map[string]interface{} `json:"model,omitempty"`
+
+	// NextBlockLabel Optional pointer to the label of the next block. When omitted, it will default to sequential order. See [[s-4bnl]].
+	NextBlockLabel    *string   `json:"next_block_label,omitempty"`
+	NextLoopOnFailure *bool     `json:"next_loop_on_failure,omitempty"`
+	ParameterKeys     *[]string `json:"parameter_keys,omitempty"`
+
+	// Query A single read-only DAX query.
+	Query string `json:"query"`
+}
+
+// PowerBIQueryBlockYAMLBlockType defines model for PowerBIQueryBlockYAML.BlockType.
+type PowerBIQueryBlockYAMLBlockType string
 
 // PrintPageBlock defines model for PrintPageBlock.
 type PrintPageBlock struct {
@@ -17270,6 +17364,40 @@ func (t *ForLoopBlock_LoopBlocks_Item) MergeGoogleSheetsWriteBlock(v GoogleSheet
 	return err
 }
 
+// AsPowerBIQueryBlock returns the union data inside the ForLoopBlock_LoopBlocks_Item as a PowerBIQueryBlock
+func (t ForLoopBlock_LoopBlocks_Item) AsPowerBIQueryBlock() (PowerBIQueryBlock, error) {
+	var body PowerBIQueryBlock
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPowerBIQueryBlock overwrites any union data inside the ForLoopBlock_LoopBlocks_Item as the provided PowerBIQueryBlock
+func (t *ForLoopBlock_LoopBlocks_Item) FromPowerBIQueryBlock(v PowerBIQueryBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	t.union = b
+	return err
+}
+
+// MergePowerBIQueryBlock performs a merge with any union data inside the ForLoopBlock_LoopBlocks_Item, using the provided PowerBIQueryBlock
+func (t *ForLoopBlock_LoopBlocks_Item) MergePowerBIQueryBlock(v PowerBIQueryBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 // AsPdfFillBlock returns the union data inside the ForLoopBlock_LoopBlocks_Item as a PdfFillBlock
 func (t ForLoopBlock_LoopBlocks_Item) AsPdfFillBlock() (PdfFillBlock, error) {
 	var body PdfFillBlock
@@ -17496,6 +17624,8 @@ func (t ForLoopBlock_LoopBlocks_Item) ValueByDiscriminator() (interface{}, error
 		return t.AsPdfFillBlock()
 	case "pdf_parser":
 		return t.AsPDFParserBlock()
+	case "powerbi_query":
+		return t.AsPowerBIQueryBlock()
 	case "print_page":
 		return t.AsPrintPageBlock()
 	case "send_email":
@@ -18034,6 +18164,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsTaskBlockYAML() (TaskBlockYAML, erro
 // FromTaskBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided TaskBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromTaskBlockYAML(v TaskBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"task"}`))
 	t.union = b
 	return err
 }
@@ -18041,6 +18175,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromTaskBlockYAML(v TaskBlockYAML) er
 // MergeTaskBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided TaskBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeTaskBlockYAML(v TaskBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"task"}`))
 	if err != nil {
 		return err
 	}
@@ -18060,6 +18198,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsForLoopBlockYAML() (ForLoopBlockYAML
 // FromForLoopBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided ForLoopBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromForLoopBlockYAML(v ForLoopBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"for_loop"}`))
 	t.union = b
 	return err
 }
@@ -18067,6 +18209,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromForLoopBlockYAML(v ForLoopBlockYA
 // MergeForLoopBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided ForLoopBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeForLoopBlockYAML(v ForLoopBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"for_loop"}`))
 	if err != nil {
 		return err
 	}
@@ -18086,6 +18232,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsWhileLoopBlockYAML() (WhileLoopBlock
 // FromWhileLoopBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided WhileLoopBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromWhileLoopBlockYAML(v WhileLoopBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"while_loop"}`))
 	t.union = b
 	return err
 }
@@ -18093,6 +18243,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromWhileLoopBlockYAML(v WhileLoopBlo
 // MergeWhileLoopBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided WhileLoopBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeWhileLoopBlockYAML(v WhileLoopBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"while_loop"}`))
 	if err != nil {
 		return err
 	}
@@ -18112,6 +18266,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsCodeBlockYAML() (CodeBlockYAML, erro
 // FromCodeBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided CodeBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromCodeBlockYAML(v CodeBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"code"}`))
 	t.union = b
 	return err
 }
@@ -18119,6 +18277,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromCodeBlockYAML(v CodeBlockYAML) er
 // MergeCodeBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided CodeBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeCodeBlockYAML(v CodeBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"code"}`))
 	if err != nil {
 		return err
 	}
@@ -18138,6 +18300,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsTextPromptBlockYAML() (TextPromptBlo
 // FromTextPromptBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided TextPromptBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromTextPromptBlockYAML(v TextPromptBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"text_prompt"}`))
 	t.union = b
 	return err
 }
@@ -18145,6 +18311,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromTextPromptBlockYAML(v TextPromptB
 // MergeTextPromptBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided TextPromptBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeTextPromptBlockYAML(v TextPromptBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"text_prompt"}`))
 	if err != nil {
 		return err
 	}
@@ -18164,6 +18334,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsDownloadToS3BlockYAML() (DownloadToS
 // FromDownloadToS3BlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided DownloadToS3BlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromDownloadToS3BlockYAML(v DownloadToS3BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"download_to_s3"}`))
 	t.union = b
 	return err
 }
@@ -18171,6 +18345,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromDownloadToS3BlockYAML(v DownloadT
 // MergeDownloadToS3BlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided DownloadToS3BlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeDownloadToS3BlockYAML(v DownloadToS3BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"download_to_s3"}`))
 	if err != nil {
 		return err
 	}
@@ -18190,6 +18368,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsUploadToS3BlockYAML() (UploadToS3Blo
 // FromUploadToS3BlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided UploadToS3BlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromUploadToS3BlockYAML(v UploadToS3BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"upload_to_s3"}`))
 	t.union = b
 	return err
 }
@@ -18197,6 +18379,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromUploadToS3BlockYAML(v UploadToS3B
 // MergeUploadToS3BlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided UploadToS3BlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeUploadToS3BlockYAML(v UploadToS3BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"upload_to_s3"}`))
 	if err != nil {
 		return err
 	}
@@ -18216,6 +18402,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsFileUploadBlockYAML() (FileUploadBlo
 // FromFileUploadBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided FileUploadBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromFileUploadBlockYAML(v FileUploadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_upload"}`))
 	t.union = b
 	return err
 }
@@ -18223,6 +18413,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromFileUploadBlockYAML(v FileUploadB
 // MergeFileUploadBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided FileUploadBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeFileUploadBlockYAML(v FileUploadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_upload"}`))
 	if err != nil {
 		return err
 	}
@@ -18242,6 +18436,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsSendEmailBlockYAML() (SendEmailBlock
 // FromSendEmailBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided SendEmailBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromSendEmailBlockYAML(v SendEmailBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"send_email"}`))
 	t.union = b
 	return err
 }
@@ -18249,6 +18447,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromSendEmailBlockYAML(v SendEmailBlo
 // MergeSendEmailBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided SendEmailBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeSendEmailBlockYAML(v SendEmailBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"send_email"}`))
 	if err != nil {
 		return err
 	}
@@ -18268,6 +18470,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsFileParserBlockYAML() (FileParserBlo
 // FromFileParserBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided FileParserBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromFileParserBlockYAML(v FileParserBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_url_parser"}`))
 	t.union = b
 	return err
 }
@@ -18275,6 +18481,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromFileParserBlockYAML(v FileParserB
 // MergeFileParserBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided FileParserBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeFileParserBlockYAML(v FileParserBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_url_parser"}`))
 	if err != nil {
 		return err
 	}
@@ -18294,6 +18504,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsValidationBlockYAML() (ValidationBlo
 // FromValidationBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided ValidationBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromValidationBlockYAML(v ValidationBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"validation"}`))
 	t.union = b
 	return err
 }
@@ -18301,6 +18515,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromValidationBlockYAML(v ValidationB
 // MergeValidationBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided ValidationBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeValidationBlockYAML(v ValidationBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"validation"}`))
 	if err != nil {
 		return err
 	}
@@ -18320,6 +18538,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsActionBlockYAML() (ActionBlockYAML, 
 // FromActionBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided ActionBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromActionBlockYAML(v ActionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"action"}`))
 	t.union = b
 	return err
 }
@@ -18327,6 +18549,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromActionBlockYAML(v ActionBlockYAML
 // MergeActionBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided ActionBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeActionBlockYAML(v ActionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"action"}`))
 	if err != nil {
 		return err
 	}
@@ -18346,6 +18572,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsNavigationBlockYAML() (NavigationBlo
 // FromNavigationBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided NavigationBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromNavigationBlockYAML(v NavigationBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"navigation"}`))
 	t.union = b
 	return err
 }
@@ -18353,6 +18583,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromNavigationBlockYAML(v NavigationB
 // MergeNavigationBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided NavigationBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeNavigationBlockYAML(v NavigationBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"navigation"}`))
 	if err != nil {
 		return err
 	}
@@ -18372,6 +18606,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsExtractionBlockYAML() (ExtractionBlo
 // FromExtractionBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided ExtractionBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromExtractionBlockYAML(v ExtractionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"extraction"}`))
 	t.union = b
 	return err
 }
@@ -18379,6 +18617,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromExtractionBlockYAML(v ExtractionB
 // MergeExtractionBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided ExtractionBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeExtractionBlockYAML(v ExtractionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"extraction"}`))
 	if err != nil {
 		return err
 	}
@@ -18398,6 +18640,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsLoginBlockYAML() (LoginBlockYAML, er
 // FromLoginBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided LoginBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromLoginBlockYAML(v LoginBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"login"}`))
 	t.union = b
 	return err
 }
@@ -18405,6 +18651,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromLoginBlockYAML(v LoginBlockYAML) 
 // MergeLoginBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided LoginBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeLoginBlockYAML(v LoginBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"login"}`))
 	if err != nil {
 		return err
 	}
@@ -18424,6 +18674,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsWaitBlockYAML() (WaitBlockYAML, erro
 // FromWaitBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided WaitBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromWaitBlockYAML(v WaitBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"wait"}`))
 	t.union = b
 	return err
 }
@@ -18431,6 +18685,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromWaitBlockYAML(v WaitBlockYAML) er
 // MergeWaitBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided WaitBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeWaitBlockYAML(v WaitBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"wait"}`))
 	if err != nil {
 		return err
 	}
@@ -18450,6 +18708,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsHumanInteractionBlockYAML() (HumanIn
 // FromHumanInteractionBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided HumanInteractionBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromHumanInteractionBlockYAML(v HumanInteractionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"human_interaction"}`))
 	t.union = b
 	return err
 }
@@ -18457,6 +18719,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromHumanInteractionBlockYAML(v Human
 // MergeHumanInteractionBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided HumanInteractionBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeHumanInteractionBlockYAML(v HumanInteractionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"human_interaction"}`))
 	if err != nil {
 		return err
 	}
@@ -18476,6 +18742,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsFileDownloadBlockYAML() (FileDownloa
 // FromFileDownloadBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided FileDownloadBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromFileDownloadBlockYAML(v FileDownloadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_download"}`))
 	t.union = b
 	return err
 }
@@ -18483,6 +18753,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromFileDownloadBlockYAML(v FileDownl
 // MergeFileDownloadBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided FileDownloadBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeFileDownloadBlockYAML(v FileDownloadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_download"}`))
 	if err != nil {
 		return err
 	}
@@ -18502,6 +18776,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsDataExportBlockYAML() (DataExportBlo
 // FromDataExportBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided DataExportBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromDataExportBlockYAML(v DataExportBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"data_export"}`))
 	t.union = b
 	return err
 }
@@ -18509,6 +18787,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromDataExportBlockYAML(v DataExportB
 // MergeDataExportBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided DataExportBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeDataExportBlockYAML(v DataExportBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"data_export"}`))
 	if err != nil {
 		return err
 	}
@@ -18528,6 +18810,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsTerminateBlockYAML() (TerminateBlock
 // FromTerminateBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided TerminateBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromTerminateBlockYAML(v TerminateBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"terminate"}`))
 	t.union = b
 	return err
 }
@@ -18535,6 +18821,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromTerminateBlockYAML(v TerminateBlo
 // MergeTerminateBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided TerminateBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeTerminateBlockYAML(v TerminateBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"terminate"}`))
 	if err != nil {
 		return err
 	}
@@ -18554,6 +18844,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsAgentStepBlockYAML() (AgentStepBlock
 // FromAgentStepBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided AgentStepBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromAgentStepBlockYAML(v AgentStepBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
 	t.union = b
 	return err
 }
@@ -18561,6 +18855,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromAgentStepBlockYAML(v AgentStepBlo
 // MergeAgentStepBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided AgentStepBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeAgentStepBlockYAML(v AgentStepBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
 	if err != nil {
 		return err
 	}
@@ -18580,6 +18878,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsUrlBlockYAML() (UrlBlockYAML, error)
 // FromUrlBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided UrlBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromUrlBlockYAML(v UrlBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"goto_url"}`))
 	t.union = b
 	return err
 }
@@ -18587,6 +18889,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromUrlBlockYAML(v UrlBlockYAML) erro
 // MergeUrlBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided UrlBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeUrlBlockYAML(v UrlBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"goto_url"}`))
 	if err != nil {
 		return err
 	}
@@ -18606,6 +18912,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsPDFParserBlockYAML() (PDFParserBlock
 // FromPDFParserBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided PDFParserBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromPDFParserBlockYAML(v PDFParserBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"pdf_parser"}`))
 	t.union = b
 	return err
 }
@@ -18613,6 +18923,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromPDFParserBlockYAML(v PDFParserBlo
 // MergePDFParserBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided PDFParserBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergePDFParserBlockYAML(v PDFParserBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"pdf_parser"}`))
 	if err != nil {
 		return err
 	}
@@ -18632,6 +18946,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsTaskV2BlockYAML() (TaskV2BlockYAML, 
 // FromTaskV2BlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided TaskV2BlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromTaskV2BlockYAML(v TaskV2BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"task_v2"}`))
 	t.union = b
 	return err
 }
@@ -18639,6 +18957,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromTaskV2BlockYAML(v TaskV2BlockYAML
 // MergeTaskV2BlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided TaskV2BlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeTaskV2BlockYAML(v TaskV2BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"task_v2"}`))
 	if err != nil {
 		return err
 	}
@@ -18658,6 +18980,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsHttpRequestBlockYAML() (HttpRequestB
 // FromHttpRequestBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided HttpRequestBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromHttpRequestBlockYAML(v HttpRequestBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"http_request"}`))
 	t.union = b
 	return err
 }
@@ -18665,6 +18991,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromHttpRequestBlockYAML(v HttpReques
 // MergeHttpRequestBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided HttpRequestBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeHttpRequestBlockYAML(v HttpRequestBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"http_request"}`))
 	if err != nil {
 		return err
 	}
@@ -18684,6 +19014,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsWebSearchBlockYAML() (WebSearchBlock
 // FromWebSearchBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided WebSearchBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromWebSearchBlockYAML(v WebSearchBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"web_search"}`))
 	t.union = b
 	return err
 }
@@ -18691,6 +19025,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromWebSearchBlockYAML(v WebSearchBlo
 // MergeWebSearchBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided WebSearchBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeWebSearchBlockYAML(v WebSearchBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"web_search"}`))
 	if err != nil {
 		return err
 	}
@@ -18710,6 +19048,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsConditionalBlockYAML() (ConditionalB
 // FromConditionalBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided ConditionalBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromConditionalBlockYAML(v ConditionalBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"conditional"}`))
 	t.union = b
 	return err
 }
@@ -18717,6 +19059,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromConditionalBlockYAML(v Conditiona
 // MergeConditionalBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided ConditionalBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeConditionalBlockYAML(v ConditionalBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"conditional"}`))
 	if err != nil {
 		return err
 	}
@@ -18736,6 +19082,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsPrintPageBlockYAML() (PrintPageBlock
 // FromPrintPageBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided PrintPageBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromPrintPageBlockYAML(v PrintPageBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"print_page"}`))
 	t.union = b
 	return err
 }
@@ -18743,6 +19093,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromPrintPageBlockYAML(v PrintPageBlo
 // MergePrintPageBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided PrintPageBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergePrintPageBlockYAML(v PrintPageBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"print_page"}`))
 	if err != nil {
 		return err
 	}
@@ -18762,6 +19116,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsPdfFillBlockYAML() (PdfFillBlockYAML
 // FromPdfFillBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided PdfFillBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromPdfFillBlockYAML(v PdfFillBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"pdf_fill"}`))
 	t.union = b
 	return err
 }
@@ -18769,6 +19127,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromPdfFillBlockYAML(v PdfFillBlockYA
 // MergePdfFillBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided PdfFillBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergePdfFillBlockYAML(v PdfFillBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"pdf_fill"}`))
 	if err != nil {
 		return err
 	}
@@ -18788,6 +19150,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsSplitPdfBlockYAML() (SplitPdfBlockYA
 // FromSplitPdfBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided SplitPdfBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromSplitPdfBlockYAML(v SplitPdfBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"split_pdf"}`))
 	t.union = b
 	return err
 }
@@ -18795,6 +19161,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromSplitPdfBlockYAML(v SplitPdfBlock
 // MergeSplitPdfBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided SplitPdfBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeSplitPdfBlockYAML(v SplitPdfBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"split_pdf"}`))
 	if err != nil {
 		return err
 	}
@@ -18814,6 +19184,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsWorkflowTriggerBlockYAML() (Workflow
 // FromWorkflowTriggerBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided WorkflowTriggerBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromWorkflowTriggerBlockYAML(v WorkflowTriggerBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"workflow_trigger"}`))
 	t.union = b
 	return err
 }
@@ -18821,6 +19195,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromWorkflowTriggerBlockYAML(v Workfl
 // MergeWorkflowTriggerBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided WorkflowTriggerBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeWorkflowTriggerBlockYAML(v WorkflowTriggerBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"workflow_trigger"}`))
 	if err != nil {
 		return err
 	}
@@ -18840,6 +19218,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsGoogleSheetsReadBlockYAML() (GoogleS
 // FromGoogleSheetsReadBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided GoogleSheetsReadBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromGoogleSheetsReadBlockYAML(v GoogleSheetsReadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"google_sheets_read"}`))
 	t.union = b
 	return err
 }
@@ -18847,6 +19229,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromGoogleSheetsReadBlockYAML(v Googl
 // MergeGoogleSheetsReadBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided GoogleSheetsReadBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeGoogleSheetsReadBlockYAML(v GoogleSheetsReadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"google_sheets_read"}`))
 	if err != nil {
 		return err
 	}
@@ -18866,6 +19252,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsEmailInboxBlockYAML() (EmailInboxBlo
 // FromEmailInboxBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided EmailInboxBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromEmailInboxBlockYAML(v EmailInboxBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"email_inbox"}`))
 	t.union = b
 	return err
 }
@@ -18873,6 +19263,10 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) FromEmailInboxBlockYAML(v EmailInboxB
 // MergeEmailInboxBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided EmailInboxBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeEmailInboxBlockYAML(v EmailInboxBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"email_inbox"}`))
 	if err != nil {
 		return err
 	}
@@ -18892,6 +19286,10 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) AsGoogleSheetsWriteBlockYAML() (Google
 // FromGoogleSheetsWriteBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided GoogleSheetsWriteBlockYAML
 func (t *ForLoopBlockYAML_LoopBlocks_Item) FromGoogleSheetsWriteBlockYAML(v GoogleSheetsWriteBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"google_sheets_write"}`))
 	t.union = b
 	return err
 }
@@ -18902,10 +19300,137 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeGoogleSheetsWriteBlockYAML(v Goo
 	if err != nil {
 		return err
 	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"google_sheets_write"}`))
+	if err != nil {
+		return err
+	}
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
 	return err
+}
+
+// AsPowerBIQueryBlockYAML returns the union data inside the ForLoopBlockYAML_LoopBlocks_Item as a PowerBIQueryBlockYAML
+func (t ForLoopBlockYAML_LoopBlocks_Item) AsPowerBIQueryBlockYAML() (PowerBIQueryBlockYAML, error) {
+	var body PowerBIQueryBlockYAML
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPowerBIQueryBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided PowerBIQueryBlockYAML
+func (t *ForLoopBlockYAML_LoopBlocks_Item) FromPowerBIQueryBlockYAML(v PowerBIQueryBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	t.union = b
+	return err
+}
+
+// MergePowerBIQueryBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided PowerBIQueryBlockYAML
+func (t *ForLoopBlockYAML_LoopBlocks_Item) MergePowerBIQueryBlockYAML(v PowerBIQueryBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ForLoopBlockYAML_LoopBlocks_Item) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"block_type"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t ForLoopBlockYAML_LoopBlocks_Item) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "action":
+		return t.AsActionBlockYAML()
+	case "agent_step":
+		return t.AsAgentStepBlockYAML()
+	case "code":
+		return t.AsCodeBlockYAML()
+	case "conditional":
+		return t.AsConditionalBlockYAML()
+	case "data_export":
+		return t.AsDataExportBlockYAML()
+	case "download_to_s3":
+		return t.AsDownloadToS3BlockYAML()
+	case "email_inbox":
+		return t.AsEmailInboxBlockYAML()
+	case "extraction":
+		return t.AsExtractionBlockYAML()
+	case "file_download":
+		return t.AsFileDownloadBlockYAML()
+	case "file_upload":
+		return t.AsFileUploadBlockYAML()
+	case "file_url_parser":
+		return t.AsFileParserBlockYAML()
+	case "for_loop":
+		return t.AsForLoopBlockYAML()
+	case "google_sheets_read":
+		return t.AsGoogleSheetsReadBlockYAML()
+	case "google_sheets_write":
+		return t.AsGoogleSheetsWriteBlockYAML()
+	case "goto_url":
+		return t.AsUrlBlockYAML()
+	case "http_request":
+		return t.AsHttpRequestBlockYAML()
+	case "human_interaction":
+		return t.AsHumanInteractionBlockYAML()
+	case "login":
+		return t.AsLoginBlockYAML()
+	case "navigation":
+		return t.AsNavigationBlockYAML()
+	case "pdf_fill":
+		return t.AsPdfFillBlockYAML()
+	case "pdf_parser":
+		return t.AsPDFParserBlockYAML()
+	case "powerbi_query":
+		return t.AsPowerBIQueryBlockYAML()
+	case "print_page":
+		return t.AsPrintPageBlockYAML()
+	case "send_email":
+		return t.AsSendEmailBlockYAML()
+	case "split_pdf":
+		return t.AsSplitPdfBlockYAML()
+	case "task":
+		return t.AsTaskBlockYAML()
+	case "task_v2":
+		return t.AsTaskV2BlockYAML()
+	case "terminate":
+		return t.AsTerminateBlockYAML()
+	case "text_prompt":
+		return t.AsTextPromptBlockYAML()
+	case "upload_to_s3":
+		return t.AsUploadToS3BlockYAML()
+	case "validation":
+		return t.AsValidationBlockYAML()
+	case "wait":
+		return t.AsWaitBlockYAML()
+	case "web_search":
+		return t.AsWebSearchBlockYAML()
+	case "while_loop":
+		return t.AsWhileLoopBlockYAML()
+	case "workflow_trigger":
+		return t.AsWorkflowTriggerBlockYAML()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
 }
 
 func (t ForLoopBlockYAML_LoopBlocks_Item) MarshalJSON() ([]byte, error) {
@@ -22391,6 +22916,431 @@ func (t PdfFillBlockYAML_Payload) MarshalJSON() ([]byte, error) {
 }
 
 func (t *PdfFillBlockYAML_Payload) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsWorkflowParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a WorkflowParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsWorkflowParameter() (WorkflowParameter, error) {
+	var body WorkflowParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromWorkflowParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided WorkflowParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromWorkflowParameter(v WorkflowParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"workflow"}`))
+	t.union = b
+	return err
+}
+
+// MergeWorkflowParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided WorkflowParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeWorkflowParameter(v WorkflowParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"workflow"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsContextParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a ContextParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsContextParameter() (ContextParameter, error) {
+	var body ContextParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromContextParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided ContextParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromContextParameter(v ContextParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"context"}`))
+	t.union = b
+	return err
+}
+
+// MergeContextParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided ContextParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeContextParameter(v ContextParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"context"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAWSSecretParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a AWSSecretParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsAWSSecretParameter() (AWSSecretParameter, error) {
+	var body AWSSecretParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAWSSecretParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided AWSSecretParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromAWSSecretParameter(v AWSSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"aws_secret"}`))
+	t.union = b
+	return err
+}
+
+// MergeAWSSecretParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided AWSSecretParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeAWSSecretParameter(v AWSSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"aws_secret"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAzureSecretParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a AzureSecretParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsAzureSecretParameter() (AzureSecretParameter, error) {
+	var body AzureSecretParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAzureSecretParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided AzureSecretParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromAzureSecretParameter(v AzureSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_secret"}`))
+	t.union = b
+	return err
+}
+
+// MergeAzureSecretParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided AzureSecretParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeAzureSecretParameter(v AzureSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_secret"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsBitwardenLoginCredentialParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a BitwardenLoginCredentialParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsBitwardenLoginCredentialParameter() (BitwardenLoginCredentialParameter, error) {
+	var body BitwardenLoginCredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromBitwardenLoginCredentialParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided BitwardenLoginCredentialParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromBitwardenLoginCredentialParameter(v BitwardenLoginCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_login_credential"}`))
+	t.union = b
+	return err
+}
+
+// MergeBitwardenLoginCredentialParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided BitwardenLoginCredentialParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeBitwardenLoginCredentialParameter(v BitwardenLoginCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_login_credential"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsBitwardenSensitiveInformationParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a BitwardenSensitiveInformationParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsBitwardenSensitiveInformationParameter() (BitwardenSensitiveInformationParameter, error) {
+	var body BitwardenSensitiveInformationParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromBitwardenSensitiveInformationParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided BitwardenSensitiveInformationParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromBitwardenSensitiveInformationParameter(v BitwardenSensitiveInformationParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_sensitive_information"}`))
+	t.union = b
+	return err
+}
+
+// MergeBitwardenSensitiveInformationParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided BitwardenSensitiveInformationParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeBitwardenSensitiveInformationParameter(v BitwardenSensitiveInformationParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_sensitive_information"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsBitwardenCreditCardDataParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a BitwardenCreditCardDataParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsBitwardenCreditCardDataParameter() (BitwardenCreditCardDataParameter, error) {
+	var body BitwardenCreditCardDataParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromBitwardenCreditCardDataParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided BitwardenCreditCardDataParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromBitwardenCreditCardDataParameter(v BitwardenCreditCardDataParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_credit_card_data"}`))
+	t.union = b
+	return err
+}
+
+// MergeBitwardenCreditCardDataParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided BitwardenCreditCardDataParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeBitwardenCreditCardDataParameter(v BitwardenCreditCardDataParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_credit_card_data"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsOnePasswordCredentialParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a OnePasswordCredentialParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsOnePasswordCredentialParameter() (OnePasswordCredentialParameter, error) {
+	var body OnePasswordCredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromOnePasswordCredentialParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided OnePasswordCredentialParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromOnePasswordCredentialParameter(v OnePasswordCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"onepassword"}`))
+	t.union = b
+	return err
+}
+
+// MergeOnePasswordCredentialParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided OnePasswordCredentialParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeOnePasswordCredentialParameter(v OnePasswordCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"onepassword"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAzureVaultCredentialParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a AzureVaultCredentialParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsAzureVaultCredentialParameter() (AzureVaultCredentialParameter, error) {
+	var body AzureVaultCredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAzureVaultCredentialParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided AzureVaultCredentialParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromAzureVaultCredentialParameter(v AzureVaultCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_vault_credential"}`))
+	t.union = b
+	return err
+}
+
+// MergeAzureVaultCredentialParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided AzureVaultCredentialParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeAzureVaultCredentialParameter(v AzureVaultCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_vault_credential"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsOutputParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a OutputParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsOutputParameter() (OutputParameter, error) {
+	var body OutputParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromOutputParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided OutputParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromOutputParameter(v OutputParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"output"}`))
+	t.union = b
+	return err
+}
+
+// MergeOutputParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided OutputParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeOutputParameter(v OutputParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"output"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCredentialParameter returns the union data inside the PowerBIQueryBlock_Parameters_Item as a CredentialParameter
+func (t PowerBIQueryBlock_Parameters_Item) AsCredentialParameter() (CredentialParameter, error) {
+	var body CredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCredentialParameter overwrites any union data inside the PowerBIQueryBlock_Parameters_Item as the provided CredentialParameter
+func (t *PowerBIQueryBlock_Parameters_Item) FromCredentialParameter(v CredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"credential"}`))
+	t.union = b
+	return err
+}
+
+// MergeCredentialParameter performs a merge with any union data inside the PowerBIQueryBlock_Parameters_Item, using the provided CredentialParameter
+func (t *PowerBIQueryBlock_Parameters_Item) MergeCredentialParameter(v CredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"credential"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t PowerBIQueryBlock_Parameters_Item) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"parameter_type"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t PowerBIQueryBlock_Parameters_Item) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "aws_secret":
+		return t.AsAWSSecretParameter()
+	case "azure_secret":
+		return t.AsAzureSecretParameter()
+	case "azure_vault_credential":
+		return t.AsAzureVaultCredentialParameter()
+	case "bitwarden_credit_card_data":
+		return t.AsBitwardenCreditCardDataParameter()
+	case "bitwarden_login_credential":
+		return t.AsBitwardenLoginCredentialParameter()
+	case "bitwarden_sensitive_information":
+		return t.AsBitwardenSensitiveInformationParameter()
+	case "context":
+		return t.AsContextParameter()
+	case "credential":
+		return t.AsCredentialParameter()
+	case "onepassword":
+		return t.AsOnePasswordCredentialParameter()
+	case "output":
+		return t.AsOutputParameter()
+	case "workflow":
+		return t.AsWorkflowParameter()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t PowerBIQueryBlock_Parameters_Item) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *PowerBIQueryBlock_Parameters_Item) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -28301,6 +29251,40 @@ func (t *WhileLoopBlock_LoopBlocks_Item) MergeGoogleSheetsWriteBlock(v GoogleShe
 	return err
 }
 
+// AsPowerBIQueryBlock returns the union data inside the WhileLoopBlock_LoopBlocks_Item as a PowerBIQueryBlock
+func (t WhileLoopBlock_LoopBlocks_Item) AsPowerBIQueryBlock() (PowerBIQueryBlock, error) {
+	var body PowerBIQueryBlock
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPowerBIQueryBlock overwrites any union data inside the WhileLoopBlock_LoopBlocks_Item as the provided PowerBIQueryBlock
+func (t *WhileLoopBlock_LoopBlocks_Item) FromPowerBIQueryBlock(v PowerBIQueryBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	t.union = b
+	return err
+}
+
+// MergePowerBIQueryBlock performs a merge with any union data inside the WhileLoopBlock_LoopBlocks_Item, using the provided PowerBIQueryBlock
+func (t *WhileLoopBlock_LoopBlocks_Item) MergePowerBIQueryBlock(v PowerBIQueryBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 // AsPdfFillBlock returns the union data inside the WhileLoopBlock_LoopBlocks_Item as a PdfFillBlock
 func (t WhileLoopBlock_LoopBlocks_Item) AsPdfFillBlock() (PdfFillBlock, error) {
 	var body PdfFillBlock
@@ -28527,6 +29511,8 @@ func (t WhileLoopBlock_LoopBlocks_Item) ValueByDiscriminator() (interface{}, err
 		return t.AsPdfFillBlock()
 	case "pdf_parser":
 		return t.AsPDFParserBlock()
+	case "powerbi_query":
+		return t.AsPowerBIQueryBlock()
 	case "print_page":
 		return t.AsPrintPageBlock()
 	case "send_email":
@@ -28578,6 +29564,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsTaskBlockYAML() (TaskBlockYAML, er
 // FromTaskBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided TaskBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromTaskBlockYAML(v TaskBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"task"}`))
 	t.union = b
 	return err
 }
@@ -28585,6 +29575,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromTaskBlockYAML(v TaskBlockYAML) 
 // MergeTaskBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided TaskBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeTaskBlockYAML(v TaskBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"task"}`))
 	if err != nil {
 		return err
 	}
@@ -28604,6 +29598,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsForLoopBlockYAML() (ForLoopBlockYA
 // FromForLoopBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided ForLoopBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromForLoopBlockYAML(v ForLoopBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"for_loop"}`))
 	t.union = b
 	return err
 }
@@ -28611,6 +29609,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromForLoopBlockYAML(v ForLoopBlock
 // MergeForLoopBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided ForLoopBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeForLoopBlockYAML(v ForLoopBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"for_loop"}`))
 	if err != nil {
 		return err
 	}
@@ -28630,6 +29632,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsWhileLoopBlockYAML() (WhileLoopBlo
 // FromWhileLoopBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided WhileLoopBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromWhileLoopBlockYAML(v WhileLoopBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"while_loop"}`))
 	t.union = b
 	return err
 }
@@ -28637,6 +29643,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromWhileLoopBlockYAML(v WhileLoopB
 // MergeWhileLoopBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided WhileLoopBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeWhileLoopBlockYAML(v WhileLoopBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"while_loop"}`))
 	if err != nil {
 		return err
 	}
@@ -28656,6 +29666,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsCodeBlockYAML() (CodeBlockYAML, er
 // FromCodeBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided CodeBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromCodeBlockYAML(v CodeBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"code"}`))
 	t.union = b
 	return err
 }
@@ -28663,6 +29677,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromCodeBlockYAML(v CodeBlockYAML) 
 // MergeCodeBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided CodeBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeCodeBlockYAML(v CodeBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"code"}`))
 	if err != nil {
 		return err
 	}
@@ -28682,6 +29700,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsTextPromptBlockYAML() (TextPromptB
 // FromTextPromptBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided TextPromptBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromTextPromptBlockYAML(v TextPromptBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"text_prompt"}`))
 	t.union = b
 	return err
 }
@@ -28689,6 +29711,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromTextPromptBlockYAML(v TextPromp
 // MergeTextPromptBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided TextPromptBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeTextPromptBlockYAML(v TextPromptBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"text_prompt"}`))
 	if err != nil {
 		return err
 	}
@@ -28708,6 +29734,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsDownloadToS3BlockYAML() (DownloadT
 // FromDownloadToS3BlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided DownloadToS3BlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromDownloadToS3BlockYAML(v DownloadToS3BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"download_to_s3"}`))
 	t.union = b
 	return err
 }
@@ -28715,6 +29745,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromDownloadToS3BlockYAML(v Downloa
 // MergeDownloadToS3BlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided DownloadToS3BlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeDownloadToS3BlockYAML(v DownloadToS3BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"download_to_s3"}`))
 	if err != nil {
 		return err
 	}
@@ -28734,6 +29768,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsUploadToS3BlockYAML() (UploadToS3B
 // FromUploadToS3BlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided UploadToS3BlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromUploadToS3BlockYAML(v UploadToS3BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"upload_to_s3"}`))
 	t.union = b
 	return err
 }
@@ -28741,6 +29779,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromUploadToS3BlockYAML(v UploadToS
 // MergeUploadToS3BlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided UploadToS3BlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeUploadToS3BlockYAML(v UploadToS3BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"upload_to_s3"}`))
 	if err != nil {
 		return err
 	}
@@ -28760,6 +29802,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsFileUploadBlockYAML() (FileUploadB
 // FromFileUploadBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided FileUploadBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromFileUploadBlockYAML(v FileUploadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_upload"}`))
 	t.union = b
 	return err
 }
@@ -28767,6 +29813,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromFileUploadBlockYAML(v FileUploa
 // MergeFileUploadBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided FileUploadBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeFileUploadBlockYAML(v FileUploadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_upload"}`))
 	if err != nil {
 		return err
 	}
@@ -28786,6 +29836,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsSendEmailBlockYAML() (SendEmailBlo
 // FromSendEmailBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided SendEmailBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromSendEmailBlockYAML(v SendEmailBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"send_email"}`))
 	t.union = b
 	return err
 }
@@ -28793,6 +29847,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromSendEmailBlockYAML(v SendEmailB
 // MergeSendEmailBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided SendEmailBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeSendEmailBlockYAML(v SendEmailBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"send_email"}`))
 	if err != nil {
 		return err
 	}
@@ -28812,6 +29870,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsFileParserBlockYAML() (FileParserB
 // FromFileParserBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided FileParserBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromFileParserBlockYAML(v FileParserBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_url_parser"}`))
 	t.union = b
 	return err
 }
@@ -28819,6 +29881,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromFileParserBlockYAML(v FileParse
 // MergeFileParserBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided FileParserBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeFileParserBlockYAML(v FileParserBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_url_parser"}`))
 	if err != nil {
 		return err
 	}
@@ -28838,6 +29904,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsValidationBlockYAML() (ValidationB
 // FromValidationBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided ValidationBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromValidationBlockYAML(v ValidationBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"validation"}`))
 	t.union = b
 	return err
 }
@@ -28845,6 +29915,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromValidationBlockYAML(v Validatio
 // MergeValidationBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided ValidationBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeValidationBlockYAML(v ValidationBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"validation"}`))
 	if err != nil {
 		return err
 	}
@@ -28864,6 +29938,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsActionBlockYAML() (ActionBlockYAML
 // FromActionBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided ActionBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromActionBlockYAML(v ActionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"action"}`))
 	t.union = b
 	return err
 }
@@ -28871,6 +29949,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromActionBlockYAML(v ActionBlockYA
 // MergeActionBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided ActionBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeActionBlockYAML(v ActionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"action"}`))
 	if err != nil {
 		return err
 	}
@@ -28890,6 +29972,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsNavigationBlockYAML() (NavigationB
 // FromNavigationBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided NavigationBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromNavigationBlockYAML(v NavigationBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"navigation"}`))
 	t.union = b
 	return err
 }
@@ -28897,6 +29983,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromNavigationBlockYAML(v Navigatio
 // MergeNavigationBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided NavigationBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeNavigationBlockYAML(v NavigationBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"navigation"}`))
 	if err != nil {
 		return err
 	}
@@ -28916,6 +30006,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsExtractionBlockYAML() (ExtractionB
 // FromExtractionBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided ExtractionBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromExtractionBlockYAML(v ExtractionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"extraction"}`))
 	t.union = b
 	return err
 }
@@ -28923,6 +30017,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromExtractionBlockYAML(v Extractio
 // MergeExtractionBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided ExtractionBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeExtractionBlockYAML(v ExtractionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"extraction"}`))
 	if err != nil {
 		return err
 	}
@@ -28942,6 +30040,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsLoginBlockYAML() (LoginBlockYAML, 
 // FromLoginBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided LoginBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromLoginBlockYAML(v LoginBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"login"}`))
 	t.union = b
 	return err
 }
@@ -28949,6 +30051,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromLoginBlockYAML(v LoginBlockYAML
 // MergeLoginBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided LoginBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeLoginBlockYAML(v LoginBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"login"}`))
 	if err != nil {
 		return err
 	}
@@ -28968,6 +30074,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsWaitBlockYAML() (WaitBlockYAML, er
 // FromWaitBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided WaitBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromWaitBlockYAML(v WaitBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"wait"}`))
 	t.union = b
 	return err
 }
@@ -28975,6 +30085,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromWaitBlockYAML(v WaitBlockYAML) 
 // MergeWaitBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided WaitBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeWaitBlockYAML(v WaitBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"wait"}`))
 	if err != nil {
 		return err
 	}
@@ -28994,6 +30108,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsHumanInteractionBlockYAML() (Human
 // FromHumanInteractionBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided HumanInteractionBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromHumanInteractionBlockYAML(v HumanInteractionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"human_interaction"}`))
 	t.union = b
 	return err
 }
@@ -29001,6 +30119,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromHumanInteractionBlockYAML(v Hum
 // MergeHumanInteractionBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided HumanInteractionBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeHumanInteractionBlockYAML(v HumanInteractionBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"human_interaction"}`))
 	if err != nil {
 		return err
 	}
@@ -29020,6 +30142,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsFileDownloadBlockYAML() (FileDownl
 // FromFileDownloadBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided FileDownloadBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromFileDownloadBlockYAML(v FileDownloadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_download"}`))
 	t.union = b
 	return err
 }
@@ -29027,6 +30153,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromFileDownloadBlockYAML(v FileDow
 // MergeFileDownloadBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided FileDownloadBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeFileDownloadBlockYAML(v FileDownloadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"file_download"}`))
 	if err != nil {
 		return err
 	}
@@ -29046,6 +30176,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsDataExportBlockYAML() (DataExportB
 // FromDataExportBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided DataExportBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromDataExportBlockYAML(v DataExportBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"data_export"}`))
 	t.union = b
 	return err
 }
@@ -29053,6 +30187,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromDataExportBlockYAML(v DataExpor
 // MergeDataExportBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided DataExportBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeDataExportBlockYAML(v DataExportBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"data_export"}`))
 	if err != nil {
 		return err
 	}
@@ -29072,6 +30210,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsTerminateBlockYAML() (TerminateBlo
 // FromTerminateBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided TerminateBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromTerminateBlockYAML(v TerminateBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"terminate"}`))
 	t.union = b
 	return err
 }
@@ -29079,6 +30221,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromTerminateBlockYAML(v TerminateB
 // MergeTerminateBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided TerminateBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeTerminateBlockYAML(v TerminateBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"terminate"}`))
 	if err != nil {
 		return err
 	}
@@ -29098,6 +30244,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsAgentStepBlockYAML() (AgentStepBlo
 // FromAgentStepBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided AgentStepBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromAgentStepBlockYAML(v AgentStepBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
 	t.union = b
 	return err
 }
@@ -29105,6 +30255,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromAgentStepBlockYAML(v AgentStepB
 // MergeAgentStepBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided AgentStepBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeAgentStepBlockYAML(v AgentStepBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"agent_step"}`))
 	if err != nil {
 		return err
 	}
@@ -29124,6 +30278,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsUrlBlockYAML() (UrlBlockYAML, erro
 // FromUrlBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided UrlBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromUrlBlockYAML(v UrlBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"goto_url"}`))
 	t.union = b
 	return err
 }
@@ -29131,6 +30289,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromUrlBlockYAML(v UrlBlockYAML) er
 // MergeUrlBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided UrlBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeUrlBlockYAML(v UrlBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"goto_url"}`))
 	if err != nil {
 		return err
 	}
@@ -29150,6 +30312,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsPDFParserBlockYAML() (PDFParserBlo
 // FromPDFParserBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided PDFParserBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromPDFParserBlockYAML(v PDFParserBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"pdf_parser"}`))
 	t.union = b
 	return err
 }
@@ -29157,6 +30323,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromPDFParserBlockYAML(v PDFParserB
 // MergePDFParserBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided PDFParserBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergePDFParserBlockYAML(v PDFParserBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"pdf_parser"}`))
 	if err != nil {
 		return err
 	}
@@ -29176,6 +30346,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsTaskV2BlockYAML() (TaskV2BlockYAML
 // FromTaskV2BlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided TaskV2BlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromTaskV2BlockYAML(v TaskV2BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"task_v2"}`))
 	t.union = b
 	return err
 }
@@ -29183,6 +30357,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromTaskV2BlockYAML(v TaskV2BlockYA
 // MergeTaskV2BlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided TaskV2BlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeTaskV2BlockYAML(v TaskV2BlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"task_v2"}`))
 	if err != nil {
 		return err
 	}
@@ -29202,6 +30380,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsHttpRequestBlockYAML() (HttpReques
 // FromHttpRequestBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided HttpRequestBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromHttpRequestBlockYAML(v HttpRequestBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"http_request"}`))
 	t.union = b
 	return err
 }
@@ -29209,6 +30391,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromHttpRequestBlockYAML(v HttpRequ
 // MergeHttpRequestBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided HttpRequestBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeHttpRequestBlockYAML(v HttpRequestBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"http_request"}`))
 	if err != nil {
 		return err
 	}
@@ -29228,6 +30414,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsWebSearchBlockYAML() (WebSearchBlo
 // FromWebSearchBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided WebSearchBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromWebSearchBlockYAML(v WebSearchBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"web_search"}`))
 	t.union = b
 	return err
 }
@@ -29235,6 +30425,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromWebSearchBlockYAML(v WebSearchB
 // MergeWebSearchBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided WebSearchBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeWebSearchBlockYAML(v WebSearchBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"web_search"}`))
 	if err != nil {
 		return err
 	}
@@ -29254,6 +30448,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsConditionalBlockYAML() (Conditiona
 // FromConditionalBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided ConditionalBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromConditionalBlockYAML(v ConditionalBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"conditional"}`))
 	t.union = b
 	return err
 }
@@ -29261,6 +30459,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromConditionalBlockYAML(v Conditio
 // MergeConditionalBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided ConditionalBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeConditionalBlockYAML(v ConditionalBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"conditional"}`))
 	if err != nil {
 		return err
 	}
@@ -29280,6 +30482,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsPrintPageBlockYAML() (PrintPageBlo
 // FromPrintPageBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided PrintPageBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromPrintPageBlockYAML(v PrintPageBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"print_page"}`))
 	t.union = b
 	return err
 }
@@ -29287,6 +30493,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromPrintPageBlockYAML(v PrintPageB
 // MergePrintPageBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided PrintPageBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergePrintPageBlockYAML(v PrintPageBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"print_page"}`))
 	if err != nil {
 		return err
 	}
@@ -29306,6 +30516,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsPdfFillBlockYAML() (PdfFillBlockYA
 // FromPdfFillBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided PdfFillBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromPdfFillBlockYAML(v PdfFillBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"pdf_fill"}`))
 	t.union = b
 	return err
 }
@@ -29313,6 +30527,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromPdfFillBlockYAML(v PdfFillBlock
 // MergePdfFillBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided PdfFillBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergePdfFillBlockYAML(v PdfFillBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"pdf_fill"}`))
 	if err != nil {
 		return err
 	}
@@ -29332,6 +30550,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsSplitPdfBlockYAML() (SplitPdfBlock
 // FromSplitPdfBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided SplitPdfBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromSplitPdfBlockYAML(v SplitPdfBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"split_pdf"}`))
 	t.union = b
 	return err
 }
@@ -29339,6 +30561,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromSplitPdfBlockYAML(v SplitPdfBlo
 // MergeSplitPdfBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided SplitPdfBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeSplitPdfBlockYAML(v SplitPdfBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"split_pdf"}`))
 	if err != nil {
 		return err
 	}
@@ -29358,6 +30584,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsWorkflowTriggerBlockYAML() (Workfl
 // FromWorkflowTriggerBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided WorkflowTriggerBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromWorkflowTriggerBlockYAML(v WorkflowTriggerBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"workflow_trigger"}`))
 	t.union = b
 	return err
 }
@@ -29365,6 +30595,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromWorkflowTriggerBlockYAML(v Work
 // MergeWorkflowTriggerBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided WorkflowTriggerBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeWorkflowTriggerBlockYAML(v WorkflowTriggerBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"workflow_trigger"}`))
 	if err != nil {
 		return err
 	}
@@ -29384,6 +30618,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsGoogleSheetsReadBlockYAML() (Googl
 // FromGoogleSheetsReadBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided GoogleSheetsReadBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromGoogleSheetsReadBlockYAML(v GoogleSheetsReadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"google_sheets_read"}`))
 	t.union = b
 	return err
 }
@@ -29391,6 +30629,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromGoogleSheetsReadBlockYAML(v Goo
 // MergeGoogleSheetsReadBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided GoogleSheetsReadBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeGoogleSheetsReadBlockYAML(v GoogleSheetsReadBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"google_sheets_read"}`))
 	if err != nil {
 		return err
 	}
@@ -29410,6 +30652,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsEmailInboxBlockYAML() (EmailInboxB
 // FromEmailInboxBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided EmailInboxBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromEmailInboxBlockYAML(v EmailInboxBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"email_inbox"}`))
 	t.union = b
 	return err
 }
@@ -29417,6 +30663,10 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromEmailInboxBlockYAML(v EmailInbo
 // MergeEmailInboxBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided EmailInboxBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeEmailInboxBlockYAML(v EmailInboxBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"email_inbox"}`))
 	if err != nil {
 		return err
 	}
@@ -29436,6 +30686,10 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) AsGoogleSheetsWriteBlockYAML() (Goog
 // FromGoogleSheetsWriteBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided GoogleSheetsWriteBlockYAML
 func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromGoogleSheetsWriteBlockYAML(v GoogleSheetsWriteBlockYAML) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"google_sheets_write"}`))
 	t.union = b
 	return err
 }
@@ -29446,10 +30700,137 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeGoogleSheetsWriteBlockYAML(v G
 	if err != nil {
 		return err
 	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"google_sheets_write"}`))
+	if err != nil {
+		return err
+	}
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
 	return err
+}
+
+// AsPowerBIQueryBlockYAML returns the union data inside the WhileLoopBlockYAML_LoopBlocks_Item as a PowerBIQueryBlockYAML
+func (t WhileLoopBlockYAML_LoopBlocks_Item) AsPowerBIQueryBlockYAML() (PowerBIQueryBlockYAML, error) {
+	var body PowerBIQueryBlockYAML
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPowerBIQueryBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided PowerBIQueryBlockYAML
+func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromPowerBIQueryBlockYAML(v PowerBIQueryBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	t.union = b
+	return err
+}
+
+// MergePowerBIQueryBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided PowerBIQueryBlockYAML
+func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergePowerBIQueryBlockYAML(v PowerBIQueryBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t WhileLoopBlockYAML_LoopBlocks_Item) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"block_type"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t WhileLoopBlockYAML_LoopBlocks_Item) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "action":
+		return t.AsActionBlockYAML()
+	case "agent_step":
+		return t.AsAgentStepBlockYAML()
+	case "code":
+		return t.AsCodeBlockYAML()
+	case "conditional":
+		return t.AsConditionalBlockYAML()
+	case "data_export":
+		return t.AsDataExportBlockYAML()
+	case "download_to_s3":
+		return t.AsDownloadToS3BlockYAML()
+	case "email_inbox":
+		return t.AsEmailInboxBlockYAML()
+	case "extraction":
+		return t.AsExtractionBlockYAML()
+	case "file_download":
+		return t.AsFileDownloadBlockYAML()
+	case "file_upload":
+		return t.AsFileUploadBlockYAML()
+	case "file_url_parser":
+		return t.AsFileParserBlockYAML()
+	case "for_loop":
+		return t.AsForLoopBlockYAML()
+	case "google_sheets_read":
+		return t.AsGoogleSheetsReadBlockYAML()
+	case "google_sheets_write":
+		return t.AsGoogleSheetsWriteBlockYAML()
+	case "goto_url":
+		return t.AsUrlBlockYAML()
+	case "http_request":
+		return t.AsHttpRequestBlockYAML()
+	case "human_interaction":
+		return t.AsHumanInteractionBlockYAML()
+	case "login":
+		return t.AsLoginBlockYAML()
+	case "navigation":
+		return t.AsNavigationBlockYAML()
+	case "pdf_fill":
+		return t.AsPdfFillBlockYAML()
+	case "pdf_parser":
+		return t.AsPDFParserBlockYAML()
+	case "powerbi_query":
+		return t.AsPowerBIQueryBlockYAML()
+	case "print_page":
+		return t.AsPrintPageBlockYAML()
+	case "send_email":
+		return t.AsSendEmailBlockYAML()
+	case "split_pdf":
+		return t.AsSplitPdfBlockYAML()
+	case "task":
+		return t.AsTaskBlockYAML()
+	case "task_v2":
+		return t.AsTaskV2BlockYAML()
+	case "terminate":
+		return t.AsTerminateBlockYAML()
+	case "text_prompt":
+		return t.AsTextPromptBlockYAML()
+	case "upload_to_s3":
+		return t.AsUploadToS3BlockYAML()
+	case "validation":
+		return t.AsValidationBlockYAML()
+	case "wait":
+		return t.AsWaitBlockYAML()
+	case "web_search":
+		return t.AsWebSearchBlockYAML()
+	case "while_loop":
+		return t.AsWhileLoopBlockYAML()
+	case "workflow_trigger":
+		return t.AsWorkflowTriggerBlockYAML()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
 }
 
 func (t WhileLoopBlockYAML_LoopBlocks_Item) MarshalJSON() ([]byte, error) {
@@ -30624,6 +32005,40 @@ func (t *WorkflowDefinition_Blocks_Item) MergeGoogleSheetsWriteBlock(v GoogleShe
 	return err
 }
 
+// AsPowerBIQueryBlock returns the union data inside the WorkflowDefinition_Blocks_Item as a PowerBIQueryBlock
+func (t WorkflowDefinition_Blocks_Item) AsPowerBIQueryBlock() (PowerBIQueryBlock, error) {
+	var body PowerBIQueryBlock
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPowerBIQueryBlock overwrites any union data inside the WorkflowDefinition_Blocks_Item as the provided PowerBIQueryBlock
+func (t *WorkflowDefinition_Blocks_Item) FromPowerBIQueryBlock(v PowerBIQueryBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	t.union = b
+	return err
+}
+
+// MergePowerBIQueryBlock performs a merge with any union data inside the WorkflowDefinition_Blocks_Item, using the provided PowerBIQueryBlock
+func (t *WorkflowDefinition_Blocks_Item) MergePowerBIQueryBlock(v PowerBIQueryBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 // AsPdfFillBlock returns the union data inside the WorkflowDefinition_Blocks_Item as a PdfFillBlock
 func (t WorkflowDefinition_Blocks_Item) AsPdfFillBlock() (PdfFillBlock, error) {
 	var body PdfFillBlock
@@ -30850,6 +32265,8 @@ func (t WorkflowDefinition_Blocks_Item) ValueByDiscriminator() (interface{}, err
 		return t.AsPdfFillBlock()
 	case "pdf_parser":
 		return t.AsPDFParserBlock()
+	case "powerbi_query":
+		return t.AsPowerBIQueryBlock()
 	case "print_page":
 		return t.AsPrintPageBlock()
 	case "send_email":
@@ -32472,6 +33889,40 @@ func (t *WorkflowDefinitionYAML_Blocks_Item) MergeGoogleSheetsWriteBlockYAML(v G
 	return err
 }
 
+// AsPowerBIQueryBlockYAML returns the union data inside the WorkflowDefinitionYAML_Blocks_Item as a PowerBIQueryBlockYAML
+func (t WorkflowDefinitionYAML_Blocks_Item) AsPowerBIQueryBlockYAML() (PowerBIQueryBlockYAML, error) {
+	var body PowerBIQueryBlockYAML
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPowerBIQueryBlockYAML overwrites any union data inside the WorkflowDefinitionYAML_Blocks_Item as the provided PowerBIQueryBlockYAML
+func (t *WorkflowDefinitionYAML_Blocks_Item) FromPowerBIQueryBlockYAML(v PowerBIQueryBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	t.union = b
+	return err
+}
+
+// MergePowerBIQueryBlockYAML performs a merge with any union data inside the WorkflowDefinitionYAML_Blocks_Item, using the provided PowerBIQueryBlockYAML
+func (t *WorkflowDefinitionYAML_Blocks_Item) MergePowerBIQueryBlockYAML(v PowerBIQueryBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"powerbi_query"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 func (t WorkflowDefinitionYAML_Blocks_Item) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"block_type"`
@@ -32528,6 +33979,8 @@ func (t WorkflowDefinitionYAML_Blocks_Item) ValueByDiscriminator() (interface{},
 		return t.AsPdfFillBlockYAML()
 	case "pdf_parser":
 		return t.AsPDFParserBlockYAML()
+	case "powerbi_query":
+		return t.AsPowerBIQueryBlockYAML()
 	case "print_page":
 		return t.AsPrintPageBlockYAML()
 	case "send_email":
