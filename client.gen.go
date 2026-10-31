@@ -945,12 +945,13 @@ func (e CredentialTypeOutput) Valid() bool {
 
 // Defines values for CredentialVaultType.
 const (
-	CredentialVaultTypeAzureVault  CredentialVaultType = "azure_vault"
-	CredentialVaultTypeBitwarden   CredentialVaultType = "bitwarden"
-	CredentialVaultTypeCustom      CredentialVaultType = "custom"
-	CredentialVaultTypeGcp         CredentialVaultType = "gcp"
-	CredentialVaultTypeOnepassword CredentialVaultType = "onepassword"
-	CredentialVaultTypeSkyvern     CredentialVaultType = "skyvern"
+	CredentialVaultTypeAzureVault         CredentialVaultType = "azure_vault"
+	CredentialVaultTypeBitwarden          CredentialVaultType = "bitwarden"
+	CredentialVaultTypeBitwardenConnected CredentialVaultType = "bitwarden_connected"
+	CredentialVaultTypeCustom             CredentialVaultType = "custom"
+	CredentialVaultTypeGcp                CredentialVaultType = "gcp"
+	CredentialVaultTypeOnepassword        CredentialVaultType = "onepassword"
+	CredentialVaultTypeSkyvern            CredentialVaultType = "skyvern"
 )
 
 // Valid indicates whether the value is a known member of the CredentialVaultType enum.
@@ -959,6 +960,8 @@ func (e CredentialVaultType) Valid() bool {
 	case CredentialVaultTypeAzureVault:
 		return true
 	case CredentialVaultTypeBitwarden:
+		return true
+	case CredentialVaultTypeBitwardenConnected:
 		return true
 	case CredentialVaultTypeCustom:
 		return true
@@ -3660,7 +3663,7 @@ type AgentStepBlockYAML struct {
 	// Prompt What the step must work out or get done. Rendered as a Jinja template against the run's parameters and earlier block outputs before the step starts.
 	Prompt string `json:"prompt"`
 
-	// Tools The tools the step may call, at least one. A block it runs through run_block is named by its block type, such as http_request. finish is always offered, and login only when the run has a credential parameter. Without a list the step is offered every tool.
+	// Tools The tools the step may call. A block it runs through run_block is named by its block type, such as http_request. finish and read_run_data are always offered, and login only when the run has a credential parameter. Without a list the step has no other tools.
 	Tools *[]string `json:"tools,omitempty"`
 }
 

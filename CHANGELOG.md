@@ -2,6 +2,11 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.6.5, 2026-10-31
+
+- `CredentialVaultType` gained the value `CredentialVaultTypeBitwardenConnected` (`bitwarden_connected`). `CredentialVaultType.Valid` accepts it.
+- The doc comment for `AgentStepBlockYAML.Tools` changed. It now says `finish` and `read_run_data` are always offered, and that without a list the step has no other tools, where it said the step is offered every tool. The field type is unchanged.
+
 ## v0.6.4, 2026-10-30
 
 - Added the `powerbi_query` workflow block. `PowerBIQueryBlock` and `PowerBIQueryBlockYAML` have `ConnectionId`, `DatasetId`, `Query`, `MaxRows`, `Label`, `OutputParameter`, `Model`, `Parameters` and the usual block fields such as `ContinueOnFailure`, `DisableCache` and `NextBlockLabel`. Their `BlockType` has the single value `PowerBIQueryBlockBlockTypePowerbiQuery` or `PowerBIQueryBlockYAMLBlockTypePowerbiQuery`. `PowerBIQueryBlock_Parameters_Item` holds the parameter union. The upstream spec says saves are unavailable until the Power BI catalog status is live.
