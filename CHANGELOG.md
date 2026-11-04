@@ -2,6 +2,13 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.6.6, 2026-11-04
+
+- `PowerBIQueryBlock` and `PowerBIQueryBlockYAML` gained an optional `CredentialSource` field, sent as `credential_source`. Its types are the new `PowerBIQueryBlockCredentialSource` and `PowerBIQueryBlockYAMLCredentialSource`, each with the single value `PowerBIQueryBlockCredentialSourceNango` or `PowerBIQueryBlockYAMLCredentialSourceNango` (`nango`) and a `Valid` method.
+- `BrowserSessionResponse` gained a `BrowserAddressRedacted` field, a `*bool` that is true when the browser address was withheld because the caller cannot connect.
+- The doc comment for `PowerBIQueryBlockYAML.ConnectionId` now says "Power BI connection ID" where it said "Microsoft OAuth credential ID".
+- The doc comment for `AgentStepBlockYAML.Tools` now says `login` is offered only when `parameter_keys` lists a credential parameter. The field type is unchanged.
+
 ## v0.6.5, 2026-10-31
 
 - `CredentialVaultType` gained the value `CredentialVaultTypeBitwardenConnected` (`bitwarden_connected`). `CredentialVaultType.Valid` accepts it.

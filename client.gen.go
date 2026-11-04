@@ -2029,6 +2029,21 @@ func (e PowerBIQueryBlockBlockType) Valid() bool {
 	}
 }
 
+// Defines values for PowerBIQueryBlockCredentialSource.
+const (
+	PowerBIQueryBlockCredentialSourceNango PowerBIQueryBlockCredentialSource = "nango"
+)
+
+// Valid indicates whether the value is a known member of the PowerBIQueryBlockCredentialSource enum.
+func (e PowerBIQueryBlockCredentialSource) Valid() bool {
+	switch e {
+	case PowerBIQueryBlockCredentialSourceNango:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PowerBIQueryBlockYAMLBlockType.
 const (
 	PowerBIQueryBlockYAMLBlockTypePowerbiQuery PowerBIQueryBlockYAMLBlockType = "powerbi_query"
@@ -2038,6 +2053,21 @@ const (
 func (e PowerBIQueryBlockYAMLBlockType) Valid() bool {
 	switch e {
 	case PowerBIQueryBlockYAMLBlockTypePowerbiQuery:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PowerBIQueryBlockYAMLCredentialSource.
+const (
+	PowerBIQueryBlockYAMLCredentialSourceNango PowerBIQueryBlockYAMLCredentialSource = "nango"
+)
+
+// Valid indicates whether the value is a known member of the PowerBIQueryBlockYAMLCredentialSource enum.
+func (e PowerBIQueryBlockYAMLCredentialSource) Valid() bool {
+	switch e {
+	case PowerBIQueryBlockYAMLCredentialSourceNango:
 		return true
 	default:
 		return false
@@ -3663,7 +3693,7 @@ type AgentStepBlockYAML struct {
 	// Prompt What the step must work out or get done. Rendered as a Jinja template against the run's parameters and earlier block outputs before the step starts.
 	Prompt string `json:"prompt"`
 
-	// Tools The tools the step may call. A block it runs through run_block is named by its block type, such as http_request. finish and read_run_data are always offered, and login only when the run has a credential parameter. Without a list the step has no other tools.
+	// Tools The tools the step may call. A block it runs through run_block is named by its block type, such as http_request. finish and read_run_data are always offered, and login only when parameter_keys lists a credential parameter. Without a list the step has no other tools.
 	Tools *[]string `json:"tools,omitempty"`
 }
 
@@ -4033,6 +4063,9 @@ type BrowserSessionResponse struct {
 	//
 	// Example: http://localhost:9222
 	BrowserAddress *string `json:"browser_address,omitempty"`
+
+	// BrowserAddressRedacted Whether the browser address was withheld because this caller cannot connect
+	BrowserAddressRedacted *bool `json:"browser_address_redacted,omitempty"`
 
 	// BrowserProfileId ID of the browser profile loaded into this session, if any. browser_profile_id starts with `bp_`.
 	BrowserProfileId *string `json:"browser_profile_id,omitempty"`
@@ -6803,12 +6836,13 @@ type PersistentBrowserType string
 
 // PowerBIQueryBlock defines model for PowerBIQueryBlock.
 type PowerBIQueryBlock struct {
-	BlockType                  *PowerBIQueryBlockBlockType `json:"block_type,omitempty"`
-	ConnectionId               string                      `json:"connection_id"`
-	ContinueOnFailure          *bool                       `json:"continue_on_failure,omitempty"`
-	DatasetId                  string                      `json:"dataset_id"`
-	DisableCache               *bool                       `json:"disable_cache,omitempty"`
-	IgnoreWorkflowSystemPrompt *bool                       `json:"ignore_workflow_system_prompt,omitempty"`
+	BlockType                  *PowerBIQueryBlockBlockType        `json:"block_type,omitempty"`
+	ConnectionId               string                             `json:"connection_id"`
+	ContinueOnFailure          *bool                              `json:"continue_on_failure,omitempty"`
+	CredentialSource           *PowerBIQueryBlockCredentialSource `json:"credential_source,omitempty"`
+	DatasetId                  string                             `json:"dataset_id"`
+	DisableCache               *bool                              `json:"disable_cache,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool                              `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier for a block; unique within a workflow.
 	Label   string                  `json:"label"`
@@ -6826,6 +6860,9 @@ type PowerBIQueryBlock struct {
 // PowerBIQueryBlockBlockType defines model for PowerBIQueryBlock.BlockType.
 type PowerBIQueryBlockBlockType string
 
+// PowerBIQueryBlockCredentialSource defines model for PowerBIQueryBlock.CredentialSource.
+type PowerBIQueryBlockCredentialSource string
+
 // PowerBIQueryBlock_Parameters_Item defines model for PowerBIQueryBlock.parameters.Item.
 type PowerBIQueryBlock_Parameters_Item struct {
 	union json.RawMessage
@@ -6835,11 +6872,12 @@ type PowerBIQueryBlock_Parameters_Item struct {
 type PowerBIQueryBlockYAML struct {
 	BlockType *PowerBIQueryBlockYAMLBlockType `json:"block_type,omitempty"`
 
-	// ConnectionId Microsoft OAuth credential ID for this user.
-	ConnectionId               string `json:"connection_id"`
-	ContinueOnFailure          *bool  `json:"continue_on_failure,omitempty"`
-	DatasetId                  string `json:"dataset_id"`
-	IgnoreWorkflowSystemPrompt *bool  `json:"ignore_workflow_system_prompt,omitempty"`
+	// ConnectionId Power BI connection ID for this user.
+	ConnectionId               string                                 `json:"connection_id"`
+	ContinueOnFailure          *bool                                  `json:"continue_on_failure,omitempty"`
+	CredentialSource           *PowerBIQueryBlockYAMLCredentialSource `json:"credential_source,omitempty"`
+	DatasetId                  string                                 `json:"dataset_id"`
+	IgnoreWorkflowSystemPrompt *bool                                  `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
 	Label   string                  `json:"label"`
@@ -6857,6 +6895,9 @@ type PowerBIQueryBlockYAML struct {
 
 // PowerBIQueryBlockYAMLBlockType defines model for PowerBIQueryBlockYAML.BlockType.
 type PowerBIQueryBlockYAMLBlockType string
+
+// PowerBIQueryBlockYAMLCredentialSource defines model for PowerBIQueryBlockYAML.CredentialSource.
+type PowerBIQueryBlockYAMLCredentialSource string
 
 // PrintPageBlock defines model for PrintPageBlock.
 type PrintPageBlock struct {
