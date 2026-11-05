@@ -3,6 +3,7 @@
 # nullable unions become nullable schemas, const becomes a singleton enum,
 # and schema examples arrays become a single example. Operations stay intact.
 # Description punctuation is normalized for the generated Go comments.
+# Empty response schemas decode into json.RawMessage instead of interface{}.
 set -euo pipefail
 trap 'on_error "$?" "$LINENO"' ERR
 
@@ -55,6 +56,14 @@ jq '
             else . end
         else . end)
     else . end)
+  | .paths |= with_entries(.value |= with_entries(
+      if (.value | type) == "object" and (.value.responses? | type) == "object" then
+        .value.responses |= with_entries(
+          if .value.content?["application/json"]?.schema? == {} then
+            .value.content["application/json"].schema =
+              {"x-go-type": "json.RawMessage"}
+          else . end)
+      else . end))
   | .openapi = "3.0.3"
 ' "${SPEC_DIR}/openapi.json" >"$tmp"
 chmod 0644 "$tmp"

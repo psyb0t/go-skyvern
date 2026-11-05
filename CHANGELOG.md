@@ -2,6 +2,13 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.7.0, 2026-11-05
+
+- Removed `RunEngineYutoriNavigator`, `RunTypeYutoriNavigator` and `TaskRunResponseRunTypeYutoriNavigator`, because the Skyvern API no longer lists `yutori-navigator` and `yutori_navigator`. Code that uses these constants must drop them. `Valid` on `RunEngine`, `RunType` and `TaskRunResponseRunType` no longer accepts those values.
+- `EmailInboxBlock` and `EmailInboxBlockYAML` gained optional `ConnectionId` and `CredentialSource` fields. The new types are `EmailInboxBlockCredentialSource` and `EmailInboxBlockYAMLCredentialSource`, with the values `EmailInboxBlockCredentialSourceNango`, `EmailInboxBlockCredentialSourceNative`, `EmailInboxBlockYAMLCredentialSourceNango` and `EmailInboxBlockYAMLCredentialSourceNative`.
+- The `JSON200` field and `GetJSON200` method changed from `*interface{}` to `*json.RawMessage` on the response types of `DeleteWorkflowV1AgentsWorkflowIdDeletePost`, `GetArtifactContentV1ArtifactsArtifactIdContentGet`, `CloseBrowserSessionV1BrowserSessionsBrowserSessionIdClosePost`, `CancelRunV1RunsRunIdCancelPost` and `RunScriptV1ScriptsScriptIdRunPost`. The matching `Parse...Response` functions decode into `json.RawMessage`. Code that reads `JSON200` as an `interface{}` must unmarshal the raw bytes instead.
+- `scripts/patch-spec.sh` now gives empty JSON response schemas the Go type `json.RawMessage`, which causes the `JSON200` change above.
+
 ## v0.6.6, 2026-11-04
 
 - `PowerBIQueryBlock` and `PowerBIQueryBlockYAML` gained an optional `CredentialSource` field, sent as `credential_source`. Its types are the new `PowerBIQueryBlockCredentialSource` and `PowerBIQueryBlockYAMLCredentialSource`, each with the single value `PowerBIQueryBlockCredentialSourceNango` or `PowerBIQueryBlockYAMLCredentialSourceNango` (`nango`) and a `Valid` method.

@@ -1093,6 +1093,24 @@ func (e EmailInboxBlockBlockType) Valid() bool {
 	}
 }
 
+// Defines values for EmailInboxBlockCredentialSource.
+const (
+	EmailInboxBlockCredentialSourceNango  EmailInboxBlockCredentialSource = "nango"
+	EmailInboxBlockCredentialSourceNative EmailInboxBlockCredentialSource = "native"
+)
+
+// Valid indicates whether the value is a known member of the EmailInboxBlockCredentialSource enum.
+func (e EmailInboxBlockCredentialSource) Valid() bool {
+	switch e {
+	case EmailInboxBlockCredentialSourceNango:
+		return true
+	case EmailInboxBlockCredentialSourceNative:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for EmailInboxBlockEmailClient.
 const (
 	EmailInboxBlockEmailClientGmail   EmailInboxBlockEmailClient = "gmail"
@@ -1120,6 +1138,24 @@ const (
 func (e EmailInboxBlockYAMLBlockType) Valid() bool {
 	switch e {
 	case EmailInboxBlockYAMLBlockTypeEmailInbox:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for EmailInboxBlockYAMLCredentialSource.
+const (
+	EmailInboxBlockYAMLCredentialSourceNango  EmailInboxBlockYAMLCredentialSource = "nango"
+	EmailInboxBlockYAMLCredentialSourceNative EmailInboxBlockYAMLCredentialSource = "native"
+)
+
+// Valid indicates whether the value is a known member of the EmailInboxBlockYAMLCredentialSource enum.
+func (e EmailInboxBlockYAMLCredentialSource) Valid() bool {
+	switch e {
+	case EmailInboxBlockYAMLCredentialSourceNango:
+		return true
+	case EmailInboxBlockYAMLCredentialSourceNative:
 		return true
 	default:
 		return false
@@ -2232,13 +2268,12 @@ func (e ProxyLocation) Valid() bool {
 
 // Defines values for RunEngine.
 const (
-	RunEngineAnthropicCua    RunEngine = "anthropic-cua"
-	RunEngineOpenaiCua       RunEngine = "openai-cua"
-	RunEngineSkyvern10       RunEngine = "skyvern-1.0"
-	RunEngineSkyvern20       RunEngine = "skyvern-2.0"
-	RunEngineSkyvern30       RunEngine = "skyvern-3.0"
-	RunEngineUiTars          RunEngine = "ui-tars"
-	RunEngineYutoriNavigator RunEngine = "yutori-navigator"
+	RunEngineAnthropicCua RunEngine = "anthropic-cua"
+	RunEngineOpenaiCua    RunEngine = "openai-cua"
+	RunEngineSkyvern10    RunEngine = "skyvern-1.0"
+	RunEngineSkyvern20    RunEngine = "skyvern-2.0"
+	RunEngineSkyvern30    RunEngine = "skyvern-3.0"
+	RunEngineUiTars       RunEngine = "ui-tars"
 )
 
 // Valid indicates whether the value is a known member of the RunEngine enum.
@@ -2255,8 +2290,6 @@ func (e RunEngine) Valid() bool {
 	case RunEngineSkyvern30:
 		return true
 	case RunEngineUiTars:
-		return true
-	case RunEngineYutoriNavigator:
 		return true
 	default:
 		return false
@@ -2304,14 +2337,13 @@ func (e RunStatus) Valid() bool {
 
 // Defines values for RunType.
 const (
-	RunTypeAnthropicCua    RunType = "anthropic_cua"
-	RunTypeOpenaiCua       RunType = "openai_cua"
-	RunTypeTaskV1          RunType = "task_v1"
-	RunTypeTaskV2          RunType = "task_v2"
-	RunTypeTaskV3          RunType = "task_v3"
-	RunTypeUiTars          RunType = "ui_tars"
-	RunTypeWorkflowRun     RunType = "workflow_run"
-	RunTypeYutoriNavigator RunType = "yutori_navigator"
+	RunTypeAnthropicCua RunType = "anthropic_cua"
+	RunTypeOpenaiCua    RunType = "openai_cua"
+	RunTypeTaskV1       RunType = "task_v1"
+	RunTypeTaskV2       RunType = "task_v2"
+	RunTypeTaskV3       RunType = "task_v3"
+	RunTypeUiTars       RunType = "ui_tars"
+	RunTypeWorkflowRun  RunType = "workflow_run"
 )
 
 // Valid indicates whether the value is a known member of the RunType enum.
@@ -2330,8 +2362,6 @@ func (e RunType) Valid() bool {
 	case RunTypeUiTars:
 		return true
 	case RunTypeWorkflowRun:
-		return true
-	case RunTypeYutoriNavigator:
 		return true
 	default:
 		return false
@@ -2445,13 +2475,12 @@ func (e TaskBlockYAMLBlockType) Valid() bool {
 
 // Defines values for TaskRunResponseRunType.
 const (
-	TaskRunResponseRunTypeAnthropicCua    TaskRunResponseRunType = "anthropic_cua"
-	TaskRunResponseRunTypeOpenaiCua       TaskRunResponseRunType = "openai_cua"
-	TaskRunResponseRunTypeTaskV1          TaskRunResponseRunType = "task_v1"
-	TaskRunResponseRunTypeTaskV2          TaskRunResponseRunType = "task_v2"
-	TaskRunResponseRunTypeTaskV3          TaskRunResponseRunType = "task_v3"
-	TaskRunResponseRunTypeUiTars          TaskRunResponseRunType = "ui_tars"
-	TaskRunResponseRunTypeYutoriNavigator TaskRunResponseRunType = "yutori_navigator"
+	TaskRunResponseRunTypeAnthropicCua TaskRunResponseRunType = "anthropic_cua"
+	TaskRunResponseRunTypeOpenaiCua    TaskRunResponseRunType = "openai_cua"
+	TaskRunResponseRunTypeTaskV1       TaskRunResponseRunType = "task_v1"
+	TaskRunResponseRunTypeTaskV2       TaskRunResponseRunType = "task_v2"
+	TaskRunResponseRunTypeTaskV3       TaskRunResponseRunType = "task_v3"
+	TaskRunResponseRunTypeUiTars       TaskRunResponseRunType = "ui_tars"
 )
 
 // Valid indicates whether the value is a known member of the TaskRunResponseRunType enum.
@@ -2468,8 +2497,6 @@ func (e TaskRunResponseRunType) Valid() bool {
 	case TaskRunResponseRunTypeTaskV3:
 		return true
 	case TaskRunResponseRunTypeUiTars:
-		return true
-	case TaskRunResponseRunTypeYutoriNavigator:
 		return true
 	default:
 		return false
@@ -4043,7 +4070,9 @@ type BrowserProfileUsageWorkflow struct {
 
 // BrowserSeedSource Which layer of the seed-precedence chain seeded a run's browser (provenance).
 //
-// Resolved once at run setup, before any browser creation, for all run types (C-semantics).
+// Resolved at run setup, before any browser creation, for all run types (C-semantics). A
+// serialized Save & Reuse run re-resolves once more after the sequential wait, so a profile an
+// earlier run in its lane saved while it was queued becomes own_memory rather than a stale pick.
 // - override: explicit request browser_profile_id (one-run-only pick via API)
 // - picked: the workflow's explicit profile pick (workflows.browser_profile_id) , "always start here"
 // - own_memory: the workflow's own auto-profile (no pick + persist_browser_session)
@@ -5076,15 +5105,17 @@ type EmailBodyFormat string
 
 // EmailInboxBlock defines model for EmailInboxBlock.
 type EmailInboxBlock struct {
-	BlockType                  *EmailInboxBlockBlockType  `json:"block_type,omitempty"`
-	ContinueOnFailure          *bool                      `json:"continue_on_failure,omitempty"`
-	CredentialId               *string                    `json:"credential_id,omitempty"`
-	DisableCache               *bool                      `json:"disable_cache,omitempty"`
-	DownloadAttachments        *bool                      `json:"download_attachments,omitempty"`
-	EmailClient                EmailInboxBlockEmailClient `json:"email_client"`
-	Folder                     *string                    `json:"folder,omitempty"`
-	IgnoreWorkflowSystemPrompt *bool                      `json:"ignore_workflow_system_prompt,omitempty"`
-	IncludeBody                *bool                      `json:"include_body,omitempty"`
+	BlockType                  *EmailInboxBlockBlockType        `json:"block_type,omitempty"`
+	ConnectionId               *string                          `json:"connection_id,omitempty"`
+	ContinueOnFailure          *bool                            `json:"continue_on_failure,omitempty"`
+	CredentialId               *string                          `json:"credential_id,omitempty"`
+	CredentialSource           *EmailInboxBlockCredentialSource `json:"credential_source,omitempty"`
+	DisableCache               *bool                            `json:"disable_cache,omitempty"`
+	DownloadAttachments        *bool                            `json:"download_attachments,omitempty"`
+	EmailClient                EmailInboxBlockEmailClient       `json:"email_client"`
+	Folder                     *string                          `json:"folder,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool                            `json:"ignore_workflow_system_prompt,omitempty"`
+	IncludeBody                *bool                            `json:"include_body,omitempty"`
 
 	// Label Author-facing identifier for a block; unique within a workflow.
 	Label         string                  `json:"label"`
@@ -5105,6 +5136,9 @@ type EmailInboxBlock struct {
 // EmailInboxBlockBlockType defines model for EmailInboxBlock.BlockType.
 type EmailInboxBlockBlockType string
 
+// EmailInboxBlockCredentialSource defines model for EmailInboxBlock.CredentialSource.
+type EmailInboxBlockCredentialSource string
+
 // EmailInboxBlockEmailClient defines model for EmailInboxBlock.EmailClient.
 type EmailInboxBlockEmailClient string
 
@@ -5115,9 +5149,11 @@ type EmailInboxBlock_Parameters_Item struct {
 
 // EmailInboxBlockYAML defines model for EmailInboxBlockYAML.
 type EmailInboxBlockYAML struct {
-	BlockType         *EmailInboxBlockYAMLBlockType `json:"block_type,omitempty"`
-	ContinueOnFailure *bool                         `json:"continue_on_failure,omitempty"`
-	CredentialId      *string                       `json:"credential_id,omitempty"`
+	BlockType         *EmailInboxBlockYAMLBlockType        `json:"block_type,omitempty"`
+	ConnectionId      *string                              `json:"connection_id,omitempty"`
+	ContinueOnFailure *bool                                `json:"continue_on_failure,omitempty"`
+	CredentialId      *string                              `json:"credential_id,omitempty"`
+	CredentialSource  *EmailInboxBlockYAMLCredentialSource `json:"credential_source,omitempty"`
 
 	// DownloadAttachments Download non-inline attachments from matched emails for downstream blocks.
 	DownloadAttachments        *bool                          `json:"download_attachments,omitempty"`
@@ -5143,6 +5179,9 @@ type EmailInboxBlockYAML struct {
 
 // EmailInboxBlockYAMLBlockType defines model for EmailInboxBlockYAML.BlockType.
 type EmailInboxBlockYAMLBlockType string
+
+// EmailInboxBlockYAMLCredentialSource defines model for EmailInboxBlockYAML.CredentialSource.
+type EmailInboxBlockYAMLCredentialSource string
 
 // EmailInboxBlockYAMLEmailClient defines model for EmailInboxBlockYAML.EmailClient.
 type EmailInboxBlockYAMLEmailClient string
@@ -9385,7 +9424,9 @@ type WorkflowRun struct {
 
 	// BrowserSeedSource Which layer of the seed-precedence chain seeded a run's browser (provenance).
 	//
-	// Resolved once at run setup, before any browser creation, for all run types (C-semantics).
+	// Resolved at run setup, before any browser creation, for all run types (C-semantics). A
+	// serialized Save & Reuse run re-resolves once more after the sequential wait, so a profile an
+	// earlier run in its lane saved while it was queued becomes own_memory rather than a stale pick.
 	// - override: explicit request browser_profile_id (one-run-only pick via API)
 	// - picked: the workflow's explicit profile pick (workflows.browser_profile_id) , "always start here"
 	// - own_memory: the workflow's own auto-profile (no pick + persist_browser_session)
@@ -9944,7 +9985,9 @@ type WorkflowRunResponse struct {
 
 	// BrowserSeedSource Which layer of the seed-precedence chain seeded a run's browser (provenance).
 	//
-	// Resolved once at run setup, before any browser creation, for all run types (C-semantics).
+	// Resolved at run setup, before any browser creation, for all run types (C-semantics). A
+	// serialized Save & Reuse run re-resolves once more after the sequential wait, so a profile an
+	// earlier run in its lane saved while it was queued becomes own_memory rather than a stale pick.
 	// - override: explicit request browser_profile_id (one-run-only pick via API)
 	// - picked: the workflow's explicit profile pick (workflows.browser_profile_id) , "always start here"
 	// - own_memory: the workflow's own auto-profile (no pick + persist_browser_session)
@@ -36084,8 +36127,6 @@ func (t GetRunV1RunsRunIdGet200JSONResponseBody) ValueByDiscriminator() (interfa
 		return t.AsTaskRunResponse()
 	case "workflow_run":
 		return t.AsWorkflowRunResponse()
-	case "yutori_navigator":
-		return t.AsTaskRunResponse()
 	default:
 		return nil, errors.New("unknown discriminator value: " + discriminator)
 	}
@@ -48655,13 +48696,13 @@ type DeleteWorkflowV1AgentsWorkflowIdDeletePostResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *interface{}
+	JSON200 *json.RawMessage
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *HTTPValidationError
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r DeleteWorkflowV1AgentsWorkflowIdDeletePostResponse) GetJSON200() *interface{} {
+func (r DeleteWorkflowV1AgentsWorkflowIdDeletePostResponse) GetJSON200() *json.RawMessage {
 	return r.JSON200
 }
 
@@ -49505,13 +49546,13 @@ type GetArtifactContentV1ArtifactsArtifactIdContentGetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *interface{}
+	JSON200 *json.RawMessage
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *HTTPValidationError
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r GetArtifactContentV1ArtifactsArtifactIdContentGetResponse) GetJSON200() *interface{} {
+func (r GetArtifactContentV1ArtifactsArtifactIdContentGetResponse) GetJSON200() *json.RawMessage {
 	return r.JSON200
 }
 
@@ -50166,13 +50207,13 @@ type CloseBrowserSessionV1BrowserSessionsBrowserSessionIdClosePostResponse struc
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *interface{}
+	JSON200 *json.RawMessage
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *HTTPValidationError
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r CloseBrowserSessionV1BrowserSessionsBrowserSessionIdClosePostResponse) GetJSON200() *interface{} {
+func (r CloseBrowserSessionV1BrowserSessionsBrowserSessionIdClosePostResponse) GetJSON200() *json.RawMessage {
 	return r.JSON200
 }
 
@@ -52009,13 +52050,13 @@ type CancelRunV1RunsRunIdCancelPostResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *interface{}
+	JSON200 *json.RawMessage
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *HTTPValidationError
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r CancelRunV1RunsRunIdCancelPostResponse) GetJSON200() *interface{} {
+func (r CancelRunV1RunsRunIdCancelPostResponse) GetJSON200() *json.RawMessage {
 	return r.JSON200
 }
 
@@ -52578,13 +52619,13 @@ type RunScriptV1ScriptsScriptIdRunPostResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
-	JSON200 *interface{}
+	JSON200 *json.RawMessage
 	// JSON422 the response for an HTTP 422 `application/json` response
 	JSON422 *HTTPValidationError
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
-func (r RunScriptV1ScriptsScriptIdRunPostResponse) GetJSON200() *interface{} {
+func (r RunScriptV1ScriptsScriptIdRunPostResponse) GetJSON200() *json.RawMessage {
 	return r.JSON200
 }
 
@@ -55863,7 +55904,7 @@ func ParseDeleteWorkflowV1AgentsWorkflowIdDeletePostResponse(rsp *http.Response)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest interface{}
+		var dest json.RawMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -56473,7 +56514,7 @@ func ParseGetArtifactContentV1ArtifactsArtifactIdContentGetResponse(rsp *http.Re
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest interface{}
+		var dest json.RawMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -57000,7 +57041,7 @@ func ParseCloseBrowserSessionV1BrowserSessionsBrowserSessionIdClosePostResponse(
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest interface{}
+		var dest json.RawMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -58438,7 +58479,7 @@ func ParseCancelRunV1RunsRunIdCancelPostResponse(rsp *http.Response) (*CancelRun
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest interface{}
+		var dest json.RawMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -58848,7 +58889,7 @@ func ParseRunScriptV1ScriptsScriptIdRunPostResponse(rsp *http.Response) (*RunScr
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest interface{}
+		var dest json.RawMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
