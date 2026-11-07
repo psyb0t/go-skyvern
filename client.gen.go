@@ -945,6 +945,7 @@ func (e CredentialTypeOutput) Valid() bool {
 
 // Defines values for CredentialVaultType.
 const (
+	CredentialVaultTypeAwsSecretsManager  CredentialVaultType = "aws_secrets_manager"
 	CredentialVaultTypeAzureVault         CredentialVaultType = "azure_vault"
 	CredentialVaultTypeBitwarden          CredentialVaultType = "bitwarden"
 	CredentialVaultTypeBitwardenConnected CredentialVaultType = "bitwarden_connected"
@@ -957,6 +958,8 @@ const (
 // Valid indicates whether the value is a known member of the CredentialVaultType enum.
 func (e CredentialVaultType) Valid() bool {
 	switch e {
+	case CredentialVaultTypeAwsSecretsManager:
+		return true
 	case CredentialVaultTypeAzureVault:
 		return true
 	case CredentialVaultTypeBitwarden:
@@ -4770,6 +4773,9 @@ type CredentialResponse struct {
 
 	// CredentialType Type of credential stored in the system.
 	CredentialType CredentialTypeOutput `json:"credential_type"`
+
+	// ExtraSiteUrls More sites this login may sign in on, each covering its whole site
+	ExtraSiteUrls *[]string `json:"extra_site_urls,omitempty"`
 
 	// FolderId ID of the credential folder this credential belongs to, if any
 	//

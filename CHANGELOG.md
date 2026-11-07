@@ -2,6 +2,11 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.7.1, 2026-11-07
+
+- `CredentialVaultType` gained the value `CredentialVaultTypeAwsSecretsManager` (`aws_secrets_manager`). `CredentialVaultType.Valid` accepts it.
+- `CredentialResponse` gained an optional `ExtraSiteUrls` field, a `*[]string` sent as `extra_site_urls`. It lists more sites the login may sign in on.
+
 ## v0.7.0, 2026-11-05
 
 - Removed `RunEngineYutoriNavigator`, `RunTypeYutoriNavigator` and `TaskRunResponseRunTypeYutoriNavigator`, because the Skyvern API no longer lists `yutori-navigator` and `yutori_navigator`. Code that uses these constants must drop them. `Valid` on `RunEngine`, `RunType` and `TaskRunResponseRunType` no longer accepts those values.
