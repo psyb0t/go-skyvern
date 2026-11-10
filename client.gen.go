@@ -3641,8 +3641,10 @@ type ActionBlockYAML struct {
 	IgnoreWorkflowSystemPrompt *bool              `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
-	Label          string                  `json:"label"`
-	MaxRetries     *int                    `json:"max_retries,omitempty"`
+	Label      string `json:"label"`
+	MaxRetries *int   `json:"max_retries,omitempty"`
+
+	// MaxStepsPerRun Action-step budget for one run, not an exact stop. On the skyvern-3.0 (Task V3) engine, except on action and validation blocks, the effective budget is never below 24: a positive value under 24 runs as 24, and a run still making progress can be granted steps past the budget.
 	MaxStepsPerRun *int                    `json:"max_steps_per_run,omitempty"`
 	Model          *map[string]interface{} `json:"model,omitempty"`
 	NavigationGoal *string                 `json:"navigation_goal,omitempty"`
@@ -3891,11 +3893,11 @@ type BitwardenCreditCardDataParameterParameterType string
 
 // BitwardenCreditCardDataParameterYAML defines model for BitwardenCreditCardDataParameterYAML.
 type BitwardenCreditCardDataParameterYAML struct {
-	BitwardenClientIdAwsSecretKey       string                                             `json:"bitwarden_client_id_aws_secret_key"`
-	BitwardenClientSecretAwsSecretKey   string                                             `json:"bitwarden_client_secret_aws_secret_key"`
+	BitwardenClientIdAwsSecretKey       *string                                            `json:"bitwarden_client_id_aws_secret_key,omitempty"`
+	BitwardenClientSecretAwsSecretKey   *string                                            `json:"bitwarden_client_secret_aws_secret_key,omitempty"`
 	BitwardenCollectionId               string                                             `json:"bitwarden_collection_id"`
 	BitwardenItemId                     string                                             `json:"bitwarden_item_id"`
-	BitwardenMasterPasswordAwsSecretKey string                                             `json:"bitwarden_master_password_aws_secret_key"`
+	BitwardenMasterPasswordAwsSecretKey *string                                            `json:"bitwarden_master_password_aws_secret_key,omitempty"`
 	Description                         *string                                            `json:"description,omitempty"`
 	Key                                 string                                             `json:"key"`
 	ParameterType                       *BitwardenCreditCardDataParameterYAMLParameterType `json:"parameter_type,omitempty"`
@@ -3928,11 +3930,11 @@ type BitwardenLoginCredentialParameterParameterType string
 
 // BitwardenLoginCredentialParameterYAML defines model for BitwardenLoginCredentialParameterYAML.
 type BitwardenLoginCredentialParameterYAML struct {
-	BitwardenClientIdAwsSecretKey       string                                              `json:"bitwarden_client_id_aws_secret_key"`
-	BitwardenClientSecretAwsSecretKey   string                                              `json:"bitwarden_client_secret_aws_secret_key"`
+	BitwardenClientIdAwsSecretKey       *string                                             `json:"bitwarden_client_id_aws_secret_key,omitempty"`
+	BitwardenClientSecretAwsSecretKey   *string                                             `json:"bitwarden_client_secret_aws_secret_key,omitempty"`
 	BitwardenCollectionId               *string                                             `json:"bitwarden_collection_id,omitempty"`
 	BitwardenItemId                     *string                                             `json:"bitwarden_item_id,omitempty"`
-	BitwardenMasterPasswordAwsSecretKey string                                              `json:"bitwarden_master_password_aws_secret_key"`
+	BitwardenMasterPasswordAwsSecretKey *string                                             `json:"bitwarden_master_password_aws_secret_key,omitempty"`
 	Description                         *string                                             `json:"description,omitempty"`
 	Key                                 string                                              `json:"key"`
 	ParameterType                       *BitwardenLoginCredentialParameterYAMLParameterType `json:"parameter_type,omitempty"`
@@ -3966,12 +3968,12 @@ type BitwardenSensitiveInformationParameterParameterType string
 
 // BitwardenSensitiveInformationParameterYAML defines model for BitwardenSensitiveInformationParameterYAML.
 type BitwardenSensitiveInformationParameterYAML struct {
-	BitwardenClientIdAwsSecretKey       string                                                   `json:"bitwarden_client_id_aws_secret_key"`
-	BitwardenClientSecretAwsSecretKey   string                                                   `json:"bitwarden_client_secret_aws_secret_key"`
+	BitwardenClientIdAwsSecretKey       *string                                                  `json:"bitwarden_client_id_aws_secret_key,omitempty"`
+	BitwardenClientSecretAwsSecretKey   *string                                                  `json:"bitwarden_client_secret_aws_secret_key,omitempty"`
 	BitwardenCollectionId               string                                                   `json:"bitwarden_collection_id"`
 	BitwardenIdentityFields             []string                                                 `json:"bitwarden_identity_fields"`
 	BitwardenIdentityKey                string                                                   `json:"bitwarden_identity_key"`
-	BitwardenMasterPasswordAwsSecretKey string                                                   `json:"bitwarden_master_password_aws_secret_key"`
+	BitwardenMasterPasswordAwsSecretKey *string                                                  `json:"bitwarden_master_password_aws_secret_key,omitempty"`
 	Description                         *string                                                  `json:"description,omitempty"`
 	Key                                 string                                                   `json:"key"`
 	ParameterType                       *BitwardenSensitiveInformationParameterYAMLParameterType `json:"parameter_type,omitempty"`
@@ -5126,6 +5128,7 @@ type EmailInboxBlock struct {
 	// Label Author-facing identifier for a block; unique within a workflow.
 	Label         string                  `json:"label"`
 	MaxResults    *int                    `json:"max_results,omitempty"`
+	MessageId     *string                 `json:"message_id,omitempty"`
 	Model         *map[string]interface{} `json:"model,omitempty"`
 	NewerThanDays *int                    `json:"newer_than_days,omitempty"`
 
@@ -5171,6 +5174,7 @@ type EmailInboxBlockYAML struct {
 	// Label Author-facing identifier; must be unique per workflow.
 	Label         string                  `json:"label"`
 	MaxResults    *int                    `json:"max_results,omitempty"`
+	MessageId     *string                 `json:"message_id,omitempty"`
 	Model         *map[string]interface{} `json:"model,omitempty"`
 	NewerThanDays *int                    `json:"newer_than_days,omitempty"`
 
@@ -5342,8 +5346,10 @@ type ExtractionBlockYAML struct {
 	IgnoreWorkflowSystemPrompt *bool                   `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
-	Label          string                  `json:"label"`
-	MaxRetries     *int                    `json:"max_retries,omitempty"`
+	Label      string `json:"label"`
+	MaxRetries *int   `json:"max_retries,omitempty"`
+
+	// MaxStepsPerRun Action-step budget for one run, not an exact stop. On the skyvern-3.0 (Task V3) engine, except on action and validation blocks, the effective budget is never below 24: a positive value under 24 runs as 24, and a run still making progress can be granted steps past the budget.
 	MaxStepsPerRun *int                    `json:"max_steps_per_run,omitempty"`
 	Model          *map[string]interface{} `json:"model,omitempty"`
 
@@ -5486,8 +5492,10 @@ type FileDownloadBlockYAML struct {
 	IgnoreWorkflowSystemPrompt *bool              `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
-	Label          string                  `json:"label"`
-	MaxRetries     *int                    `json:"max_retries,omitempty"`
+	Label      string `json:"label"`
+	MaxRetries *int   `json:"max_retries,omitempty"`
+
+	// MaxStepsPerRun Action-step budget for one run, not an exact stop. On the skyvern-3.0 (Task V3) engine, except on action and validation blocks, the effective budget is never below 24: a positive value under 24 runs as 24, and a run still making progress can be granted steps past the budget.
 	MaxStepsPerRun *int                    `json:"max_steps_per_run,omitempty"`
 	Model          *map[string]interface{} `json:"model,omitempty"`
 	NavigationGoal string                  `json:"navigation_goal"`
@@ -6335,8 +6343,10 @@ type LoginBlockYAML struct {
 	IncludeActionHistoryInVerification *bool              `json:"include_action_history_in_verification,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
-	Label          string                  `json:"label"`
-	MaxRetries     *int                    `json:"max_retries,omitempty"`
+	Label      string `json:"label"`
+	MaxRetries *int   `json:"max_retries,omitempty"`
+
+	// MaxStepsPerRun Action-step budget for one run, not an exact stop. On the skyvern-3.0 (Task V3) engine, except on action and validation blocks, the effective budget is never below 24: a positive value under 24 runs as 24, and a run still making progress can be granted steps past the budget.
 	MaxStepsPerRun *int                    `json:"max_steps_per_run,omitempty"`
 	Model          *map[string]interface{} `json:"model,omitempty"`
 	NavigationGoal *string                 `json:"navigation_goal,omitempty"`
@@ -6514,8 +6524,10 @@ type NavigationBlockYAML struct {
 	IncludeActionHistoryInVerification *bool              `json:"include_action_history_in_verification,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
-	Label          string                  `json:"label"`
-	MaxRetries     *int                    `json:"max_retries,omitempty"`
+	Label      string `json:"label"`
+	MaxRetries *int   `json:"max_retries,omitempty"`
+
+	// MaxStepsPerRun Action-step budget for one run, not an exact stop. On the skyvern-3.0 (Task V3) engine, except on action and validation blocks, the effective budget is never below 24: a positive value under 24 runs as 24, and a run still making progress can be granted steps past the budget.
 	MaxStepsPerRun *int                    `json:"max_steps_per_run,omitempty"`
 	Model          *map[string]interface{} `json:"model,omitempty"`
 	NavigationGoal string                  `json:"navigation_goal"`
@@ -7310,6 +7322,7 @@ type SendEmailBlock struct {
 	NextLoopOnFailure *bool              `json:"next_loop_on_failure,omitempty"`
 	OutputParameter   OutputParameter    `json:"output_parameter"`
 	Recipients        []string           `json:"recipients"`
+	ReplyToMessageId  *string            `json:"reply_to_message_id,omitempty"`
 	Sender            string             `json:"sender"`
 	SmtpHost          AWSSecretParameter `json:"smtp_host"`
 	SmtpPassword      AWSSecretParameter `json:"smtp_password"`
@@ -7351,6 +7364,9 @@ type SendEmailBlockYAML struct {
 	NextBlockLabel    *string  `json:"next_block_label,omitempty"`
 	NextLoopOnFailure *bool    `json:"next_loop_on_failure,omitempty"`
 	Recipients        []string `json:"recipients"`
+
+	// ReplyToMessageId Gmail message ID to reply to in its original thread; requires send and read permissions.
+	ReplyToMessageId *string `json:"reply_to_message_id,omitempty"`
 
 	// Sender From address. Required unless transport is 'gmail'.
 	Sender                         *string         `json:"sender,omitempty"`
@@ -7757,8 +7773,10 @@ type TaskBlockYAML struct {
 	IncludeActionHistoryInVerification *bool              `json:"include_action_history_in_verification,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
-	Label          string                  `json:"label"`
-	MaxRetries     *int                    `json:"max_retries,omitempty"`
+	Label      string `json:"label"`
+	MaxRetries *int   `json:"max_retries,omitempty"`
+
+	// MaxStepsPerRun Action-step budget for one run, not an exact stop. On the skyvern-3.0 (Task V3) engine, except on action and validation blocks, the effective budget is never below 24: a positive value under 24 runs as 24, and a run still making progress can be granted steps past the budget.
 	MaxStepsPerRun *int                    `json:"max_steps_per_run,omitempty"`
 	Model          *map[string]interface{} `json:"model,omitempty"`
 	NavigationGoal *string                 `json:"navigation_goal,omitempty"`
@@ -8882,7 +8900,9 @@ type ValidationBlockYAML struct {
 	IgnoreWorkflowSystemPrompt *bool              `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
-	Label          string                  `json:"label"`
+	Label string `json:"label"`
+
+	// MaxStepsPerRun Action-step budget for one run, not an exact stop. On the skyvern-3.0 (Task V3) engine, except on action and validation blocks, the effective budget is never below 24: a positive value under 24 runs as 24, and a run still making progress can be granted steps past the budget.
 	MaxStepsPerRun *int                    `json:"max_steps_per_run,omitempty"`
 	Model          *map[string]interface{} `json:"model,omitempty"`
 

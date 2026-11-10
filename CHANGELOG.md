@@ -2,6 +2,13 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.8.0, 2026-11-10
+
+- Breaking: the `BitwardenClientIdAwsSecretKey`, `BitwardenClientSecretAwsSecretKey` and `BitwardenMasterPasswordAwsSecretKey` fields changed from `string` to `*string` on `BitwardenCreditCardDataParameterYAML`, `BitwardenLoginCredentialParameterYAML` and `BitwardenSensitiveInformationParameterYAML`. Code that sets or reads them must use a pointer.
+- `EmailInboxBlock` and `EmailInboxBlockYAML` gained an optional `MessageId` field, a `*string` sent as `message_id`.
+- `SendEmailBlock` and `SendEmailBlockYAML` gained an optional `ReplyToMessageId` field, a `*string` sent as `reply_to_message_id`. It is the Gmail message ID to reply to in its original thread and needs send and read permissions.
+- Added a doc comment to `MaxStepsPerRun` on `ActionBlockYAML`, `ExtractionBlockYAML`, `FileDownloadBlockYAML`, `LoginBlockYAML`, `NavigationBlockYAML`, `TaskBlockYAML` and `ValidationBlockYAML`. It says the value is a budget, not an exact stop, and that the skyvern-3.0 engine runs at least 24 steps except on action and validation blocks. The field type is unchanged.
+
 ## v0.7.1, 2026-11-07
 
 - `CredentialVaultType` gained the value `CredentialVaultTypeAwsSecretsManager` (`aws_secrets_manager`). `CredentialVaultType.Valid` accepts it.
