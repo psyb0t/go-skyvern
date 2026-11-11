@@ -2,6 +2,11 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.8.1, 2026-11-11
+
+- `SendEmailBlock` and `SendEmailBlockYAML` gained optional `ConnectionId` and `CredentialSource` fields, both sent as `connection_id` and `credential_source`. `ConnectionId` is a `*string`. When `CredentialSource` is `nango`, the block sends from the connected account named by `ConnectionId` instead of `CredentialId`.
+- Added the types `SendEmailBlockCredentialSource` and `SendEmailBlockYAMLCredentialSource`, with the values `SendEmailBlockCredentialSourceNango`, `SendEmailBlockCredentialSourceNative`, `SendEmailBlockYAMLCredentialSourceNango` and `SendEmailBlockYAMLCredentialSourceNative`. Each type has a `Valid` method.
+
 ## v0.8.0, 2026-11-10
 
 - Breaking: the `BitwardenClientIdAwsSecretKey`, `BitwardenClientSecretAwsSecretKey` and `BitwardenMasterPasswordAwsSecretKey` fields changed from `string` to `*string` on `BitwardenCreditCardDataParameterYAML`, `BitwardenLoginCredentialParameterYAML` and `BitwardenSensitiveInformationParameterYAML`. Code that sets or reads them must use a pointer.

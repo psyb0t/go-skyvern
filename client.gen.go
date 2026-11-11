@@ -2401,6 +2401,24 @@ func (e SendEmailBlockBlockType) Valid() bool {
 	}
 }
 
+// Defines values for SendEmailBlockCredentialSource.
+const (
+	SendEmailBlockCredentialSourceNango  SendEmailBlockCredentialSource = "nango"
+	SendEmailBlockCredentialSourceNative SendEmailBlockCredentialSource = "native"
+)
+
+// Valid indicates whether the value is a known member of the SendEmailBlockCredentialSource enum.
+func (e SendEmailBlockCredentialSource) Valid() bool {
+	switch e {
+	case SendEmailBlockCredentialSourceNango:
+		return true
+	case SendEmailBlockCredentialSourceNative:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for SendEmailBlockYAMLBlockType.
 const (
 	SendEmailBlockYAMLBlockTypeSendEmail SendEmailBlockYAMLBlockType = "send_email"
@@ -2410,6 +2428,24 @@ const (
 func (e SendEmailBlockYAMLBlockType) Valid() bool {
 	switch e {
 	case SendEmailBlockYAMLBlockTypeSendEmail:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SendEmailBlockYAMLCredentialSource.
+const (
+	SendEmailBlockYAMLCredentialSourceNango  SendEmailBlockYAMLCredentialSource = "nango"
+	SendEmailBlockYAMLCredentialSourceNative SendEmailBlockYAMLCredentialSource = "native"
+)
+
+// Valid indicates whether the value is a known member of the SendEmailBlockYAMLCredentialSource enum.
+func (e SendEmailBlockYAMLCredentialSource) Valid() bool {
+	switch e {
+	case SendEmailBlockYAMLCredentialSourceNango:
+		return true
+	case SendEmailBlockYAMLCredentialSourceNative:
 		return true
 	default:
 		return false
@@ -7298,20 +7334,22 @@ type SelectOptionActionType string
 
 // SendEmailBlock defines model for SendEmailBlock.
 type SendEmailBlock struct {
-	Bcc                        *[]string                `json:"bcc,omitempty"`
-	BlockType                  *SendEmailBlockBlockType `json:"block_type,omitempty"`
-	Body                       string                   `json:"body"`
-	BodyFormat                 *EmailBodyFormat         `json:"body_format,omitempty"`
-	Cc                         *[]string                `json:"cc,omitempty"`
-	ContinueOnFailure          *bool                    `json:"continue_on_failure,omitempty"`
-	CredentialId               *string                  `json:"credential_id,omitempty"`
-	CustomSmtpHost             *string                  `json:"custom_smtp_host,omitempty"`
-	CustomSmtpPassword         *string                  `json:"custom_smtp_password,omitempty"`
-	CustomSmtpPort             *int                     `json:"custom_smtp_port,omitempty"`
-	CustomSmtpUsername         *string                  `json:"custom_smtp_username,omitempty"`
-	DisableCache               *bool                    `json:"disable_cache,omitempty"`
-	FileAttachments            *[]string                `json:"file_attachments,omitempty"`
-	IgnoreWorkflowSystemPrompt *bool                    `json:"ignore_workflow_system_prompt,omitempty"`
+	Bcc                        *[]string                       `json:"bcc,omitempty"`
+	BlockType                  *SendEmailBlockBlockType        `json:"block_type,omitempty"`
+	Body                       string                          `json:"body"`
+	BodyFormat                 *EmailBodyFormat                `json:"body_format,omitempty"`
+	Cc                         *[]string                       `json:"cc,omitempty"`
+	ConnectionId               *string                         `json:"connection_id,omitempty"`
+	ContinueOnFailure          *bool                           `json:"continue_on_failure,omitempty"`
+	CredentialId               *string                         `json:"credential_id,omitempty"`
+	CredentialSource           *SendEmailBlockCredentialSource `json:"credential_source,omitempty"`
+	CustomSmtpHost             *string                         `json:"custom_smtp_host,omitempty"`
+	CustomSmtpPassword         *string                         `json:"custom_smtp_password,omitempty"`
+	CustomSmtpPort             *int                            `json:"custom_smtp_port,omitempty"`
+	CustomSmtpUsername         *string                         `json:"custom_smtp_username,omitempty"`
+	DisableCache               *bool                           `json:"disable_cache,omitempty"`
+	FileAttachments            *[]string                       `json:"file_attachments,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool                           `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier for a block; unique within a workflow.
 	Label string                  `json:"label"`
@@ -7335,6 +7373,9 @@ type SendEmailBlock struct {
 // SendEmailBlockBlockType defines model for SendEmailBlock.BlockType.
 type SendEmailBlockBlockType string
 
+// SendEmailBlockCredentialSource defines model for SendEmailBlock.CredentialSource.
+type SendEmailBlockCredentialSource string
+
 // SendEmailBlockYAML defines model for SendEmailBlockYAML.
 type SendEmailBlockYAML struct {
 	// Bcc Bcc recipients. Only with transport 'gmail'.
@@ -7345,16 +7386,20 @@ type SendEmailBlockYAML struct {
 
 	// Cc Cc recipients. Only with transport 'gmail'.
 	Cc                *[]string `json:"cc,omitempty"`
+	ConnectionId      *string   `json:"connection_id,omitempty"`
 	ContinueOnFailure *bool     `json:"continue_on_failure,omitempty"`
 
 	// CredentialId ID of a connected Google account that has send permission. Used only with transport 'gmail'.
-	CredentialId               *string   `json:"credential_id,omitempty"`
-	CustomSmtpHost             *string   `json:"custom_smtp_host,omitempty"`
-	CustomSmtpPassword         *string   `json:"custom_smtp_password,omitempty"`
-	CustomSmtpPort             *int      `json:"custom_smtp_port,omitempty"`
-	CustomSmtpUsername         *string   `json:"custom_smtp_username,omitempty"`
-	FileAttachments            *[]string `json:"file_attachments,omitempty"`
-	IgnoreWorkflowSystemPrompt *bool     `json:"ignore_workflow_system_prompt,omitempty"`
+	CredentialId *string `json:"credential_id,omitempty"`
+
+	// CredentialSource 'nango' sends from the connected account named by connection_id instead of credential_id.
+	CredentialSource           *SendEmailBlockYAMLCredentialSource `json:"credential_source,omitempty"`
+	CustomSmtpHost             *string                             `json:"custom_smtp_host,omitempty"`
+	CustomSmtpPassword         *string                             `json:"custom_smtp_password,omitempty"`
+	CustomSmtpPort             *int                                `json:"custom_smtp_port,omitempty"`
+	CustomSmtpUsername         *string                             `json:"custom_smtp_username,omitempty"`
+	FileAttachments            *[]string                           `json:"file_attachments,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool                               `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
 	Label string                  `json:"label"`
@@ -7380,6 +7425,9 @@ type SendEmailBlockYAML struct {
 
 // SendEmailBlockYAMLBlockType defines model for SendEmailBlockYAML.BlockType.
 type SendEmailBlockYAMLBlockType string
+
+// SendEmailBlockYAMLCredentialSource 'nango' sends from the connected account named by connection_id instead of credential_id.
+type SendEmailBlockYAMLCredentialSource string
 
 // SplitPdfBlock defines model for SplitPdfBlock.
 type SplitPdfBlock struct {
