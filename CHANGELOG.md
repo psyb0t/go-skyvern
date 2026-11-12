@@ -2,6 +2,13 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.8.2, 2026-11-12
+
+- Added the `BotProtection` type, a string with the values `BotProtectionAkamai`, `BotProtectionCloudflare`, `BotProtectionHcaptcha` and `BotProtectionRecaptcha`. It has a `Valid` method.
+- `CreateBrowserSessionRequest` gained an optional `BotProtection` field, a `*BotProtection` sent as `bot_protection`. It names the service a site uses to tell people from automated browsers, such as a captcha.
+- The doc comment for `MaxSteps` on `TaskRunRequestInput` and `TaskRunRequestOutput` now says a run with more steps can cost more, where it said you are charged per step. The field type is unchanged.
+- The Go version in `go.mod` moved from 1.26.10 to 1.26.11, which fixes the `net/http` crash GO-2026-6859 flagged by govulncheck. The development image `Dockerfile.dev` uses `golang:1.26.11-trixie`.
+
 ## v0.8.1, 2026-11-11
 
 - `SendEmailBlock` and `SendEmailBlockYAML` gained optional `ConnectionId` and `CredentialSource` fields, both sent as `connection_id` and `credential_source`. `ConnectionId` is a `*string`. When `CredentialSource` is `nango`, the block sends from the connected account named by `ConnectionId` instead of `CredentialId`.

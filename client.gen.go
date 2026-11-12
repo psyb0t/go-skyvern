@@ -676,6 +676,30 @@ func (e BlockType) Valid() bool {
 	}
 }
 
+// Defines values for BotProtection.
+const (
+	BotProtectionAkamai     BotProtection = "akamai"
+	BotProtectionCloudflare BotProtection = "cloudflare"
+	BotProtectionHcaptcha   BotProtection = "hcaptcha"
+	BotProtectionRecaptcha  BotProtection = "recaptcha"
+)
+
+// Valid indicates whether the value is a known member of the BotProtection enum.
+func (e BotProtection) Valid() bool {
+	switch e {
+	case BotProtectionAkamai:
+		return true
+	case BotProtectionCloudflare:
+		return true
+	case BotProtectionHcaptcha:
+		return true
+	case BotProtectionRecaptcha:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for BranchCriteriaYAMLCriteriaType.
 const (
 	BranchCriteriaYAMLCriteriaTypeJinja2Template BranchCriteriaYAMLCriteriaType = "jinja2_template"
@@ -4029,6 +4053,9 @@ type BodyUploadFileV1UploadFilePost struct {
 	RetentionDays *int `json:"retention_days,omitempty"`
 }
 
+// BotProtection A service a site uses to tell people from automated browsers, such as a captcha.
+type BotProtection string
+
 // BranchCondition Represents a single conditional branch edge within a ConditionalBlock.
 type BranchCondition struct {
 	Criteria       *BranchCondition_Criteria `json:"criteria,omitempty"`
@@ -4554,6 +4581,9 @@ type CreateBrowserProfileRequest_ProxyLocation struct {
 
 // CreateBrowserSessionRequest defines model for CreateBrowserSessionRequest.
 type CreateBrowserSessionRequest struct {
+	// BotProtection A service a site uses to tell people from automated browsers, such as a captcha.
+	BotProtection *BotProtection `json:"bot_protection,omitempty"`
+
 	// BrowserProfileId ID of a browser profile to load into this session (restores cookies, localStorage, etc.). browser_profile_id starts with `bp_`.
 	BrowserProfileId *string                `json:"browser_profile_id,omitempty"`
 	BrowserSettings  *BrowserSettings       `json:"browser_settings,omitempty"`
@@ -7937,7 +7967,7 @@ type TaskRunRequestInput struct {
 	MaxScreenshotScrolls *int `json:"max_screenshot_scrolls,omitempty"`
 
 	// MaxSteps
-	// Maximum number of steps the task can take. Task will fail if it exceeds this number. Cautions: you are charged per step so please set this number to a reasonable value. Contact sales@skyvern.com for custom pricing.
+	// Maximum number of steps the task can take. Task will fail if it exceeds this number. Cautions: a run that takes more steps can cost more, so please set this number to a reasonable value. Contact sales@skyvern.com for custom pricing.
 	//
 	//
 	// Example: 10
@@ -8144,7 +8174,7 @@ type TaskRunRequestOutput struct {
 	MaxScreenshotScrolls *int `json:"max_screenshot_scrolls,omitempty"`
 
 	// MaxSteps
-	// Maximum number of steps the task can take. Task will fail if it exceeds this number. Cautions: you are charged per step so please set this number to a reasonable value. Contact sales@skyvern.com for custom pricing.
+	// Maximum number of steps the task can take. Task will fail if it exceeds this number. Cautions: a run that takes more steps can cost more, so please set this number to a reasonable value. Contact sales@skyvern.com for custom pricing.
 	//
 	//
 	// Example: 10
