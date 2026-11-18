@@ -2,6 +2,15 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.8.3, 2026-11-18
+
+- Added the `integration_action` workflow block. `IntegrationActionBlock` and `IntegrationActionBlockYAML` have `ActionId`, `IntegrationId`, `ConnectionId`, `Inputs`, `Label`, `Model` and the usual block fields such as `ContinueOnFailure`, `NextBlockLabel` and `OutputParameter`. `ConnectionId` is the connected account the action runs as. `IntegrationActionBlock_Parameters_Item` holds the parameter union.
+- Added `IntegrationActionBlockBlockType` and `IntegrationActionBlockYAMLBlockType`, each with a `Valid` method and the single value `IntegrationActionBlockBlockTypeIntegrationAction` or `IntegrationActionBlockYAMLBlockTypeIntegrationAction`. `BlockType` gained `BlockTypeIntegrationAction`.
+- The block unions `WorkflowDefinition_Blocks_Item`, `WorkflowDefinitionYAML_Blocks_Item`, `ForLoopBlock_LoopBlocks_Item`, `ForLoopBlockYAML_LoopBlocks_Item`, `WhileLoopBlock_LoopBlocks_Item` and `WhileLoopBlockYAML_LoopBlocks_Item` gained `AsIntegrationActionBlock`, `FromIntegrationActionBlock` and `MergeIntegrationActionBlock` methods, with `YAML` suffixed variants on the YAML unions.
+- Added the `EmailOrganizeAction` type with the values `EmailOrganizeActionArchive`, `EmailOrganizeActionLabel`, `EmailOrganizeActionMarkRead` and `EmailOrganizeActionMove`. It has a `Valid` method.
+- `EmailInboxBlock` and `EmailInboxBlockYAML` gained optional `OrganizeAction` and `OrganizeLabel` fields, sent as `organize_action` and `organize_label`. `OrganizeAction` is a `*EmailOrganizeAction`, the change applied to every matched email. `OrganizeLabel` is a `*string` naming an existing Gmail label for the `label` and `move` actions, and must be literal text.
+- The doc comment for `Tools` on `AgentStepBlockYAML` now says an integration action is named `<integration id>__<action id>`, such as `gmail__read_inbox`, and that `load_skill` and `read_skill_resource` are offered only when the run has skills.
+
 ## v0.8.2, 2026-11-12
 
 - Added the `BotProtection` type, a string with the values `BotProtectionAkamai`, `BotProtectionCloudflare`, `BotProtectionHcaptcha` and `BotProtectionRecaptcha`. It has a `Valid` method.

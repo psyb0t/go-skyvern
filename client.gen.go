@@ -578,6 +578,7 @@ const (
 	BlockTypeGotoUrl           BlockType = "goto_url"
 	BlockTypeHttpRequest       BlockType = "http_request"
 	BlockTypeHumanInteraction  BlockType = "human_interaction"
+	BlockTypeIntegrationAction BlockType = "integration_action"
 	BlockTypeLogin             BlockType = "login"
 	BlockTypeNavigation        BlockType = "navigation"
 	BlockTypePdfFill           BlockType = "pdf_fill"
@@ -634,6 +635,8 @@ func (e BlockType) Valid() bool {
 	case BlockTypeHttpRequest:
 		return true
 	case BlockTypeHumanInteraction:
+		return true
+	case BlockTypeIntegrationAction:
 		return true
 	case BlockTypeLogin:
 		return true
@@ -1207,6 +1210,30 @@ func (e EmailInboxBlockYAMLEmailClient) Valid() bool {
 	}
 }
 
+// Defines values for EmailOrganizeAction.
+const (
+	EmailOrganizeActionArchive  EmailOrganizeAction = "archive"
+	EmailOrganizeActionLabel    EmailOrganizeAction = "label"
+	EmailOrganizeActionMarkRead EmailOrganizeAction = "mark_read"
+	EmailOrganizeActionMove     EmailOrganizeAction = "move"
+)
+
+// Valid indicates whether the value is a known member of the EmailOrganizeAction enum.
+func (e EmailOrganizeAction) Valid() bool {
+	switch e {
+	case EmailOrganizeActionArchive:
+		return true
+	case EmailOrganizeActionLabel:
+		return true
+	case EmailOrganizeActionMarkRead:
+		return true
+	case EmailOrganizeActionMove:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for EmailTransport.
 const (
 	EmailTransportGmail EmailTransport = "gmail"
@@ -1675,6 +1702,36 @@ const (
 func (e InputTextActionType) Valid() bool {
 	switch e {
 	case InputTextActionTypeAiInputText:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IntegrationActionBlockBlockType.
+const (
+	IntegrationActionBlockBlockTypeIntegrationAction IntegrationActionBlockBlockType = "integration_action"
+)
+
+// Valid indicates whether the value is a known member of the IntegrationActionBlockBlockType enum.
+func (e IntegrationActionBlockBlockType) Valid() bool {
+	switch e {
+	case IntegrationActionBlockBlockTypeIntegrationAction:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for IntegrationActionBlockYAMLBlockType.
+const (
+	IntegrationActionBlockYAMLBlockTypeIntegrationAction IntegrationActionBlockYAMLBlockType = "integration_action"
+)
+
+// Valid indicates whether the value is a known member of the IntegrationActionBlockYAMLBlockType enum.
+func (e IntegrationActionBlockYAMLBlockType) Valid() bool {
+	switch e {
+	case IntegrationActionBlockYAMLBlockTypeIntegrationAction:
 		return true
 	default:
 		return false
@@ -3785,7 +3842,7 @@ type AgentStepBlockYAML struct {
 	// Prompt What the step must work out or get done. Rendered as a Jinja template against the run's parameters and earlier block outputs before the step starts.
 	Prompt string `json:"prompt"`
 
-	// Tools The tools the step may call. A block it runs through run_block is named by its block type, such as http_request. finish and read_run_data are always offered, and login only when parameter_keys lists a credential parameter. Without a list the step has no other tools.
+	// Tools The tools the step may call. A block it runs through run_block is named by its block type, such as http_request, and an integration action by <integration id>__<action id>, such as gmail__read_inbox. finish and read_run_data are always offered, and login only when parameter_keys lists a credential parameter. load_skill also offers read_skill_resource, and both are offered only when the run has skills. Without a list the step has no other tools.
 	Tools *[]string `json:"tools,omitempty"`
 }
 
@@ -5199,13 +5256,17 @@ type EmailInboxBlock struct {
 	NewerThanDays *int                    `json:"newer_than_days,omitempty"`
 
 	// NextBlockLabel Optional pointer to the next block label when constructing a DAG. Defaults to sequential order when omitted.
-	NextBlockLabel    *string                            `json:"next_block_label,omitempty"`
-	NextLoopOnFailure *bool                              `json:"next_loop_on_failure,omitempty"`
-	OutputParameter   OutputParameter                    `json:"output_parameter"`
-	Parameters        *[]EmailInboxBlock_Parameters_Item `json:"parameters,omitempty"`
-	Prompt            *string                            `json:"prompt,omitempty"`
-	Sender            *string                            `json:"sender,omitempty"`
-	Subject           *string                            `json:"subject,omitempty"`
+	NextBlockLabel    *string `json:"next_block_label,omitempty"`
+	NextLoopOnFailure *bool   `json:"next_loop_on_failure,omitempty"`
+
+	// OrganizeAction One change an Email Inbox block applies to every email it matched.
+	OrganizeAction  *EmailOrganizeAction               `json:"organize_action,omitempty"`
+	OrganizeLabel   *string                            `json:"organize_label,omitempty"`
+	OutputParameter OutputParameter                    `json:"output_parameter"`
+	Parameters      *[]EmailInboxBlock_Parameters_Item `json:"parameters,omitempty"`
+	Prompt          *string                            `json:"prompt,omitempty"`
+	Sender          *string                            `json:"sender,omitempty"`
+	Subject         *string                            `json:"subject,omitempty"`
 }
 
 // EmailInboxBlockBlockType defines model for EmailInboxBlock.BlockType.
@@ -5245,12 +5306,18 @@ type EmailInboxBlockYAML struct {
 	NewerThanDays *int                    `json:"newer_than_days,omitempty"`
 
 	// NextBlockLabel Optional pointer to the label of the next block. When omitted, it will default to sequential order. See [[s-4bnl]].
-	NextBlockLabel    *string   `json:"next_block_label,omitempty"`
-	NextLoopOnFailure *bool     `json:"next_loop_on_failure,omitempty"`
-	ParameterKeys     *[]string `json:"parameter_keys,omitempty"`
-	Prompt            *string   `json:"prompt,omitempty"`
-	Sender            *string   `json:"sender,omitempty"`
-	Subject           *string   `json:"subject,omitempty"`
+	NextBlockLabel    *string `json:"next_block_label,omitempty"`
+	NextLoopOnFailure *bool   `json:"next_loop_on_failure,omitempty"`
+
+	// OrganizeAction One change an Email Inbox block applies to every email it matched.
+	OrganizeAction *EmailOrganizeAction `json:"organize_action,omitempty"`
+
+	// OrganizeLabel Existing Gmail label name for organize_action label or move. Must be literal text.
+	OrganizeLabel *string   `json:"organize_label,omitempty"`
+	ParameterKeys *[]string `json:"parameter_keys,omitempty"`
+	Prompt        *string   `json:"prompt,omitempty"`
+	Sender        *string   `json:"sender,omitempty"`
+	Subject       *string   `json:"subject,omitempty"`
 }
 
 // EmailInboxBlockYAMLBlockType defines model for EmailInboxBlockYAML.BlockType.
@@ -5261,6 +5328,9 @@ type EmailInboxBlockYAMLCredentialSource string
 
 // EmailInboxBlockYAMLEmailClient defines model for EmailInboxBlockYAML.EmailClient.
 type EmailInboxBlockYAMLEmailClient string
+
+// EmailOrganizeAction One change an Email Inbox block applies to every email it matched.
+type EmailOrganizeAction string
 
 // EmailTransport defines model for EmailTransport.
 type EmailTransport string
@@ -6275,6 +6345,66 @@ type InputTextAction_Data struct {
 
 // InputTextActionType defines model for InputTextAction.Type.
 type InputTextActionType string
+
+// IntegrationActionBlock defines model for IntegrationActionBlock.
+type IntegrationActionBlock struct {
+	ActionId                   string                           `json:"action_id"`
+	BlockType                  *IntegrationActionBlockBlockType `json:"block_type,omitempty"`
+	ConnectionId               *string                          `json:"connection_id,omitempty"`
+	ContinueOnFailure          *bool                            `json:"continue_on_failure,omitempty"`
+	DisableCache               *bool                            `json:"disable_cache,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool                            `json:"ignore_workflow_system_prompt,omitempty"`
+	Inputs                     *map[string]interface{}          `json:"inputs,omitempty"`
+	IntegrationId              string                           `json:"integration_id"`
+
+	// Label Author-facing identifier for a block; unique within a workflow.
+	Label string                  `json:"label"`
+	Model *map[string]interface{} `json:"model,omitempty"`
+
+	// NextBlockLabel Optional pointer to the next block label when constructing a DAG. Defaults to sequential order when omitted.
+	NextBlockLabel    *string                                   `json:"next_block_label,omitempty"`
+	NextLoopOnFailure *bool                                     `json:"next_loop_on_failure,omitempty"`
+	OutputParameter   OutputParameter                           `json:"output_parameter"`
+	Parameters        *[]IntegrationActionBlock_Parameters_Item `json:"parameters,omitempty"`
+}
+
+// IntegrationActionBlockBlockType defines model for IntegrationActionBlock.BlockType.
+type IntegrationActionBlockBlockType string
+
+// IntegrationActionBlock_Parameters_Item defines model for IntegrationActionBlock.parameters.Item.
+type IntegrationActionBlock_Parameters_Item struct {
+	union json.RawMessage
+}
+
+// IntegrationActionBlockYAML defines model for IntegrationActionBlockYAML.
+type IntegrationActionBlockYAML struct {
+	// ActionId Action id within that entry, e.g. 'read_rows'.
+	ActionId  string                               `json:"action_id"`
+	BlockType *IntegrationActionBlockYAMLBlockType `json:"block_type,omitempty"`
+
+	// ConnectionId ID of the connected account the action runs as.
+	ConnectionId               *string `json:"connection_id,omitempty"`
+	ContinueOnFailure          *bool   `json:"continue_on_failure,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool   `json:"ignore_workflow_system_prompt,omitempty"`
+
+	// Inputs Values for the action's inputs, keyed by the catalog action's input names.
+	Inputs *map[string]interface{} `json:"inputs,omitempty"`
+
+	// IntegrationId Integration catalog entry id, e.g. 'google_sheets'.
+	IntegrationId string `json:"integration_id"`
+
+	// Label Author-facing identifier; must be unique per workflow.
+	Label string                  `json:"label"`
+	Model *map[string]interface{} `json:"model,omitempty"`
+
+	// NextBlockLabel Optional pointer to the label of the next block. When omitted, it will default to sequential order. See [[s-4bnl]].
+	NextBlockLabel    *string   `json:"next_block_label,omitempty"`
+	NextLoopOnFailure *bool     `json:"next_loop_on_failure,omitempty"`
+	ParameterKeys     *[]string `json:"parameter_keys,omitempty"`
+}
+
+// IntegrationActionBlockYAMLBlockType defines model for IntegrationActionBlockYAML.BlockType.
+type IntegrationActionBlockYAMLBlockType string
 
 // JinjaBranchCriteria Jinja2-templated branch criteria (only supported criteria type for now).
 type JinjaBranchCriteria struct {
@@ -17589,6 +17719,40 @@ func (t *ForLoopBlock_LoopBlocks_Item) MergePowerBIQueryBlock(v PowerBIQueryBloc
 	return err
 }
 
+// AsIntegrationActionBlock returns the union data inside the ForLoopBlock_LoopBlocks_Item as a IntegrationActionBlock
+func (t ForLoopBlock_LoopBlocks_Item) AsIntegrationActionBlock() (IntegrationActionBlock, error) {
+	var body IntegrationActionBlock
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromIntegrationActionBlock overwrites any union data inside the ForLoopBlock_LoopBlocks_Item as the provided IntegrationActionBlock
+func (t *ForLoopBlock_LoopBlocks_Item) FromIntegrationActionBlock(v IntegrationActionBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	t.union = b
+	return err
+}
+
+// MergeIntegrationActionBlock performs a merge with any union data inside the ForLoopBlock_LoopBlocks_Item, using the provided IntegrationActionBlock
+func (t *ForLoopBlock_LoopBlocks_Item) MergeIntegrationActionBlock(v IntegrationActionBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 // AsPdfFillBlock returns the union data inside the ForLoopBlock_LoopBlocks_Item as a PdfFillBlock
 func (t ForLoopBlock_LoopBlocks_Item) AsPdfFillBlock() (PdfFillBlock, error) {
 	var body PdfFillBlock
@@ -17807,6 +17971,8 @@ func (t ForLoopBlock_LoopBlocks_Item) ValueByDiscriminator() (interface{}, error
 		return t.AsHttpRequestBlock()
 	case "human_interaction":
 		return t.AsHumanInteractionBlock()
+	case "integration_action":
+		return t.AsIntegrationActionBlock()
 	case "login":
 		return t.AsLoginBlock()
 	case "navigation":
@@ -19535,6 +19701,40 @@ func (t *ForLoopBlockYAML_LoopBlocks_Item) MergePowerBIQueryBlockYAML(v PowerBIQ
 	return err
 }
 
+// AsIntegrationActionBlockYAML returns the union data inside the ForLoopBlockYAML_LoopBlocks_Item as a IntegrationActionBlockYAML
+func (t ForLoopBlockYAML_LoopBlocks_Item) AsIntegrationActionBlockYAML() (IntegrationActionBlockYAML, error) {
+	var body IntegrationActionBlockYAML
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromIntegrationActionBlockYAML overwrites any union data inside the ForLoopBlockYAML_LoopBlocks_Item as the provided IntegrationActionBlockYAML
+func (t *ForLoopBlockYAML_LoopBlocks_Item) FromIntegrationActionBlockYAML(v IntegrationActionBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	t.union = b
+	return err
+}
+
+// MergeIntegrationActionBlockYAML performs a merge with any union data inside the ForLoopBlockYAML_LoopBlocks_Item, using the provided IntegrationActionBlockYAML
+func (t *ForLoopBlockYAML_LoopBlocks_Item) MergeIntegrationActionBlockYAML(v IntegrationActionBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 func (t ForLoopBlockYAML_LoopBlocks_Item) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"block_type"`
@@ -19583,6 +19783,8 @@ func (t ForLoopBlockYAML_LoopBlocks_Item) ValueByDiscriminator() (interface{}, e
 		return t.AsHttpRequestBlockYAML()
 	case "human_interaction":
 		return t.AsHumanInteractionBlockYAML()
+	case "integration_action":
+		return t.AsIntegrationActionBlockYAML()
 	case "login":
 		return t.AsLoginBlockYAML()
 	case "navigation":
@@ -21480,6 +21682,431 @@ func (t InputTextAction_Data) MarshalJSON() ([]byte, error) {
 }
 
 func (t *InputTextAction_Data) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsWorkflowParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a WorkflowParameter
+func (t IntegrationActionBlock_Parameters_Item) AsWorkflowParameter() (WorkflowParameter, error) {
+	var body WorkflowParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromWorkflowParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided WorkflowParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromWorkflowParameter(v WorkflowParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"workflow"}`))
+	t.union = b
+	return err
+}
+
+// MergeWorkflowParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided WorkflowParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeWorkflowParameter(v WorkflowParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"workflow"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsContextParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a ContextParameter
+func (t IntegrationActionBlock_Parameters_Item) AsContextParameter() (ContextParameter, error) {
+	var body ContextParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromContextParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided ContextParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromContextParameter(v ContextParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"context"}`))
+	t.union = b
+	return err
+}
+
+// MergeContextParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided ContextParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeContextParameter(v ContextParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"context"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAWSSecretParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a AWSSecretParameter
+func (t IntegrationActionBlock_Parameters_Item) AsAWSSecretParameter() (AWSSecretParameter, error) {
+	var body AWSSecretParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAWSSecretParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided AWSSecretParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromAWSSecretParameter(v AWSSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"aws_secret"}`))
+	t.union = b
+	return err
+}
+
+// MergeAWSSecretParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided AWSSecretParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeAWSSecretParameter(v AWSSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"aws_secret"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAzureSecretParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a AzureSecretParameter
+func (t IntegrationActionBlock_Parameters_Item) AsAzureSecretParameter() (AzureSecretParameter, error) {
+	var body AzureSecretParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAzureSecretParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided AzureSecretParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromAzureSecretParameter(v AzureSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_secret"}`))
+	t.union = b
+	return err
+}
+
+// MergeAzureSecretParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided AzureSecretParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeAzureSecretParameter(v AzureSecretParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_secret"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsBitwardenLoginCredentialParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a BitwardenLoginCredentialParameter
+func (t IntegrationActionBlock_Parameters_Item) AsBitwardenLoginCredentialParameter() (BitwardenLoginCredentialParameter, error) {
+	var body BitwardenLoginCredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromBitwardenLoginCredentialParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided BitwardenLoginCredentialParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromBitwardenLoginCredentialParameter(v BitwardenLoginCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_login_credential"}`))
+	t.union = b
+	return err
+}
+
+// MergeBitwardenLoginCredentialParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided BitwardenLoginCredentialParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeBitwardenLoginCredentialParameter(v BitwardenLoginCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_login_credential"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsBitwardenSensitiveInformationParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a BitwardenSensitiveInformationParameter
+func (t IntegrationActionBlock_Parameters_Item) AsBitwardenSensitiveInformationParameter() (BitwardenSensitiveInformationParameter, error) {
+	var body BitwardenSensitiveInformationParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromBitwardenSensitiveInformationParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided BitwardenSensitiveInformationParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromBitwardenSensitiveInformationParameter(v BitwardenSensitiveInformationParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_sensitive_information"}`))
+	t.union = b
+	return err
+}
+
+// MergeBitwardenSensitiveInformationParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided BitwardenSensitiveInformationParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeBitwardenSensitiveInformationParameter(v BitwardenSensitiveInformationParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_sensitive_information"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsBitwardenCreditCardDataParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a BitwardenCreditCardDataParameter
+func (t IntegrationActionBlock_Parameters_Item) AsBitwardenCreditCardDataParameter() (BitwardenCreditCardDataParameter, error) {
+	var body BitwardenCreditCardDataParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromBitwardenCreditCardDataParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided BitwardenCreditCardDataParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromBitwardenCreditCardDataParameter(v BitwardenCreditCardDataParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_credit_card_data"}`))
+	t.union = b
+	return err
+}
+
+// MergeBitwardenCreditCardDataParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided BitwardenCreditCardDataParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeBitwardenCreditCardDataParameter(v BitwardenCreditCardDataParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"bitwarden_credit_card_data"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsOnePasswordCredentialParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a OnePasswordCredentialParameter
+func (t IntegrationActionBlock_Parameters_Item) AsOnePasswordCredentialParameter() (OnePasswordCredentialParameter, error) {
+	var body OnePasswordCredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromOnePasswordCredentialParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided OnePasswordCredentialParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromOnePasswordCredentialParameter(v OnePasswordCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"onepassword"}`))
+	t.union = b
+	return err
+}
+
+// MergeOnePasswordCredentialParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided OnePasswordCredentialParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeOnePasswordCredentialParameter(v OnePasswordCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"onepassword"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAzureVaultCredentialParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a AzureVaultCredentialParameter
+func (t IntegrationActionBlock_Parameters_Item) AsAzureVaultCredentialParameter() (AzureVaultCredentialParameter, error) {
+	var body AzureVaultCredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAzureVaultCredentialParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided AzureVaultCredentialParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromAzureVaultCredentialParameter(v AzureVaultCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_vault_credential"}`))
+	t.union = b
+	return err
+}
+
+// MergeAzureVaultCredentialParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided AzureVaultCredentialParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeAzureVaultCredentialParameter(v AzureVaultCredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"azure_vault_credential"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsOutputParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a OutputParameter
+func (t IntegrationActionBlock_Parameters_Item) AsOutputParameter() (OutputParameter, error) {
+	var body OutputParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromOutputParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided OutputParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromOutputParameter(v OutputParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"output"}`))
+	t.union = b
+	return err
+}
+
+// MergeOutputParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided OutputParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeOutputParameter(v OutputParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"output"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCredentialParameter returns the union data inside the IntegrationActionBlock_Parameters_Item as a CredentialParameter
+func (t IntegrationActionBlock_Parameters_Item) AsCredentialParameter() (CredentialParameter, error) {
+	var body CredentialParameter
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCredentialParameter overwrites any union data inside the IntegrationActionBlock_Parameters_Item as the provided CredentialParameter
+func (t *IntegrationActionBlock_Parameters_Item) FromCredentialParameter(v CredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"credential"}`))
+	t.union = b
+	return err
+}
+
+// MergeCredentialParameter performs a merge with any union data inside the IntegrationActionBlock_Parameters_Item, using the provided CredentialParameter
+func (t *IntegrationActionBlock_Parameters_Item) MergeCredentialParameter(v CredentialParameter) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"parameter_type":"credential"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t IntegrationActionBlock_Parameters_Item) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"parameter_type"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t IntegrationActionBlock_Parameters_Item) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "aws_secret":
+		return t.AsAWSSecretParameter()
+	case "azure_secret":
+		return t.AsAzureSecretParameter()
+	case "azure_vault_credential":
+		return t.AsAzureVaultCredentialParameter()
+	case "bitwarden_credit_card_data":
+		return t.AsBitwardenCreditCardDataParameter()
+	case "bitwarden_login_credential":
+		return t.AsBitwardenLoginCredentialParameter()
+	case "bitwarden_sensitive_information":
+		return t.AsBitwardenSensitiveInformationParameter()
+	case "context":
+		return t.AsContextParameter()
+	case "credential":
+		return t.AsCredentialParameter()
+	case "onepassword":
+		return t.AsOnePasswordCredentialParameter()
+	case "output":
+		return t.AsOutputParameter()
+	case "workflow":
+		return t.AsWorkflowParameter()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t IntegrationActionBlock_Parameters_Item) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *IntegrationActionBlock_Parameters_Item) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -29476,6 +30103,40 @@ func (t *WhileLoopBlock_LoopBlocks_Item) MergePowerBIQueryBlock(v PowerBIQueryBl
 	return err
 }
 
+// AsIntegrationActionBlock returns the union data inside the WhileLoopBlock_LoopBlocks_Item as a IntegrationActionBlock
+func (t WhileLoopBlock_LoopBlocks_Item) AsIntegrationActionBlock() (IntegrationActionBlock, error) {
+	var body IntegrationActionBlock
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromIntegrationActionBlock overwrites any union data inside the WhileLoopBlock_LoopBlocks_Item as the provided IntegrationActionBlock
+func (t *WhileLoopBlock_LoopBlocks_Item) FromIntegrationActionBlock(v IntegrationActionBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	t.union = b
+	return err
+}
+
+// MergeIntegrationActionBlock performs a merge with any union data inside the WhileLoopBlock_LoopBlocks_Item, using the provided IntegrationActionBlock
+func (t *WhileLoopBlock_LoopBlocks_Item) MergeIntegrationActionBlock(v IntegrationActionBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 // AsPdfFillBlock returns the union data inside the WhileLoopBlock_LoopBlocks_Item as a PdfFillBlock
 func (t WhileLoopBlock_LoopBlocks_Item) AsPdfFillBlock() (PdfFillBlock, error) {
 	var body PdfFillBlock
@@ -29694,6 +30355,8 @@ func (t WhileLoopBlock_LoopBlocks_Item) ValueByDiscriminator() (interface{}, err
 		return t.AsHttpRequestBlock()
 	case "human_interaction":
 		return t.AsHumanInteractionBlock()
+	case "integration_action":
+		return t.AsIntegrationActionBlock()
 	case "login":
 		return t.AsLoginBlock()
 	case "navigation":
@@ -30935,6 +31598,40 @@ func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergePowerBIQueryBlockYAML(v PowerB
 	return err
 }
 
+// AsIntegrationActionBlockYAML returns the union data inside the WhileLoopBlockYAML_LoopBlocks_Item as a IntegrationActionBlockYAML
+func (t WhileLoopBlockYAML_LoopBlocks_Item) AsIntegrationActionBlockYAML() (IntegrationActionBlockYAML, error) {
+	var body IntegrationActionBlockYAML
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromIntegrationActionBlockYAML overwrites any union data inside the WhileLoopBlockYAML_LoopBlocks_Item as the provided IntegrationActionBlockYAML
+func (t *WhileLoopBlockYAML_LoopBlocks_Item) FromIntegrationActionBlockYAML(v IntegrationActionBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	t.union = b
+	return err
+}
+
+// MergeIntegrationActionBlockYAML performs a merge with any union data inside the WhileLoopBlockYAML_LoopBlocks_Item, using the provided IntegrationActionBlockYAML
+func (t *WhileLoopBlockYAML_LoopBlocks_Item) MergeIntegrationActionBlockYAML(v IntegrationActionBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 func (t WhileLoopBlockYAML_LoopBlocks_Item) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"block_type"`
@@ -30983,6 +31680,8 @@ func (t WhileLoopBlockYAML_LoopBlocks_Item) ValueByDiscriminator() (interface{},
 		return t.AsHttpRequestBlockYAML()
 	case "human_interaction":
 		return t.AsHumanInteractionBlockYAML()
+	case "integration_action":
+		return t.AsIntegrationActionBlockYAML()
 	case "login":
 		return t.AsLoginBlockYAML()
 	case "navigation":
@@ -32230,6 +32929,40 @@ func (t *WorkflowDefinition_Blocks_Item) MergePowerBIQueryBlock(v PowerBIQueryBl
 	return err
 }
 
+// AsIntegrationActionBlock returns the union data inside the WorkflowDefinition_Blocks_Item as a IntegrationActionBlock
+func (t WorkflowDefinition_Blocks_Item) AsIntegrationActionBlock() (IntegrationActionBlock, error) {
+	var body IntegrationActionBlock
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromIntegrationActionBlock overwrites any union data inside the WorkflowDefinition_Blocks_Item as the provided IntegrationActionBlock
+func (t *WorkflowDefinition_Blocks_Item) FromIntegrationActionBlock(v IntegrationActionBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	t.union = b
+	return err
+}
+
+// MergeIntegrationActionBlock performs a merge with any union data inside the WorkflowDefinition_Blocks_Item, using the provided IntegrationActionBlock
+func (t *WorkflowDefinition_Blocks_Item) MergeIntegrationActionBlock(v IntegrationActionBlock) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 // AsPdfFillBlock returns the union data inside the WorkflowDefinition_Blocks_Item as a PdfFillBlock
 func (t WorkflowDefinition_Blocks_Item) AsPdfFillBlock() (PdfFillBlock, error) {
 	var body PdfFillBlock
@@ -32448,6 +33181,8 @@ func (t WorkflowDefinition_Blocks_Item) ValueByDiscriminator() (interface{}, err
 		return t.AsHttpRequestBlock()
 	case "human_interaction":
 		return t.AsHumanInteractionBlock()
+	case "integration_action":
+		return t.AsIntegrationActionBlock()
 	case "login":
 		return t.AsLoginBlock()
 	case "navigation":
@@ -34114,6 +34849,40 @@ func (t *WorkflowDefinitionYAML_Blocks_Item) MergePowerBIQueryBlockYAML(v PowerB
 	return err
 }
 
+// AsIntegrationActionBlockYAML returns the union data inside the WorkflowDefinitionYAML_Blocks_Item as a IntegrationActionBlockYAML
+func (t WorkflowDefinitionYAML_Blocks_Item) AsIntegrationActionBlockYAML() (IntegrationActionBlockYAML, error) {
+	var body IntegrationActionBlockYAML
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromIntegrationActionBlockYAML overwrites any union data inside the WorkflowDefinitionYAML_Blocks_Item as the provided IntegrationActionBlockYAML
+func (t *WorkflowDefinitionYAML_Blocks_Item) FromIntegrationActionBlockYAML(v IntegrationActionBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	t.union = b
+	return err
+}
+
+// MergeIntegrationActionBlockYAML performs a merge with any union data inside the WorkflowDefinitionYAML_Blocks_Item, using the provided IntegrationActionBlockYAML
+func (t *WorkflowDefinitionYAML_Blocks_Item) MergeIntegrationActionBlockYAML(v IntegrationActionBlockYAML) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	b, err = runtime.JSONMerge(b, []byte(`{"block_type":"integration_action"}`))
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 func (t WorkflowDefinitionYAML_Blocks_Item) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"block_type"`
@@ -34162,6 +34931,8 @@ func (t WorkflowDefinitionYAML_Blocks_Item) ValueByDiscriminator() (interface{},
 		return t.AsHttpRequestBlockYAML()
 	case "human_interaction":
 		return t.AsHumanInteractionBlockYAML()
+	case "integration_action":
+		return t.AsIntegrationActionBlockYAML()
 	case "login":
 		return t.AsLoginBlockYAML()
 	case "navigation":
