@@ -9348,7 +9348,7 @@ type Workflow struct {
 	// BuildSource Which surface wrote a workflow version.
 	//
 	// - ui: the Skyvern app
-	// - copilot: the workflow copilot
+	// - copilot: Ember, Skyvern's agent builder (the value keeps the old name)
 	// - mcp: a first-party MCP client
 	// - cli: the Skyvern CLI
 	// - api: any other API or SDK caller
@@ -9412,7 +9412,7 @@ type Workflow_ProxyLocation struct {
 // WorkflowBuildSource Which surface wrote a workflow version.
 //
 // - ui: the Skyvern app
-// - copilot: the workflow copilot
+// - copilot: Ember, Skyvern's agent builder (the value keeps the old name)
 // - mcp: a first-party MCP client
 // - cli: the Skyvern CLI
 // - api: any other API or SDK caller

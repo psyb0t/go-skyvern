@@ -2,6 +2,10 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.8.4, 2026-11-19
+
+- The doc comment for `BuildSource` on `Workflow` and for the `WorkflowBuildSource` type now says the `copilot` value is Ember, Skyvern's agent builder, and that the value keeps the old name. It said the workflow copilot. No fields, types or signatures changed.
+
 ## v0.8.3, 2026-11-18
 
 - Added the `integration_action` workflow block. `IntegrationActionBlock` and `IntegrationActionBlockYAML` have `ActionId`, `IntegrationId`, `ConnectionId`, `Inputs`, `Label`, `Model` and the usual block fields such as `ContinueOnFailure`, `NextBlockLabel` and `OutputParameter`. `ConnectionId` is the connected account the action runs as. `IntegrationActionBlock_Parameters_Item` holds the parameter union.
