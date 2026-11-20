@@ -10525,7 +10525,7 @@ type CreateWorkflowV1AgentsPostParams struct {
 	// XApiKey Skyvern API key for authentication. API key can be found at https://app.skyvern.com/settings.
 	XApiKey *string `json:"x-api-key,omitempty"`
 
-	// IdempotencyKey Idempotency-Key must contain 1 to 255 visible ASCII bytes.
+	// IdempotencyKey Makes the create safe to retry: a repeat request with the same key returns the agent the first request created instead of creating another. Must contain 1 to 255 visible ASCII bytes. When this header is sent, the returned `workflow_permanent_id` is derived from the key: `wpid_` followed by 64 hexadecimal characters, instead of the usual `wpid_` followed by digits. The ID is permanent and works like any other agent ID. Omit the header to get the usual format.
 	IdempotencyKey *string `json:"Idempotency-Key,omitempty"`
 }
 
