@@ -9381,7 +9381,7 @@ type Workflow struct {
 	// OriginalCreatedAt When the agent's first version was created. Populated by the list endpoint only.
 	OriginalCreatedAt *time.Time `json:"original_created_at,omitempty"`
 
-	// OriginalCreatedBy Who created the agent's first version. Populated by the list endpoint only.
+	// OriginalCreatedBy Who created the agent's first version. Populated by the list and detail endpoints only.
 	OriginalCreatedBy     *string                 `json:"original_created_by,omitempty"`
 	PersistBrowserSession *bool                   `json:"persist_browser_session,omitempty"`
 	PinSavedSessionIp     *bool                   `json:"pin_saved_session_ip,omitempty"`

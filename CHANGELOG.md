@@ -2,6 +2,10 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.8.6, 2026-11-21
+
+- The doc comment for `OriginalCreatedBy` on `Workflow` now says the field is populated by the list and detail endpoints. It said the list endpoint only. No fields, types or signatures changed.
+
 ## v0.8.5, 2026-11-20
 
 - The doc comment for `IdempotencyKey` on `CreateWorkflowV1AgentsPostParams` now says a repeat request with the same key returns the agent the first request created. It also says that when the header is sent, `workflow_permanent_id` is `wpid_` followed by 64 hexadecimal characters instead of digits. No fields, types or signatures changed.
