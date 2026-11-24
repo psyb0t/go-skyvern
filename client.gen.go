@@ -2151,13 +2151,16 @@ func (e PowerBIQueryBlockBlockType) Valid() bool {
 
 // Defines values for PowerBIQueryBlockCredentialSource.
 const (
-	PowerBIQueryBlockCredentialSourceNango PowerBIQueryBlockCredentialSource = "nango"
+	PowerBIQueryBlockCredentialSourceNango  PowerBIQueryBlockCredentialSource = "nango"
+	PowerBIQueryBlockCredentialSourceNative PowerBIQueryBlockCredentialSource = "native"
 )
 
 // Valid indicates whether the value is a known member of the PowerBIQueryBlockCredentialSource enum.
 func (e PowerBIQueryBlockCredentialSource) Valid() bool {
 	switch e {
 	case PowerBIQueryBlockCredentialSourceNango:
+		return true
+	case PowerBIQueryBlockCredentialSourceNative:
 		return true
 	default:
 		return false
@@ -2181,13 +2184,16 @@ func (e PowerBIQueryBlockYAMLBlockType) Valid() bool {
 
 // Defines values for PowerBIQueryBlockYAMLCredentialSource.
 const (
-	PowerBIQueryBlockYAMLCredentialSourceNango PowerBIQueryBlockYAMLCredentialSource = "nango"
+	PowerBIQueryBlockYAMLCredentialSourceNango  PowerBIQueryBlockYAMLCredentialSource = "nango"
+	PowerBIQueryBlockYAMLCredentialSourceNative PowerBIQueryBlockYAMLCredentialSource = "native"
 )
 
 // Valid indicates whether the value is a known member of the PowerBIQueryBlockYAMLCredentialSource enum.
 func (e PowerBIQueryBlockYAMLCredentialSource) Valid() bool {
 	switch e {
 	case PowerBIQueryBlockYAMLCredentialSourceNango:
+		return true
+	case PowerBIQueryBlockYAMLCredentialSourceNative:
 		return true
 	default:
 		return false
@@ -4102,6 +4108,11 @@ type BitwardenSensitiveInformationParameterYAMLParameterType string
 // BlockType defines model for BlockType.
 type BlockType string
 
+// BodyRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost defines model for Body_retry_workflow_run_v1_workflows_runs__workflow_run_id__retry_post.
+type BodyRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost struct {
+	OtpRequestId *string `json:"otp_request_id,omitempty"`
+}
+
 // BodyUploadFileV1UploadFilePost defines model for Body_upload_file_v1_upload_file_post.
 type BodyUploadFileV1UploadFilePost struct {
 	File string `json:"file"`
@@ -5784,6 +5795,7 @@ type FileUploadBlock struct {
 	EndpointUrl                *string `json:"endpoint_url,omitempty"`
 	GoogleCredentialId         *string `json:"google_credential_id,omitempty"`
 	GoogleDriveFolderId        *string `json:"google_drive_folder_id,omitempty"`
+	GoogleDriveSaveAsSheet     *bool   `json:"google_drive_save_as_sheet,omitempty"`
 	IgnoreWorkflowSystemPrompt *bool   `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier for a block; unique within a workflow.
@@ -5827,6 +5839,7 @@ type FileUploadBlockYAML struct {
 	EndpointUrl                *string                       `json:"endpoint_url,omitempty"`
 	GoogleCredentialId         *string                       `json:"google_credential_id,omitempty"`
 	GoogleDriveFolderId        *string                       `json:"google_drive_folder_id,omitempty"`
+	GoogleDriveSaveAsSheet     *bool                         `json:"google_drive_save_as_sheet,omitempty"`
 	IgnoreWorkflowSystemPrompt *bool                         `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
@@ -7642,6 +7655,10 @@ type SplitPdfBlockYAMLBlockType string
 
 // TOTPCode defines model for TOTPCode.
 type TOTPCode struct {
+	ClaimedAt              *time.Time `json:"claimed_at,omitempty"`
+	ClaimedByTaskId        *string    `json:"claimed_by_task_id,omitempty"`
+	ClaimedByWorkflowRunId *string    `json:"claimed_by_workflow_run_id,omitempty"`
+
 	// Code The TOTP code extracted from the content.
 	Code string `json:"code"`
 
@@ -7662,8 +7679,14 @@ type TOTPCode struct {
 	ModifiedAt time.Time `json:"modified_at"`
 
 	// OrganizationId The ID of the organization that the TOTP code is for.
-	OrganizationId string   `json:"organization_id"`
-	OtpType        *OTPType `json:"otp_type,omitempty"`
+	OrganizationId string `json:"organization_id"`
+
+	// OtpRequestId Explicit request marker for strict run-bound delivery. Omit this field to retain legacy behavior.
+	//
+	// Example: otpr_example
+	OtpRequestId *string    `json:"otp_request_id,omitempty"`
+	OtpType      *OTPType   `json:"otp_type,omitempty"`
+	RejectedAt   *time.Time `json:"rejected_at,omitempty"`
 
 	// Source An optional field. The source of the TOTP code. e.g. email, sms, etc.
 	//
@@ -7706,6 +7729,11 @@ type TOTPCodeCreate struct {
 	//
 	// Example: 2025-01-01T00:00:00Z
 	ExpiredAt *time.Time `json:"expired_at,omitempty"`
+
+	// OtpRequestId Explicit request marker for strict run-bound delivery. Omit this field to retain legacy behavior.
+	//
+	// Example: otpr_example
+	OtpRequestId *string `json:"otp_request_id,omitempty"`
 
 	// Source An optional field. The source of the TOTP code. e.g. email, sms, etc.
 	//
@@ -8107,6 +8135,11 @@ type TaskRunRequestInput struct {
 	// Optional model configuration.
 	Model *map[string]interface{} `json:"model,omitempty"`
 
+	// OtpRequestId Explicit request marker for strict run-bound OTP delivery. This field is accepted only on the otp-bound run endpoint; omit it to retain legacy behavior.
+	//
+	// Example: otpr_example
+	OtpRequestId *string `json:"otp_request_id,omitempty"`
+
 	// Prompt
 	// The goal or task description for Skyvern to accomplish
 	//
@@ -8313,6 +8346,11 @@ type TaskRunRequestOutput struct {
 	// Model
 	// Optional model configuration.
 	Model *map[string]interface{} `json:"model,omitempty"`
+
+	// OtpRequestId Explicit request marker for strict run-bound OTP delivery. This field is accepted only on the otp-bound run endpoint; omit it to retain legacy behavior.
+	//
+	// Example: otpr_example
+	OtpRequestId *string `json:"otp_request_id,omitempty"`
 
 	// Prompt
 	// The goal or task description for Skyvern to accomplish
@@ -9442,7 +9480,7 @@ type WorkflowCreateYAMLRequest struct {
 	GenerateScriptOnTerminal *bool              `json:"generate_script_on_terminal,omitempty"`
 	IsSavedTask              *bool              `json:"is_saved_task,omitempty"`
 
-	// MaskSecrets Mask secret values across this workflow's runs: hide them while they are typed (screenshots, recordings, live view) and redact them from stored artifacts, network logs, and LLM-bound text.
+	// MaskSecrets Mask secret values across this workflow's runs. A new workflow defaults to true; on PUT updates, omission keeps the stored value. With this off, stored text artifacts (page HTML, element trees, LLM prompts and responses, logs and network logs) are still scrubbed of known secret values of 8 or more characters. With it on, shorter secret values are scrubbed too, secrets are hidden while they are typed (screenshots, recordings, live view), and they are redacted from LLM-bound text and failure reasons.
 	MaskSecrets           *bool                   `json:"mask_secrets,omitempty"`
 	MaxElapsedTimeMinutes *int                    `json:"max_elapsed_time_minutes,omitempty"`
 	MaxScreenshotScrolls  *int                    `json:"max_screenshot_scrolls,omitempty"`
@@ -9915,6 +9953,11 @@ type WorkflowRunRequestInput struct {
 	// MaxScreenshotScrolls The maximum number of scrolls for the post action screenshot. When it's None or 0, it takes the current viewpoint screenshot.
 	MaxScreenshotScrolls *int `json:"max_screenshot_scrolls,omitempty"`
 
+	// OtpRequestId Explicit request marker for strict run-bound OTP delivery. This field is accepted only on the otp-bound run endpoint; omit it to retain legacy behavior.
+	//
+	// Example: otpr_example
+	OtpRequestId *string `json:"otp_request_id,omitempty"`
+
 	// Parameters Parameters to pass to the workflow
 	Parameters *map[string]interface{} `json:"parameters,omitempty"`
 
@@ -10072,6 +10115,11 @@ type WorkflowRunRequestOutput struct {
 
 	// MaxScreenshotScrolls The maximum number of scrolls for the post action screenshot. When it's None or 0, it takes the current viewpoint screenshot.
 	MaxScreenshotScrolls *int `json:"max_screenshot_scrolls,omitempty"`
+
+	// OtpRequestId Explicit request marker for strict run-bound OTP delivery. This field is accepted only on the otp-bound run endpoint; omit it to retain legacy behavior.
+	//
+	// Example: otpr_example
+	OtpRequestId *string `json:"otp_request_id,omitempty"`
 
 	// Parameters Parameters to pass to the workflow
 	Parameters *map[string]interface{} `json:"parameters,omitempty"`
@@ -11466,6 +11514,9 @@ type BatchGetWorkflowTagsPostV1WorkflowTagsPostParams struct {
 
 // CreateWorkflowV1AgentsPostJSONRequestBody defines body for CreateWorkflowV1AgentsPost for application/json ContentType.
 type CreateWorkflowV1AgentsPostJSONRequestBody = WorkflowRequest
+
+// RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostJSONRequestBody defines body for RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost for application/json ContentType.
+type RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostJSONRequestBody = BodyRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost
 
 // UpdateWorkflowV1AgentsWorkflowIdPostJSONRequestBody defines body for UpdateWorkflowV1AgentsWorkflowIdPost for application/json ContentType.
 type UpdateWorkflowV1AgentsWorkflowIdPostJSONRequestBody = WorkflowRequest
@@ -37177,12 +37228,23 @@ type ClientInterface interface {
 	// Corresponds with GET /v1/agents/runs (the `GetWorkflowRunsV1WorkflowsRunsGet` operationId).
 	GetWorkflowRunsV1WorkflowsRunsGet(ctx context.Context, params *GetWorkflowRunsV1WorkflowsRunsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBody Retry a run
+	//
+	// Retry a workflow run using the original run parameters.
+	//
+	// Takes any type of body and a specified content type.
+	//
+	// Corresponds with POST /v1/agents/runs/{workflow_run_id}/retry (the `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost` operationId).
+	RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBody(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost Retry a run
 	//
 	// Retry a workflow run using the original run parameters.
 	//
+	// Takes a body of the `application/json` content type.
+	//
 	// Corresponds with POST /v1/agents/runs/{workflow_run_id}/retry (the `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost` operationId).
-	RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, body RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateWorkflowV1AgentsWorkflowIdPostWithBody Update an agent
 	//
@@ -38471,13 +38533,34 @@ func (c *Client) GetWorkflowRunsV1WorkflowsRunsGet(ctx context.Context, params *
 	return c.Client.Do(req)
 }
 
+// RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBody Retry a run
+//
+// Retry a workflow run using the original run parameters.
+//
+// Takes any type of body and a specified content type.
+//
+// Corresponds with POST /v1/agents/runs/{workflow_run_id}/retry (the `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost` operationId).
+func (c *Client) RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBody(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequestWithBody(c.Server, workflowRunId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost Retry a run
 //
 // Retry a workflow run using the original run parameters.
 //
+// Takes a body of the `application/json` content type.
+//
 // Corresponds with POST /v1/agents/runs/{workflow_run_id}/retry (the `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost` operationId).
-func (c *Client) RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequest(c.Server, workflowRunId, params)
+func (c *Client) RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, body RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequest(c.Server, workflowRunId, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -41491,8 +41574,19 @@ func NewGetWorkflowRunsV1WorkflowsRunsGetRequest(server string, params *GetWorkf
 	return req, nil
 }
 
-// NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequest constructs an http.Request for the RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost method
-func NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequest(server string, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams) (*http.Request, error) {
+// NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequest calls the generic RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost builder with application/json body
+func NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequest(server string, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, body RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequestWithBody(server, workflowRunId, params, "application/json", bodyReader)
+}
+
+// NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequestWithBody constructs an http.Request for the RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost method, with any body, and a specified content type
+func NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequestWithBody(server string, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -41517,10 +41611,12 @@ func NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequest(server stri
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, queryURL.String(), nil)
+	req, err := http.NewRequest(http.MethodPost, queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	if params != nil {
 
@@ -48042,14 +48138,23 @@ type ClientWithResponsesInterface interface {
 	// Corresponds with GET /v1/agents/runs (the `GetWorkflowRunsV1WorkflowsRunsGet` operationId).
 	GetWorkflowRunsV1WorkflowsRunsGetWithResponse(ctx context.Context, params *GetWorkflowRunsV1WorkflowsRunsGetParams, reqEditors ...RequestEditorFn) (*GetWorkflowRunsV1WorkflowsRunsGetResponse, error)
 
+	// RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBodyWithResponse Retry a run
+	//
+	// Retry a workflow run using the original run parameters.
+	//
+	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with POST /v1/agents/runs/{workflow_run_id}/retry (the `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost` operationId).
+	RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBodyWithResponse(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostResponse, error)
+
 	// RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithResponse Retry a run
 	//
 	// Retry a workflow run using the original run parameters.
 	//
-	// Returns a wrapper object for the known response body format(s).
+	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /v1/agents/runs/{workflow_run_id}/retry (the `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost` operationId).
-	RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithResponse(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, reqEditors ...RequestEditorFn) (*RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostResponse, error)
+	RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithResponse(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, body RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostJSONRequestBody, reqEditors ...RequestEditorFn) (*RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostResponse, error)
 
 	// UpdateWorkflowV1AgentsWorkflowIdPostWithBodyWithResponse Update an agent
 	//
@@ -54433,15 +54538,30 @@ func (c *ClientWithResponses) GetWorkflowRunsV1WorkflowsRunsGetWithResponse(ctx 
 	return ParseGetWorkflowRunsV1WorkflowsRunsGetResponse(rsp)
 }
 
+// RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBodyWithResponse Retry a run
+//
+// Retry a workflow run using the original run parameters.
+//
+// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
+//
+// Corresponds with POST /v1/agents/runs/{workflow_run_id}/retry (the `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost` operationId).
+func (c *ClientWithResponses) RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBodyWithResponse(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostResponse, error) {
+	rsp, err := c.RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBody(ctx, workflowRunId, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostResponse(rsp)
+}
+
 // RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithResponse Retry a run
 //
 // Retry a workflow run using the original run parameters.
 //
-// Returns a wrapper object for the known response body format(s).
+// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /v1/agents/runs/{workflow_run_id}/retry (the `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost` operationId).
-func (c *ClientWithResponses) RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithResponse(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, reqEditors ...RequestEditorFn) (*RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostResponse, error) {
-	rsp, err := c.RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost(ctx, workflowRunId, params, reqEditors...)
+func (c *ClientWithResponses) RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithResponse(ctx context.Context, workflowRunId string, params *RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostParams, body RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostJSONRequestBody, reqEditors ...RequestEditorFn) (*RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostResponse, error) {
+	rsp, err := c.RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost(ctx, workflowRunId, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

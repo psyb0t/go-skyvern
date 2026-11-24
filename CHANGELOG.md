@@ -2,6 +2,16 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.9.0, 2026-11-24
+
+- Breaking: the retry run methods now take a JSON request body. `Client.RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost`, `ClientWithResponses.RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithResponse` and `NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequest` have a new `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostJSONRequestBody` parameter after `params`. The matching `ClientInterface` and `ClientWithResponsesInterface` methods changed the same way.
+- Added `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBody`, `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithBodyWithResponse` and `NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequestWithBody` for sending a raw body with a content type.
+- Added `BodyRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost`, with an optional `OtpRequestId` field sent as `otp_request_id`.
+- Added an optional `OtpRequestId` field to `TOTPCodeCreate`, `TOTPCode`, `TaskRunRequestInput`, `TaskRunRequestOutput`, `WorkflowRunRequestInput` and `WorkflowRunRequestOutput`. It marks a request for strict run-bound OTP delivery. Omitting it keeps the old behavior.
+- `TOTPCode` gained optional `ClaimedAt`, `ClaimedByTaskId`, `ClaimedByWorkflowRunId` and `RejectedAt` fields.
+- `FileUploadBlock` and `FileUploadBlockYAML` gained an optional `GoogleDriveSaveAsSheet` field, sent as `google_drive_save_as_sheet`.
+- Added `PowerBIQueryBlockCredentialSourceNative` and `PowerBIQueryBlockYAMLCredentialSourceNative`, the `native` credential source. Their `Valid` methods accept it.
+
 ## v0.8.6, 2026-11-21
 
 - The doc comment for `OriginalCreatedBy` on `Workflow` now says the field is populated by the list and detail endpoints. It said the list endpoint only. No fields, types or signatures changed.
