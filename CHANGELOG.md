@@ -2,6 +2,14 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.10.0, 2026-11-25
+
+- Breaking: the apply and extract recipe methods take a new `params` argument after the context. This covers `Client.ApplyToJobV1RecipesJobsApplyPost`, `Client.ExtractJobApplicationV1RecipesJobsExtractPost`, their `WithBody` variants, the `WithResponse` and `WithBodyWithResponse` methods on `ClientWithResponses`, and `NewApplyToJobV1RecipesJobsApplyPostRequest`, `NewExtractJobApplicationV1RecipesJobsExtractPostRequest` and their `WithBody` variants. The `ClientInterface` and `ClientWithResponsesInterface` methods changed the same way. Pass nil to keep the old behavior.
+- Added `ApplyToJobV1RecipesJobsApplyPostParams` and `ExtractJobApplicationV1RecipesJobsExtractPostParams`, each with an optional `XMaxStepsOverride` field sent as the `x-max-steps-override` header. It caps the steps each task in the run may take and overrides the organization limit.
+- Breaking: `OtherInformation` on `ApplyToJobV1RecipesJobsApplyPostJSONBody` and `ApplyToJobV1RecipesJobsApplyPostJSONRequestBody` changed from `interface{}` to `*ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation`. The new union holds `ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0` (an object) or `ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1` (an array). The API rejects plain text.
+- Added an optional `CredentialId` field, sent as `credential_id`, to `ApplyToJobV1RecipesJobsApplyPostJSONBody`, `ApplyToJobV1RecipesJobsApplyPostJSONRequestBody`, `ApplyToJobV1RecipesJobsApplyPostMultipartBody` and `ApplyToJobV1RecipesJobsApplyPostMultipartRequestBody`. It names a saved password credential to use in place of username, password and `PersistCredentials`. The `job_url` must be on a website saved on the credential.
+- The doc comment for `CreateSheetIfMissing` on `GoogleSheetsWriteBlockYAML` now says it adds the tab named by `sheet_name` and that the spreadsheet must already exist. The field type is unchanged.
+
 ## v0.9.0, 2026-11-24
 
 - Breaking: the retry run methods now take a JSON request body. `Client.RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPost`, `ClientWithResponses.RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostWithResponse` and `NewRetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostRequest` have a new `RetryWorkflowRunV1WorkflowsRunsWorkflowRunIdRetryPostJSONRequestBody` parameter after `params`. The matching `ClientInterface` and `ClientWithResponsesInterface` methods changed the same way.

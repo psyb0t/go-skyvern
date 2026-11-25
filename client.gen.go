@@ -6104,12 +6104,14 @@ type GoogleSheetsWriteBlockWriteMode string
 
 // GoogleSheetsWriteBlockYAML defines model for GoogleSheetsWriteBlockYAML.
 type GoogleSheetsWriteBlockYAML struct {
-	BlockType                  *GoogleSheetsWriteBlockYAMLBlockType `json:"block_type,omitempty"`
-	ColumnMapping              *map[string]string                   `json:"column_mapping,omitempty"`
-	ContinueOnFailure          *bool                                `json:"continue_on_failure,omitempty"`
-	CreateSheetIfMissing       *bool                                `json:"create_sheet_if_missing,omitempty"`
-	CredentialId               *string                              `json:"credential_id,omitempty"`
-	IgnoreWorkflowSystemPrompt *bool                                `json:"ignore_workflow_system_prompt,omitempty"`
+	BlockType         *GoogleSheetsWriteBlockYAMLBlockType `json:"block_type,omitempty"`
+	ColumnMapping     *map[string]string                   `json:"column_mapping,omitempty"`
+	ContinueOnFailure *bool                                `json:"continue_on_failure,omitempty"`
+
+	// CreateSheetIfMissing Add the tab named by sheet_name to the spreadsheet when it has no tab with that name. The spreadsheet itself must already exist.
+	CreateSheetIfMissing       *bool   `json:"create_sheet_if_missing,omitempty"`
+	CredentialId               *string `json:"credential_id,omitempty"`
+	IgnoreWorkflowSystemPrompt *bool   `json:"ignore_workflow_system_prompt,omitempty"`
 
 	// Label Author-facing identifier; must be unique per workflow.
 	Label string                  `json:"label"`
@@ -11059,14 +11061,19 @@ type EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostParams str
 // ApplyToJobV1RecipesJobsApplyPostJSONBody defines parameters for ApplyToJobV1RecipesJobsApplyPost.
 type ApplyToJobV1RecipesJobsApplyPostJSONBody struct {
 	N2faIdentifier *string `json:"2fa_identifier,omitempty"`
-	CustomPrompt   string  `json:"custom_prompt"`
+
+	// CredentialId ID of a password credential saved in your organization, such as one an earlier Apply call saved with persist_credentials. Use it in place of username, password, and persist_credentials. The job_url must be on a website saved on the credential (its tested_url or one of its extra_site_urls). Before the run types the credential's password, or a one-time code made from it, it checks that the receiving page is on one of those websites. Change a credential's saved websites in the Skyvern app's credential editor.
+	CredentialId *string `json:"credential_id,omitempty"`
+	CustomPrompt string  `json:"custom_prompt"`
 
 	// ErrorCodeMapping Error codes and descriptions. Omit for the recipe default; null or {} disables mapping. A supplied mapping replaces the default independently of terminate_criterion.
-	ErrorCodeMapping   *map[string]string `json:"error_code_mapping,omitempty"`
-	JobUrl             string             `json:"job_url"`
-	OtherInformation   interface{}        `json:"other_information,omitempty"`
-	Password           *string            `json:"password,omitempty"`
-	PersistCredentials *bool              `json:"persist_credentials,omitempty"`
+	ErrorCodeMapping *map[string]string `json:"error_code_mapping,omitempty"`
+	JobUrl           string             `json:"job_url"`
+
+	// OtherInformation Extra applicant details as a JSON object or array, for example {"location": "New York, NY", "salary_expectation": "120000"}. Plain text is rejected.
+	OtherInformation   *ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation `json:"other_information,omitempty"`
+	Password           *string                                                    `json:"password,omitempty"`
+	PersistCredentials *bool                                                      `json:"persist_credentials,omitempty"`
 
 	// ProxyLocation Geographic Proxy location to route the browser traffic through. This is only available in Skyvern Cloud.
 	//
@@ -11117,11 +11124,16 @@ type ApplyToJobV1RecipesJobsApplyPostJSONBody struct {
 // ApplyToJobV1RecipesJobsApplyPostMultipartBody defines parameters for ApplyToJobV1RecipesJobsApplyPost.
 type ApplyToJobV1RecipesJobsApplyPostMultipartBody struct {
 	N2faIdentifier *string `json:"2fa_identifier,omitempty"`
-	CustomPrompt   string  `json:"custom_prompt"`
+
+	// CredentialId ID of a password credential saved in your organization, such as one an earlier Apply call saved with persist_credentials. Use it in place of username, password, and persist_credentials. The job_url must be on a website saved on the credential (its tested_url or one of its extra_site_urls). Before the run types the credential's password, or a one-time code made from it, it checks that the receiving page is on one of those websites. Change a credential's saved websites in the Skyvern app's credential editor.
+	CredentialId *string `json:"credential_id,omitempty"`
+	CustomPrompt string  `json:"custom_prompt"`
 
 	// ErrorCodeMapping JSON text containing an object of error codes and descriptions. Omit for the recipe default; JSON null or {} disables mapping. A supplied mapping replaces the default independently of terminate_criterion.
-	ErrorCodeMapping   *string `json:"error_code_mapping,omitempty"`
-	JobUrl             string  `json:"job_url"`
+	ErrorCodeMapping *string `json:"error_code_mapping,omitempty"`
+	JobUrl           string  `json:"job_url"`
+
+	// OtherInformation JSON text containing an object or array of extra applicant details, for example {"location": "New York, NY"}. Plain text is rejected.
 	OtherInformation   *string `json:"other_information,omitempty"`
 	Password           *string `json:"password,omitempty"`
 	PersistCredentials *string `json:"persist_credentials,omitempty"`
@@ -11136,6 +11148,23 @@ type ApplyToJobV1RecipesJobsApplyPostMultipartBody struct {
 
 	// WebhookUrl After a run is finished, send an update to this URL. Refer to https://www.skyvern.com/docs/running-tasks/webhooks-faq for more details.
 	WebhookUrl *string `json:"webhook_url,omitempty"`
+}
+
+// ApplyToJobV1RecipesJobsApplyPostParams defines parameters for ApplyToJobV1RecipesJobsApplyPost.
+type ApplyToJobV1RecipesJobsApplyPostParams struct {
+	// XMaxStepsOverride Maximum steps each task in the run may take. Overrides the organization limit.
+	XMaxStepsOverride *int `json:"x-max-steps-override,omitempty"`
+}
+
+// ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0 defines parameters for ApplyToJobV1RecipesJobsApplyPost.
+type ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0 map[string]interface{}
+
+// ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1 defines parameters for ApplyToJobV1RecipesJobsApplyPost.
+type ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1 = []interface{}
+
+// ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation defines parameters for ApplyToJobV1RecipesJobsApplyPost.
+type ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation struct {
+	union json.RawMessage
 }
 
 // ApplyToJobV1RecipesJobsApplyPostJSONBodyProxyLocation2 defines parameters for ApplyToJobV1RecipesJobsApplyPost.
@@ -11189,6 +11218,12 @@ type ExtractJobApplicationV1RecipesJobsExtractPostJSONBody struct {
 	//
 	// Example: https://my-site.com/webhook
 	WebhookUrl *string `json:"webhook_url,omitempty"`
+}
+
+// ExtractJobApplicationV1RecipesJobsExtractPostParams defines parameters for ExtractJobApplicationV1RecipesJobsExtractPost.
+type ExtractJobApplicationV1RecipesJobsExtractPostParams struct {
+	// XMaxStepsOverride Maximum steps each task in the run may take. Overrides the organization limit.
+	XMaxStepsOverride *int `json:"x-max-steps-override,omitempty"`
 }
 
 // ExtractJobApplicationV1RecipesJobsExtractPostJSONBodyProxyLocation2 defines parameters for ExtractJobApplicationV1RecipesJobsExtractPost.
@@ -36797,6 +36832,68 @@ func (t *WorkflowTriggerBlock_Parameters_Item) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+// AsApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0 returns the union data inside the ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation as a ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0
+func (t ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation) AsApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0() (ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0, error) {
+	var body ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0 overwrites any union data inside the ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation as the provided ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0
+func (t *ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation) FromApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0(v ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0 performs a merge with any union data inside the ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation, using the provided ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0
+func (t *ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation) MergeApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0(v ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation0) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1 returns the union data inside the ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation as a ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1
+func (t ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation) AsApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1() (ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1, error) {
+	var body ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1 overwrites any union data inside the ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation as the provided ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1
+func (t *ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation) FromApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1(v ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1 performs a merge with any union data inside the ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation, using the provided ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1
+func (t *ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation) MergeApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1(v ApplyToJobV1RecipesJobsApplyPostJSONBodyOtherInformation1) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ApplyToJobV1RecipesJobsApplyPostJSONBody_OtherInformation) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
 // AsProxyLocation returns the union data inside the ApplyToJobV1RecipesJobsApplyPostJSONBody_ProxyLocation as a ProxyLocation
 func (t ApplyToJobV1RecipesJobsApplyPostJSONBody_ProxyLocation) AsProxyLocation() (ProxyLocation, error) {
 	var body ProxyLocation
@@ -37893,7 +37990,7 @@ type ClientInterface interface {
 	// Takes any type of body and a specified content type.
 	//
 	// Corresponds with POST /v1/recipes/jobs/apply (the `ApplyToJobV1RecipesJobsApplyPost` operationId).
-	ApplyToJobV1RecipesJobsApplyPostWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ApplyToJobV1RecipesJobsApplyPostWithBody(ctx context.Context, params *ApplyToJobV1RecipesJobsApplyPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ApplyToJobV1RecipesJobsApplyPost Apply to a job
 	//
@@ -37902,7 +37999,7 @@ type ClientInterface interface {
 	// Takes a body of the `application/json` content type.
 	//
 	// Corresponds with POST /v1/recipes/jobs/apply (the `ApplyToJobV1RecipesJobsApplyPost` operationId).
-	ApplyToJobV1RecipesJobsApplyPost(ctx context.Context, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ApplyToJobV1RecipesJobsApplyPost(ctx context.Context, params *ApplyToJobV1RecipesJobsApplyPostParams, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ExtractJobApplicationV1RecipesJobsExtractPostWithBody Extract a job application posting
 	//
@@ -37911,7 +38008,7 @@ type ClientInterface interface {
 	// Takes any type of body and a specified content type.
 	//
 	// Corresponds with POST /v1/recipes/jobs/extract (the `ExtractJobApplicationV1RecipesJobsExtractPost` operationId).
-	ExtractJobApplicationV1RecipesJobsExtractPostWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ExtractJobApplicationV1RecipesJobsExtractPostWithBody(ctx context.Context, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ExtractJobApplicationV1RecipesJobsExtractPost Extract a job application posting
 	//
@@ -37920,7 +38017,7 @@ type ClientInterface interface {
 	// Takes a body of the `application/json` content type.
 	//
 	// Corresponds with POST /v1/recipes/jobs/extract (the `ExtractJobApplicationV1RecipesJobsExtractPost` operationId).
-	ExtractJobApplicationV1RecipesJobsExtractPost(ctx context.Context, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ExtractJobApplicationV1RecipesJobsExtractPost(ctx context.Context, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListJobRecipeRunsV1RecipesJobsRunsGet List job recipe runs
 	//
@@ -39998,8 +40095,8 @@ func (c *Client) EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePo
 // Takes any type of body and a specified content type.
 //
 // Corresponds with POST /v1/recipes/jobs/apply (the `ApplyToJobV1RecipesJobsApplyPost` operationId).
-func (c *Client) ApplyToJobV1RecipesJobsApplyPostWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewApplyToJobV1RecipesJobsApplyPostRequestWithBody(c.Server, contentType, body)
+func (c *Client) ApplyToJobV1RecipesJobsApplyPostWithBody(ctx context.Context, params *ApplyToJobV1RecipesJobsApplyPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewApplyToJobV1RecipesJobsApplyPostRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -40017,8 +40114,8 @@ func (c *Client) ApplyToJobV1RecipesJobsApplyPostWithBody(ctx context.Context, c
 // Takes a body of the `application/json` content type.
 //
 // Corresponds with POST /v1/recipes/jobs/apply (the `ApplyToJobV1RecipesJobsApplyPost` operationId).
-func (c *Client) ApplyToJobV1RecipesJobsApplyPost(ctx context.Context, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewApplyToJobV1RecipesJobsApplyPostRequest(c.Server, body)
+func (c *Client) ApplyToJobV1RecipesJobsApplyPost(ctx context.Context, params *ApplyToJobV1RecipesJobsApplyPostParams, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewApplyToJobV1RecipesJobsApplyPostRequest(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -40036,8 +40133,8 @@ func (c *Client) ApplyToJobV1RecipesJobsApplyPost(ctx context.Context, body Appl
 // Takes any type of body and a specified content type.
 //
 // Corresponds with POST /v1/recipes/jobs/extract (the `ExtractJobApplicationV1RecipesJobsExtractPost` operationId).
-func (c *Client) ExtractJobApplicationV1RecipesJobsExtractPostWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewExtractJobApplicationV1RecipesJobsExtractPostRequestWithBody(c.Server, contentType, body)
+func (c *Client) ExtractJobApplicationV1RecipesJobsExtractPostWithBody(ctx context.Context, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewExtractJobApplicationV1RecipesJobsExtractPostRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -40055,8 +40152,8 @@ func (c *Client) ExtractJobApplicationV1RecipesJobsExtractPostWithBody(ctx conte
 // Takes a body of the `application/json` content type.
 //
 // Corresponds with POST /v1/recipes/jobs/extract (the `ExtractJobApplicationV1RecipesJobsExtractPost` operationId).
-func (c *Client) ExtractJobApplicationV1RecipesJobsExtractPost(ctx context.Context, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewExtractJobApplicationV1RecipesJobsExtractPostRequest(c.Server, body)
+func (c *Client) ExtractJobApplicationV1RecipesJobsExtractPost(ctx context.Context, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewExtractJobApplicationV1RecipesJobsExtractPostRequest(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -45302,18 +45399,18 @@ func NewEnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNumbersEnablePostRequest
 }
 
 // NewApplyToJobV1RecipesJobsApplyPostRequest calls the generic ApplyToJobV1RecipesJobsApplyPost builder with application/json body
-func NewApplyToJobV1RecipesJobsApplyPostRequest(server string, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody) (*http.Request, error) {
+func NewApplyToJobV1RecipesJobsApplyPostRequest(server string, params *ApplyToJobV1RecipesJobsApplyPostParams, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewApplyToJobV1RecipesJobsApplyPostRequestWithBody(server, "application/json", bodyReader)
+	return NewApplyToJobV1RecipesJobsApplyPostRequestWithBody(server, params, "application/json", bodyReader)
 }
 
 // NewApplyToJobV1RecipesJobsApplyPostRequestWithBody constructs an http.Request for the ApplyToJobV1RecipesJobsApplyPost method, with any body, and a specified content type
-func NewApplyToJobV1RecipesJobsApplyPostRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewApplyToJobV1RecipesJobsApplyPostRequestWithBody(server string, params *ApplyToJobV1RecipesJobsApplyPostParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -45338,22 +45435,37 @@ func NewApplyToJobV1RecipesJobsApplyPostRequestWithBody(server string, contentTy
 
 	req.Header.Add("Content-Type", contentType)
 
+	if params != nil {
+
+		if params.XMaxStepsOverride != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-max-steps-override", *params.XMaxStepsOverride, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "integer", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-max-steps-override", headerParam0)
+		}
+
+	}
+
 	return req, nil
 }
 
 // NewExtractJobApplicationV1RecipesJobsExtractPostRequest calls the generic ExtractJobApplicationV1RecipesJobsExtractPost builder with application/json body
-func NewExtractJobApplicationV1RecipesJobsExtractPostRequest(server string, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody) (*http.Request, error) {
+func NewExtractJobApplicationV1RecipesJobsExtractPostRequest(server string, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewExtractJobApplicationV1RecipesJobsExtractPostRequestWithBody(server, "application/json", bodyReader)
+	return NewExtractJobApplicationV1RecipesJobsExtractPostRequestWithBody(server, params, "application/json", bodyReader)
 }
 
 // NewExtractJobApplicationV1RecipesJobsExtractPostRequestWithBody constructs an http.Request for the ExtractJobApplicationV1RecipesJobsExtractPost method, with any body, and a specified content type
-func NewExtractJobApplicationV1RecipesJobsExtractPostRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewExtractJobApplicationV1RecipesJobsExtractPostRequestWithBody(server string, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -45377,6 +45489,21 @@ func NewExtractJobApplicationV1RecipesJobsExtractPostRequestWithBody(server stri
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XMaxStepsOverride != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-max-steps-override", *params.XMaxStepsOverride, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "integer", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("x-max-steps-override", headerParam0)
+		}
+
+	}
 
 	return req, nil
 }
@@ -48879,7 +49006,7 @@ type ClientWithResponsesInterface interface {
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /v1/recipes/jobs/apply (the `ApplyToJobV1RecipesJobsApplyPost` operationId).
-	ApplyToJobV1RecipesJobsApplyPostWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApplyToJobV1RecipesJobsApplyPostResponse, error)
+	ApplyToJobV1RecipesJobsApplyPostWithBodyWithResponse(ctx context.Context, params *ApplyToJobV1RecipesJobsApplyPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApplyToJobV1RecipesJobsApplyPostResponse, error)
 
 	// ApplyToJobV1RecipesJobsApplyPostWithResponse Apply to a job
 	//
@@ -48888,7 +49015,7 @@ type ClientWithResponsesInterface interface {
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /v1/recipes/jobs/apply (the `ApplyToJobV1RecipesJobsApplyPost` operationId).
-	ApplyToJobV1RecipesJobsApplyPostWithResponse(ctx context.Context, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ApplyToJobV1RecipesJobsApplyPostResponse, error)
+	ApplyToJobV1RecipesJobsApplyPostWithResponse(ctx context.Context, params *ApplyToJobV1RecipesJobsApplyPostParams, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ApplyToJobV1RecipesJobsApplyPostResponse, error)
 
 	// ExtractJobApplicationV1RecipesJobsExtractPostWithBodyWithResponse Extract a job application posting
 	//
@@ -48897,7 +49024,7 @@ type ClientWithResponsesInterface interface {
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /v1/recipes/jobs/extract (the `ExtractJobApplicationV1RecipesJobsExtractPost` operationId).
-	ExtractJobApplicationV1RecipesJobsExtractPostWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ExtractJobApplicationV1RecipesJobsExtractPostResponse, error)
+	ExtractJobApplicationV1RecipesJobsExtractPostWithBodyWithResponse(ctx context.Context, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ExtractJobApplicationV1RecipesJobsExtractPostResponse, error)
 
 	// ExtractJobApplicationV1RecipesJobsExtractPostWithResponse Extract a job application posting
 	//
@@ -48906,7 +49033,7 @@ type ClientWithResponsesInterface interface {
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /v1/recipes/jobs/extract (the `ExtractJobApplicationV1RecipesJobsExtractPost` operationId).
-	ExtractJobApplicationV1RecipesJobsExtractPostWithResponse(ctx context.Context, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ExtractJobApplicationV1RecipesJobsExtractPostResponse, error)
+	ExtractJobApplicationV1RecipesJobsExtractPostWithResponse(ctx context.Context, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ExtractJobApplicationV1RecipesJobsExtractPostResponse, error)
 
 	// ListJobRecipeRunsV1RecipesJobsRunsGetWithResponse List job recipe runs
 	//
@@ -55759,8 +55886,8 @@ func (c *ClientWithResponses) EnableTwilioPhoneNumberV1IntegrationsTwilioPhoneNu
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /v1/recipes/jobs/apply (the `ApplyToJobV1RecipesJobsApplyPost` operationId).
-func (c *ClientWithResponses) ApplyToJobV1RecipesJobsApplyPostWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApplyToJobV1RecipesJobsApplyPostResponse, error) {
-	rsp, err := c.ApplyToJobV1RecipesJobsApplyPostWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) ApplyToJobV1RecipesJobsApplyPostWithBodyWithResponse(ctx context.Context, params *ApplyToJobV1RecipesJobsApplyPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApplyToJobV1RecipesJobsApplyPostResponse, error) {
+	rsp, err := c.ApplyToJobV1RecipesJobsApplyPostWithBody(ctx, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -55774,8 +55901,8 @@ func (c *ClientWithResponses) ApplyToJobV1RecipesJobsApplyPostWithBodyWithRespon
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /v1/recipes/jobs/apply (the `ApplyToJobV1RecipesJobsApplyPost` operationId).
-func (c *ClientWithResponses) ApplyToJobV1RecipesJobsApplyPostWithResponse(ctx context.Context, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ApplyToJobV1RecipesJobsApplyPostResponse, error) {
-	rsp, err := c.ApplyToJobV1RecipesJobsApplyPost(ctx, body, reqEditors...)
+func (c *ClientWithResponses) ApplyToJobV1RecipesJobsApplyPostWithResponse(ctx context.Context, params *ApplyToJobV1RecipesJobsApplyPostParams, body ApplyToJobV1RecipesJobsApplyPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ApplyToJobV1RecipesJobsApplyPostResponse, error) {
+	rsp, err := c.ApplyToJobV1RecipesJobsApplyPost(ctx, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -55789,8 +55916,8 @@ func (c *ClientWithResponses) ApplyToJobV1RecipesJobsApplyPostWithResponse(ctx c
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /v1/recipes/jobs/extract (the `ExtractJobApplicationV1RecipesJobsExtractPost` operationId).
-func (c *ClientWithResponses) ExtractJobApplicationV1RecipesJobsExtractPostWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ExtractJobApplicationV1RecipesJobsExtractPostResponse, error) {
-	rsp, err := c.ExtractJobApplicationV1RecipesJobsExtractPostWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) ExtractJobApplicationV1RecipesJobsExtractPostWithBodyWithResponse(ctx context.Context, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ExtractJobApplicationV1RecipesJobsExtractPostResponse, error) {
+	rsp, err := c.ExtractJobApplicationV1RecipesJobsExtractPostWithBody(ctx, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -55804,8 +55931,8 @@ func (c *ClientWithResponses) ExtractJobApplicationV1RecipesJobsExtractPostWithB
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /v1/recipes/jobs/extract (the `ExtractJobApplicationV1RecipesJobsExtractPost` operationId).
-func (c *ClientWithResponses) ExtractJobApplicationV1RecipesJobsExtractPostWithResponse(ctx context.Context, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ExtractJobApplicationV1RecipesJobsExtractPostResponse, error) {
-	rsp, err := c.ExtractJobApplicationV1RecipesJobsExtractPost(ctx, body, reqEditors...)
+func (c *ClientWithResponses) ExtractJobApplicationV1RecipesJobsExtractPostWithResponse(ctx context.Context, params *ExtractJobApplicationV1RecipesJobsExtractPostParams, body ExtractJobApplicationV1RecipesJobsExtractPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ExtractJobApplicationV1RecipesJobsExtractPostResponse, error) {
+	rsp, err := c.ExtractJobApplicationV1RecipesJobsExtractPost(ctx, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -58985,6 +59112,9 @@ func ParseApplyToJobV1RecipesJobsApplyPostResponse(rsp *http.Response) (*ApplyTo
 		break // No content-type
 
 	case rsp.StatusCode == 502:
+		break // No content-type
+
+	case rsp.StatusCode == 503:
 		break // No content-type
 
 	}
